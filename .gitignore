@@ -1,0 +1,23 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# macOS
+.DS_Store
+
+# Personal data — excluded to protect privacy
+data/history.json
+data/favorites.json
+
+# Generated PDFs
+PDFs/
+
+# Environment
+.env
+email_report.py
+CLAUDE.md
