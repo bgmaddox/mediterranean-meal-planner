@@ -13,6 +13,14 @@ build/
 # Personal data — excluded to protect privacy
 data/history.json
 data/favorites.json
+data/preferences.json
+data/constraints.json
+data/recipe_library.json
+
+# Google Drive credentials — never commit
+data/client_secrets.json
+data/drive_token.json
+data/drive_folder_id.json
 
 # Generated PDFs
 PDFs/

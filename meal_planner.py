@@ -58,26 +58,25 @@ def _strip_fences(raw: str) -> str:
 # Generate week plan
 # ─────────────────────────────────────────────────────────────────────────────
 
-def generate_week_plan(week_notes: str | None = None, cuisine_notes: str | None = None) -> WeekPlan:
+_DEFAULT_USER_MESSAGE = (
+    "Please generate this week's meal plan. "
+    "Apply all health constraints, household rules, ingredient efficiency rules, "
+    "history context, and seasonal guidance from the system prompt. "
+    "Return only the JSON object — no preamble, no explanation, no markdown."
+)
+
+
+def build_generation_prompts(
+    week_notes: str | None = None,
+    cuisine_notes: str | None = None,
+) -> tuple[str, str]:
     """
-    Generate a full weekly meal plan using Claude.
-
-    Loads all context (history, favorites, constraints, preferences) from
-    data_store, builds the system prompt, calls Claude, and returns a WeekPlan.
-
-    Parameters
-    ----------
-    week_notes : str or None
-        Free-text notes for this week (e.g. 'busy week, keep it fast').
-        Appears in the Generate tab as 'Notes for this week'.
+    Build the system prompt and user message for generate_week_plan without
+    calling the API. Used by the prompt-preview dialog in app.py.
 
     Returns
     -------
-    WeekPlan
-
-    Raises
-    ------
-    MealPlanError on API or parse failure.
+    (system_prompt, user_message)
     """
     prefs = data_store.load_preferences()
     system_prompt = build_system_prompt(
@@ -85,19 +84,24 @@ def generate_week_plan(week_notes: str | None = None, cuisine_notes: str | None 
         favorites=data_store.load_favorites(),
         constraints=data_store.active_constraints_for_prompt(),
         lunch_adult_count=prefs["lunch_adult_count"],
+        children=prefs.get("children"),
         budget=prefs.get("budget"),
         current_date=date.today().isoformat(),
         week_notes=week_notes,
         cuisine_notes=cuisine_notes,
     )
+    return system_prompt, _DEFAULT_USER_MESSAGE
 
-    user_message = (
-        "Please generate this week's meal plan. "
-        "Apply all health constraints, household rules, ingredient efficiency rules, "
-        "history context, and seasonal guidance from the system prompt. "
-        "Return only the JSON object — no preamble, no explanation, no markdown."
-    )
 
+def generate_week_plan_from_prompts(system_prompt: str, user_message: str) -> WeekPlan:
+    """
+    Call Claude with pre-built prompts and return a validated WeekPlan.
+    Used after the prompt-preview dialog allows editing.
+
+    Raises
+    ------
+    MealPlanError on API or parse failure.
+    """
     try:
         response = _client().messages.create(
             model=MODEL,
@@ -125,6 +129,32 @@ def generate_week_plan(week_notes: str | None = None, cuisine_notes: str | None 
     plan: WeekPlan = data["week_plan"]
     _validate_plan(plan)
     return plan
+
+
+def generate_week_plan(week_notes: str | None = None, cuisine_notes: str | None = None) -> WeekPlan:
+    """
+    Generate a full weekly meal plan using Claude.
+
+    Loads all context (history, favorites, constraints, preferences) from
+    data_store, builds the system prompt, calls Claude, and returns a WeekPlan.
+
+    Parameters
+    ----------
+    week_notes : str or None
+        Free-text notes for this week (e.g. 'busy week, keep it fast').
+    cuisine_notes : str or None
+        Cuisine preferences for this week.
+
+    Returns
+    -------
+    WeekPlan
+
+    Raises
+    ------
+    MealPlanError on API or parse failure.
+    """
+    system_prompt, user_message = build_generation_prompts(week_notes, cuisine_notes)
+    return generate_week_plan_from_prompts(system_prompt, user_message)
 
 
 def _validate_plan(plan: WeekPlan) -> None:
@@ -287,7 +317,7 @@ Recent history to avoid (last 6 weeks):
 Special ingredients already purchased this week (reuse if possible to avoid new one-off buys):
 {", ".join(special_already) if special_already else "None"}
 
-Household: {prefs['lunch_adult_count']} adult(s) for lunch; family of 4 for dinner (2 adults + 2 kids).
+Household: {prefs['lunch_adult_count']} adult(s) for lunch; family of {2 + len(prefs.get('children') or [])} for dinner (2 adults + {len(prefs.get('children') or [])} kids).
 
 Return ONLY this JSON structure:
 {json.dumps(schema, indent=2)}"""
@@ -341,8 +371,8 @@ Return ONLY this JSON structure:
 # Kid meal notes
 # ─────────────────────────────────────────────────────────────────────────────
 
-_KID_NOTES_SYSTEM = """You are writing a babysitter/caregiver meal guide for a family with a \
-5-year-old and 2-year-old. You will receive a list of dinner recipes and rewrite each one \
+_KID_NOTES_SYSTEM_TEMPLATE = """You are writing a babysitter/caregiver meal guide for a family with {kids_desc}. \
+You will receive a list of dinner recipes and rewrite each one \
 as a simple, plain-English guide for someone who may not be a confident cook.
 
 Rules:
@@ -403,6 +433,12 @@ def generate_kid_notes(week_plan: WeekPlan) -> str:
     if not dinners:
         raise MealPlanError("No dinners in the plan to generate kid notes for.")
 
+    from system_prompt import _describe_children
+    prefs = data_store.load_preferences()
+    children = prefs.get("children") or [{"name": "", "age": 5}, {"name": "", "age": 2}]
+    kids_desc = _describe_children(children)
+    kid_notes_system = _KID_NOTES_SYSTEM_TEMPLATE.format(kids_desc=kids_desc)
+
     # Build compact dinner summaries to send to Claude
     dinner_summaries = []
     for dinner in dinners:
@@ -429,7 +465,7 @@ def generate_kid_notes(week_plan: WeekPlan) -> str:
         response = _client().messages.create(
             model=MODEL,
             max_tokens=3000,
-            system=_KID_NOTES_SYSTEM,
+            system=kid_notes_system,
             messages=[{"role": "user", "content": user_message}],
         )
     except anthropic.APIError as e:
@@ -437,7 +473,7 @@ def generate_kid_notes(week_plan: WeekPlan) -> str:
 
     header = (
         f"KIDS' MEAL GUIDE — Week of {date.today().isoformat()}\n"
-        f"Family: 2 children (ages 5 and 2)\n"
+        f"Family: {kids_desc}\n"
         f"Food constraints: No mushrooms in any form\n"
         f"{'=' * 47}\n\n"
     )

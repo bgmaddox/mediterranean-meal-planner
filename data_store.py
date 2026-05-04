@@ -22,6 +22,7 @@ from schemas import (
     ConstraintEntry,
     FavoriteMeal,
     MealHistoryEntry,
+    RecipeLibraryEntry,
     UserPreferences,
     WeekPlan,
     DinnerMeal,
@@ -32,6 +33,7 @@ HISTORY_FILE = DATA_DIR / "history.json"
 FAVORITES_FILE = DATA_DIR / "favorites.json"
 CONSTRAINTS_FILE = DATA_DIR / "constraints.json"
 PREFERENCES_FILE = DATA_DIR / "preferences.json"
+LIBRARY_FILE = DATA_DIR / "recipe_library.json"
 
 MAX_HISTORY_WEEKS = 12     # stored
 HISTORY_WEEKS_FOR_PROMPT = 6  # passed to Claude
@@ -59,6 +61,20 @@ def load_history() -> list[MealHistoryEntry]:
 def history_for_prompt() -> list[MealHistoryEntry]:
     """Return only the last HISTORY_WEEKS_FOR_PROMPT entries for Claude's context."""
     return load_history()[:HISTORY_WEEKS_FOR_PROMPT]
+
+
+def update_history_plan(week_plan: WeekPlan, week_start: str) -> None:
+    """
+    Overwrite the saved plan for an existing history entry identified by week_start.
+    If no entry with that week_start exists, does nothing.
+    """
+    history = load_history()
+    for entry in history:
+        if entry["week_start"] == week_start:
+            entry["plan"] = week_plan
+            entry["meal_names"] = [d["name"] for d in week_plan["dinners"]]
+            _write(HISTORY_FILE, history)
+            return
 
 
 def append_to_history(week_plan: WeekPlan, week_start: str | None = None) -> None:
@@ -231,6 +247,7 @@ def update_preferences(**kwargs) -> UserPreferences:
     """
     prefs = load_preferences()
     valid_keys = {
+        "children",
         "lunch_adult_count",
         "budget",
         "recipient_email",
@@ -244,3 +261,62 @@ def update_preferences(**kwargs) -> UserPreferences:
             prefs[key] = value
     save_preferences(prefs)
     return prefs
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Recipe Library
+# ─────────────────────────────────────────────────────────────────────────────
+
+def load_recipe_library() -> list[RecipeLibraryEntry]:
+    if not LIBRARY_FILE.exists():
+        return []
+    return _read(LIBRARY_FILE)
+
+
+def add_recipes_from_plan(week_plan: WeekPlan) -> None:
+    """Auto-save all meals from a generated plan. Deduplicates by name."""
+    library = load_recipe_library()
+    by_name = {r["name"]: r for r in library}
+    today = date.today().isoformat()
+
+    for meal in week_plan.get("dinners", []):
+        if meal["name"] in by_name:
+            by_name[meal["name"]]["last_generated"] = today
+            by_name[meal["name"]]["meal"] = meal
+        else:
+            entry: RecipeLibraryEntry = {
+                "id": str(uuid.uuid4()),
+                "name": meal["name"],
+                "meal_type": "dinner",
+                "last_generated": today,
+                "meal": meal,
+            }
+            library.append(entry)
+            by_name[meal["name"]] = entry
+
+    for meal in week_plan.get("lunches", []):
+        if meal["name"] in by_name:
+            by_name[meal["name"]]["last_generated"] = today
+            by_name[meal["name"]]["meal"] = meal
+        else:
+            entry: RecipeLibraryEntry = {
+                "id": str(uuid.uuid4()),
+                "name": meal["name"],
+                "meal_type": "lunch",
+                "last_generated": today,
+                "meal": meal,
+            }
+            library.append(entry)
+            by_name[meal["name"]] = entry
+
+    _write(LIBRARY_FILE, library)
+
+
+def delete_from_library(recipe_id: str) -> bool:
+    """Remove a recipe from the library by id. Returns True if found and deleted."""
+    library = load_recipe_library()
+    updated = [r for r in library if r["id"] != recipe_id]
+    if len(updated) == len(library):
+        return False
+    _write(LIBRARY_FILE, updated)
+    return True

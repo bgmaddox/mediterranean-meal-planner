@@ -10,14 +10,18 @@ Tabs:
     Generate        — Generate this week's plan; swap meals; export kid notes
     Shopping List   — Aggregated, grouped shopping list; copyable/downloadable
     Favorites       — Saved meals with ratings and feedback
+    Recipe Library  — All ever-generated recipes; search and add any back to the current week
     Settings        — Constraints, preferences, nutrition targets, email config
 """
 
+import copy
+import uuid
 from datetime import date
 
 import streamlit as st
 
 import data_store
+import drive_upload
 import meal_planner
 import pdf_export
 import shopping
@@ -46,12 +50,24 @@ if "kid_notes" not in st.session_state:
     st.session_state.kid_notes: str | None = None
 if "week_start" not in st.session_state:
     st.session_state.week_start: str = date.today().isoformat()
+if "show_prompt_dialog" not in st.session_state:
+    st.session_state.show_prompt_dialog: bool = False
+if "pending_system_prompt" not in st.session_state:
+    st.session_state.pending_system_prompt: str = ""
+if "pending_user_message" not in st.session_state:
+    st.session_state.pending_user_message: str = ""
+if "swapping" not in st.session_state:
+    # Tuple of (meal_id, meal_type, meal_name) while dialog is open; None otherwise
+    st.session_state.swapping: tuple | None = None
+if "deleted_meals" not in st.session_state:
+    # List of {"type": "dinner"|"lunch", "meal": dict, "removed_lunches": list}
+    st.session_state.deleted_meals: list = []
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Tabs
 # ─────────────────────────────────────────────────────────────────────────────
-tab_generate, tab_shopping, tab_favorites, tab_settings = st.tabs(
-    ["Generate", "Shopping List", "Favorites", "Settings"]
+tab_generate, tab_shopping, tab_favorites, tab_library, tab_settings = st.tabs(
+    ["Generate", "Shopping List", "Favorites", "Recipe Library", "Settings"]
 )
 
 
@@ -69,6 +85,49 @@ def _on_track_icon(value: int, target: int) -> str:
     return "✅" if value >= target else "⚠️"
 
 
+@st.dialog("Review & Edit Prompt", width="large")
+def _prompt_preview_dialog():
+    st.caption(
+        "Review and edit the prompts before sending. "
+        "Changes here are one-off and won't affect future generations."
+    )
+    system_edited = st.text_area(
+        "System Prompt",
+        value=st.session_state.pending_system_prompt,
+        height=400,
+    )
+    user_edited = st.text_area(
+        "User Message",
+        value=st.session_state.pending_user_message,
+        height=100,
+    )
+
+    col_send, col_cancel = st.columns(2)
+    with col_send:
+        if st.button("Send to Claude", type="primary", use_container_width=True):
+            with st.spinner("Asking Claude to plan your week..."):
+                try:
+                    plan = meal_planner.generate_week_plan_from_prompts(
+                        system_edited, user_edited
+                    )
+                except MealPlanError as e:
+                    st.error(f"Could not generate plan: {e}")
+                    plan = None
+            if plan is not None:
+                st.session_state.week_plan = plan
+                st.session_state.week_start = date.today().isoformat()
+                st.session_state.kid_notes = None
+                _rebuild_shopping()
+                data_store.append_to_history(plan)
+                data_store.add_recipes_from_plan(plan)
+                st.session_state.show_prompt_dialog = False
+                st.rerun()
+    with col_cancel:
+        if st.button("Cancel", use_container_width=True):
+            st.session_state.show_prompt_dialog = False
+            st.rerun()
+
+
 SWAP_REASONS = [
     "Too time-consuming",
     "Missing an ingredient",
@@ -76,6 +135,48 @@ SWAP_REASONS = [
     "Want something lighter",
     "Other",
 ]
+
+
+@st.dialog("Replace Meal", width="small")
+def _swap_dialog():
+    meal_id, meal_type, meal_name = st.session_state.swapping
+    st.markdown(f"Replace **{meal_name}**?")
+    reason = st.selectbox(
+        "Reason (optional — helps Claude pick something better)",
+        options=[""] + SWAP_REASONS,
+        index=0,
+        label_visibility="collapsed",
+        placeholder="Reason for swapping (optional)",
+    )
+    other_text = ""
+    if reason == "Other":
+        other_text = st.text_input(
+            "Describe the reason",
+            placeholder="e.g. 'We already had salmon this week'",
+        )
+    final_reason = other_text if reason == "Other" else reason
+
+    col_confirm, col_cancel = st.columns(2)
+    with col_confirm:
+        if st.button("Replace it", type="primary", use_container_width=True):
+            with st.spinner(f"Finding a replacement for '{meal_name}'..."):
+                try:
+                    updated = meal_planner.swap_meal(
+                        st.session_state.week_plan, meal_id, meal_type,
+                        reason=final_reason,
+                    )
+                    st.session_state.week_plan = updated
+                    st.session_state.swapping = None
+                    _rebuild_shopping()
+                    data_store.update_history_plan(updated, st.session_state.week_start)
+                    st.success("Meal replaced!")
+                    st.rerun()
+                except MealPlanError as e:
+                    st.error(f"Swap failed: {e}")
+    with col_cancel:
+        if st.button("Cancel", use_container_width=True):
+            st.session_state.swapping = None
+            st.rerun()
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -106,20 +207,18 @@ with tab_generate:
         )
 
     if generate_clicked:
-        with st.spinner("Asking Claude to plan your week..."):
-            try:
-                plan = meal_planner.generate_week_plan(
-                    week_notes=week_notes or None,
-                    cuisine_notes=cuisine_notes or None,
-                )
-                st.session_state.week_plan = plan
-                st.session_state.week_start = date.today().isoformat()
-                st.session_state.kid_notes = None
-                _rebuild_shopping()
-                data_store.append_to_history(plan)
-                st.success("Week generated!")
-            except MealPlanError as e:
-                st.error(f"Could not generate plan: {e}")
+        sys_p, usr_m = meal_planner.build_generation_prompts(
+            week_notes or None, cuisine_notes or None
+        )
+        st.session_state.pending_system_prompt = sys_p
+        st.session_state.pending_user_message = usr_m
+        st.session_state.show_prompt_dialog = True
+
+    if st.session_state.show_prompt_dialog:
+        _prompt_preview_dialog()
+
+    if st.session_state.swapping:
+        _swap_dialog()
 
     # ── Load a previous week ──────────────────────────────────────────────────
     history = data_store.load_history()
@@ -137,6 +236,7 @@ with tab_generate:
                     st.session_state.week_start = entry["week_start"]
                     st.session_state.kid_notes = None
                     _rebuild_shopping()
+                    data_store.add_recipes_from_plan(entry["plan"])
                     st.rerun()
 
     plan = st.session_state.week_plan
@@ -195,25 +295,64 @@ with tab_generate:
             with st.expander("Ingredient overlap notes"):
                 st.write(summary["ingredient_overlap_notes"])
 
-        # ── PDF export ────────────────────────────────────────────────────────
-        if st.button("📄 Build & Download Weekly PDF"):
-            if not st.session_state.shopping_sections:
-                _rebuild_shopping()
-            with st.spinner("Building PDF..."):
-                try:
-                    pdf_bytes = pdf_export.build_pdf_bytes(
-                        plan,
-                        st.session_state.shopping_sections or {},
-                        week_start=st.session_state.week_start,
-                    )
-                    st.download_button(
-                        "Download PDF",
-                        data=pdf_bytes,
-                        file_name=f"meal_plan_{st.session_state.week_start}.pdf",
-                        mime="application/pdf",
-                    )
-                except Exception as e:
-                    st.error(f"PDF generation failed: {e}")
+        # ── PDF export + Drive upload ──────────────────────────────────────────
+        exp_col1, exp_col2 = st.columns([1, 1])
+
+        with exp_col1:
+            if st.button("📄 Build & Download Weekly PDF", use_container_width=True):
+                if not st.session_state.shopping_sections:
+                    _rebuild_shopping()
+                with st.spinner("Building PDF..."):
+                    try:
+                        pdf_bytes = pdf_export.build_pdf_bytes(
+                            plan,
+                            st.session_state.shopping_sections or {},
+                            week_start=st.session_state.week_start,
+                        )
+                        st.download_button(
+                            "⬇ Download PDF",
+                            data=pdf_bytes,
+                            file_name=f"meal_plan_{st.session_state.week_start}.pdf",
+                            mime="application/pdf",
+                            use_container_width=True,
+                        )
+                    except Exception as e:
+                        st.error(f"PDF generation failed: {e}")
+
+        with exp_col2:
+            drive_ready = drive_upload.credentials_configured()
+            drive_help = (
+                "Uploads this week's PDF to the 'Mediterranean Meal Plans' folder in your Google Drive."
+                if drive_ready
+                else "client_secrets.json not found — see Drive Setup in Settings."
+            )
+            if st.button(
+                "☁ Upload PDF to Drive",
+                use_container_width=True,
+                disabled=not drive_ready,
+                help=drive_help,
+            ):
+                if not st.session_state.shopping_sections:
+                    _rebuild_shopping()
+                with st.spinner("Building PDF and uploading to Drive..."):
+                    try:
+                        pdf_bytes = pdf_export.build_pdf_bytes(
+                            plan,
+                            st.session_state.shopping_sections or {},
+                            week_start=st.session_state.week_start,
+                        )
+                        filename = f"meal_plan_{st.session_state.week_start}.pdf"
+                        url = drive_upload.upload_pdf_to_drive(pdf_bytes, filename)
+                        if url:
+                            st.success(f"Uploaded! [Open in Drive]({url})")
+                        else:
+                            st.success("Uploaded to Drive.")
+                    except FileNotFoundError as e:
+                        st.error(str(e))
+                    except RuntimeError as e:
+                        st.error(str(e))
+                    except Exception as e:
+                        st.error(f"Upload failed: {e}")
 
         st.divider()
 
@@ -221,10 +360,29 @@ with tab_generate:
         st.subheader("Dinners")
         for dinner in plan.get("dinners", []):
             did = dinner["id"]
-            with st.expander(
-                f"**{dinner['name']}**  ·  {dinner['cook_time_minutes']} min  ·  {dinner['primary_equipment']}",
-                expanded=False,
-            ):
+
+            # Header row: meal name + swap + remove buttons
+            hdr_col, swap_col, remove_col = st.columns([8, 1, 1])
+            hdr_col.markdown(
+                f"**{dinner['name']}** &nbsp;·&nbsp; {dinner['cook_time_minutes']} min"
+                f" &nbsp;·&nbsp; {dinner['primary_equipment']}",
+                unsafe_allow_html=True,
+            )
+            if swap_col.button("🔄 Swap", key=f"swap_{did}", use_container_width=True):
+                st.session_state.swapping = (did, "dinner", dinner["name"])
+            if remove_col.button("✕ Remove", key=f"remove_{did}", use_container_width=True):
+                removed_lunches = [l for l in plan["lunches"] if l.get("leftover_from_dinner_id") == did]
+                st.session_state.deleted_meals.append({
+                    "type": "dinner", "meal": dinner, "removed_lunches": removed_lunches,
+                })
+                plan["dinners"] = [d for d in plan["dinners"] if d["id"] != did]
+                plan["lunches"] = [l for l in plan["lunches"] if l.get("leftover_from_dinner_id") != did]
+                st.session_state.week_plan = plan
+                _rebuild_shopping()
+                data_store.update_history_plan(plan, st.session_state.week_start)
+                st.rerun()
+
+            with st.expander("Recipe & details", expanded=False):
                 if dinner.get("health_highlights"):
                     st.caption(" · ".join(dinner["health_highlights"]))
 
@@ -287,35 +445,21 @@ with tab_generate:
                     except ValueError as e:
                         st.warning(str(e))
 
-                # Swap
-                st.markdown("---")
-                swap_reason = st.selectbox(
-                    "Swap this meal — reason:",
-                    options=[""] + SWAP_REASONS,
-                    index=0,
-                    key=f"swap_reason_{did}",
-                    label_visibility="collapsed",
-                )
-                other_text = ""
-                if swap_reason == "Other":
-                    other_text = st.text_input(
-                        "Describe the reason",
-                        key=f"swap_other_{did}",
-                        placeholder="e.g. 'We already had salmon this week'",
-                    )
-                final_reason = other_text if swap_reason == "Other" else swap_reason
-                if swap_reason and st.button("Confirm Swap", key=f"swap_btn_{did}"):
-                    with st.spinner(f"Finding a replacement for '{dinner['name']}'..."):
-                        try:
-                            updated = meal_planner.swap_meal(
-                                plan, did, "dinner", reason=final_reason
-                            )
-                            st.session_state.week_plan = updated
-                            _rebuild_shopping()
-                            st.success("Meal swapped!")
-                            st.rerun()
-                        except MealPlanError as e:
-                            st.error(f"Swap failed: {e}")
+        # ── Recently removed (dinners) ────────────────────────────────────────
+        removed_dinners = [r for r in st.session_state.deleted_meals if r["type"] == "dinner"]
+        if removed_dinners:
+            with st.expander(f"Recently removed dinners ({len(removed_dinners)})"):
+                for i, removed in enumerate(removed_dinners):
+                    col_name, col_restore = st.columns([8, 1])
+                    col_name.markdown(f"**{removed['meal']['name']}**")
+                    if col_restore.button("Restore", key=f"restore_dinner_{i}", use_container_width=True):
+                        plan["dinners"].append(removed["meal"])
+                        plan["lunches"].extend(removed["removed_lunches"])
+                        st.session_state.deleted_meals.remove(removed)
+                        st.session_state.week_plan = plan
+                        _rebuild_shopping()
+                        data_store.update_history_plan(plan, st.session_state.week_start)
+                        st.rerun()
 
         # ── Export Kid Notes ──────────────────────────────────────────────────
         st.markdown("")
@@ -350,10 +494,26 @@ with tab_generate:
             lid = lunch["id"]
             source_label = "Leftover from dinner" if lunch["source"] == "leftover" else "Standalone"
             reheat_label = "Microwave" if lunch["reheat"] == "microwave" else "Cold (no reheat)"
-            with st.expander(
-                f"**{lunch['name']}**  ·  {source_label}  ·  {reheat_label}",
-                expanded=False,
-            ):
+
+            # Header row: meal name + swap + remove buttons
+            hdr_col, swap_col, remove_col = st.columns([8, 1, 1])
+            hdr_col.markdown(
+                f"**{lunch['name']}** &nbsp;·&nbsp; {source_label} &nbsp;·&nbsp; {reheat_label}",
+                unsafe_allow_html=True,
+            )
+            if swap_col.button("🔄 Swap", key=f"swap_{lid}", use_container_width=True):
+                st.session_state.swapping = (lid, "lunch", lunch["name"])
+            if remove_col.button("✕ Remove", key=f"remove_{lid}", use_container_width=True):
+                st.session_state.deleted_meals.append({
+                    "type": "lunch", "meal": lunch, "removed_lunches": [],
+                })
+                plan["lunches"] = [l for l in plan["lunches"] if l["id"] != lid]
+                st.session_state.week_plan = plan
+                _rebuild_shopping()
+                data_store.update_history_plan(plan, st.session_state.week_start)
+                st.rerun()
+
+            with st.expander("Recipe & details", expanded=False):
                 if lunch.get("health_highlights"):
                     st.caption(" · ".join(lunch["health_highlights"]))
 
@@ -386,35 +546,20 @@ with tab_generate:
                         nc3.metric("Fiber", f"{nut.get('fiber_g', '—')}g")
                         nc4.metric("Fat", f"{nut.get('fat_g', '—')}g")
 
-                # Swap lunch
-                st.markdown("---")
-                swap_reason_l = st.selectbox(
-                    "Swap this lunch — reason:",
-                    options=[""] + SWAP_REASONS,
-                    index=0,
-                    key=f"swap_reason_{lid}",
-                    label_visibility="collapsed",
-                )
-                other_text_l = ""
-                if swap_reason_l == "Other":
-                    other_text_l = st.text_input(
-                        "Describe the reason",
-                        key=f"swap_other_{lid}",
-                        placeholder="e.g. 'Want something cold'",
-                    )
-                final_reason_l = other_text_l if swap_reason_l == "Other" else swap_reason_l
-                if swap_reason_l and st.button("Confirm Swap", key=f"swap_btn_{lid}"):
-                    with st.spinner(f"Finding a replacement for '{lunch['name']}'..."):
-                        try:
-                            updated = meal_planner.swap_meal(
-                                plan, lid, "lunch", reason=final_reason_l
-                            )
-                            st.session_state.week_plan = updated
-                            _rebuild_shopping()
-                            st.success("Lunch swapped!")
-                            st.rerun()
-                        except MealPlanError as e:
-                            st.error(f"Swap failed: {e}")
+        # ── Recently removed (lunches) ────────────────────────────────────────
+        removed_lunches = [r for r in st.session_state.deleted_meals if r["type"] == "lunch"]
+        if removed_lunches:
+            with st.expander(f"Recently removed lunches ({len(removed_lunches)})"):
+                for i, removed in enumerate(removed_lunches):
+                    col_name, col_restore = st.columns([8, 1])
+                    col_name.markdown(f"**{removed['meal']['name']}**")
+                    if col_restore.button("Restore", key=f"restore_lunch_{i}", use_container_width=True):
+                        plan["lunches"].append(removed["meal"])
+                        st.session_state.deleted_meals.remove(removed)
+                        st.session_state.week_plan = plan
+                        _rebuild_shopping()
+                        data_store.update_history_plan(plan, st.session_state.week_start)
+                        st.rerun()
 
         st.divider()
 
@@ -466,11 +611,16 @@ with tab_shopping:
         )
         st.divider()
 
-        for section, items in sections.items():
-            st.markdown(f"**{section}**")
-            for item in items:
-                st.markdown(f"- {item.name} — {item.display_quantity()}")
-            st.write("")
+        section_list = [(s, items) for s, items in sections.items() if items]
+        mid = (len(section_list) + 1) // 2
+        col_left, col_right = st.columns(2)
+        for col, chunk in ((col_left, section_list[:mid]), (col_right, section_list[mid:])):
+            with col:
+                for section, items in chunk:
+                    st.markdown(f"**{section}**")
+                    for item in items:
+                        st.markdown(f"- {item.name} — {item.display_quantity()}")
+                    st.write("")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -524,11 +674,160 @@ with tab_favorites:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# Tab: Recipe Library
+# ─────────────────────────────────────────────────────────────────────────────
+with tab_library:
+    st.header("Recipe Library")
+    st.caption("Every meal Claude has ever generated for you — auto-saved. Add any recipe back into your current week.")
+
+    library = data_store.load_recipe_library()
+    if not library:
+        st.info("No recipes yet. Generate a meal plan to start building your library.")
+    else:
+        col_search, col_filter = st.columns([3, 1])
+        search_query = col_search.text_input(
+            "Search", placeholder="Search by name…", label_visibility="collapsed"
+        )
+        meal_type_filter = col_filter.selectbox(
+            "Type", options=["All", "Dinners", "Lunches"], label_visibility="collapsed"
+        )
+
+        filtered = library
+        if search_query:
+            q = search_query.lower()
+            filtered = [r for r in filtered if q in r["name"].lower()]
+        if meal_type_filter == "Dinners":
+            filtered = [r for r in filtered if r["meal_type"] == "dinner"]
+        elif meal_type_filter == "Lunches":
+            filtered = [r for r in filtered if r["meal_type"] == "lunch"]
+
+        filtered = sorted(filtered, key=lambda r: r["last_generated"], reverse=True)
+
+        has_plan = st.session_state.week_plan is not None
+
+        dinners = [r for r in filtered if r["meal_type"] == "dinner"]
+        lunches = [r for r in filtered if r["meal_type"] == "lunch"]
+
+        def _render_library_section(recipes: list, section_label: str):
+            if not recipes:
+                return
+            st.subheader(section_label)
+            for rec in recipes:
+                meal = rec["meal"]
+                with st.expander(f"**{rec['name']}** &nbsp;·&nbsp; Last generated: {rec['last_generated']}", expanded=False):
+                    if rec["meal_type"] == "dinner":
+                        st.caption(f"{meal.get('cook_time_minutes', '?')} min · {meal.get('primary_equipment', '')}")
+                        if meal.get("health_highlights"):
+                            st.caption(" · ".join(meal["health_highlights"]))
+
+                        cols = st.columns([3, 2])
+                        with cols[0]:
+                            st.markdown("**Ingredients**")
+                            for ing in meal.get("ingredients", []):
+                                staple = " *(pantry)*" if ing.get("pantry_staple") else ""
+                                st.markdown(f"- {ing['quantity']} {ing['unit']} {ing['name']}{staple}")
+                        with cols[1]:
+                            st.markdown("**Instructions**")
+                            for i, step in enumerate(meal.get("instructions", []), 1):
+                                st.markdown(f"{i}. {step}")
+
+                        if meal.get("kid_adaptation"):
+                            st.info(f"**Kids:** {meal['kid_adaptation']}")
+                        if meal.get("uric_acid_tip"):
+                            st.success(f"**Uric acid tip:** {meal['uric_acid_tip']}")
+                    else:
+                        source_label = "Leftover from dinner" if meal.get("source") == "leftover" else "Standalone"
+                        st.caption(source_label)
+                        st.markdown("**Ingredients**")
+                        for ing in meal.get("ingredients", []):
+                            staple = " *(pantry)*" if ing.get("pantry_staple") else ""
+                            st.markdown(f"- {ing['quantity']} {ing['unit']} {ing['name']}{staple}")
+                        if meal.get("pack_instructions"):
+                            st.info(f"**Pack:** {meal['pack_instructions']}")
+
+                    btn_col, del_col = st.columns([3, 1])
+                    with btn_col:
+                        add_help = "Load a week plan first." if not has_plan else None
+                        if st.button(
+                            "Add to This Week",
+                            key=f"lib_add_{rec['id']}",
+                            use_container_width=True,
+                            disabled=not has_plan,
+                            help=add_help,
+                        ):
+                            added = copy.deepcopy(meal)
+                            added["id"] = str(uuid.uuid4())
+                            active_plan = st.session_state.week_plan
+                            if rec["meal_type"] == "dinner":
+                                active_plan["dinners"].append(added)
+                            else:
+                                active_plan["lunches"].append(added)
+                            st.session_state.week_plan = active_plan
+                            _rebuild_shopping()
+                            data_store.update_history_plan(active_plan, st.session_state.week_start)
+                            st.success(f"'{rec['name']}' added to this week.")
+                            st.rerun()
+                    with del_col:
+                        if st.button("Delete", key=f"lib_del_{rec['id']}", use_container_width=True):
+                            data_store.delete_from_library(rec["id"])
+                            st.rerun()
+
+        if meal_type_filter != "Lunches":
+            _render_library_section(dinners, f"Dinners ({len(dinners)})")
+        if meal_type_filter != "Dinners":
+            _render_library_section(lunches, f"Lunches ({len(lunches)})")
+
+        if not filtered:
+            st.caption("No recipes match your search.")
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # Tab: Settings
 # ─────────────────────────────────────────────────────────────────────────────
 with tab_settings:
     st.header("Settings")
     prefs = data_store.load_preferences()
+
+    # ── Children ──────────────────────────────────────────────────────────────
+    st.subheader("Children")
+    st.caption("Used to set serving sizes and kid adaptations in every generated plan.")
+
+    children = prefs.get("children", [])
+    for i, child in enumerate(children):
+        col_name, col_age, col_del = st.columns([3, 1, 1])
+        new_name = col_name.text_input(
+            "Name (optional)",
+            value=child.get("name", ""),
+            placeholder="e.g. Emma",
+            key=f"child_name_{i}",
+            label_visibility="collapsed",
+        )
+        new_age = col_age.number_input(
+            "Age",
+            min_value=0, max_value=17,
+            value=child.get("age", 1),
+            step=1,
+            key=f"child_age_{i}",
+            label_visibility="collapsed",
+        )
+        if col_del.button("✕", key=f"del_child_{i}"):
+            children = [c for j, c in enumerate(children) if j != i]
+            data_store.update_preferences(children=children)
+            st.rerun()
+        if new_name != child.get("name", "") or new_age != child.get("age"):
+            children[i] = {"name": new_name, "age": int(new_age)}
+            data_store.update_preferences(children=children)
+
+    with st.form("add_child_form", clear_on_submit=True):
+        col_n, col_a, col_add = st.columns([3, 1, 1])
+        add_name = col_n.text_input("Name (optional)", placeholder="e.g. Liam", label_visibility="collapsed")
+        add_age = col_a.number_input("Age", min_value=0, max_value=17, value=1, step=1, label_visibility="collapsed")
+        if st.form_submit_button("Add child", use_container_width=True):
+            children = prefs.get("children", []) + [{"name": add_name.strip(), "age": int(add_age)}]
+            data_store.update_preferences(children=children)
+            st.rerun()
+
+    st.divider()
 
     # ── Meal Planning Preferences ─────────────────────────────────────────────
     st.subheader("Meal Planning")
@@ -623,6 +922,39 @@ with tab_settings:
         data_store.add_constraint(new_constraint.strip())
         st.success("Constraint added.")
         st.rerun()
+
+    st.divider()
+
+    # ── Google Drive Setup ────────────────────────────────────────────────────
+    st.subheader("Google Drive Setup")
+    if drive_upload.credentials_configured():
+        st.success(
+            "✅ `data/client_secrets.json` found — Drive upload is ready. "
+            "Your token is stored at `data/drive_token.json` after the first upload."
+        )
+    else:
+        st.warning("⚠️ `data/client_secrets.json` not found — Drive upload is disabled.")
+
+    with st.expander("Step-by-step: connect Google Drive"):
+        st.markdown("""
+**One-time setup (~10 minutes)**
+
+1. **Go to** [console.cloud.google.com](https://console.cloud.google.com) and sign in with your Google account.
+2. Click **Select a project** → **New Project** → give it any name (e.g. "Meal Planner") → **Create**.
+3. In the left sidebar: **APIs & Services → Library**. Search for **Google Drive API** → click it → **Enable**.
+4. **APIs & Services → OAuth consent screen**:
+   - User type: **External** → Create
+   - Fill in App name (anything), support email, developer email → Save and Continue
+   - Skip Scopes → Save and Continue
+   - Add yourself as a **Test user** (your Gmail address) → Save and Continue → Back to Dashboard
+5. **APIs & Services → Credentials** → **+ Create Credentials → OAuth client ID**:
+   - Application type: **Desktop app** → Name it anything → **Create**
+6. Click **⬇ Download JSON** on the new credential → save that file as **`data/client_secrets.json`** in this project folder.
+7. Come back to the app, refresh the Settings tab — the warning above should turn green.
+8. Click **☁ Upload PDF to Drive** in the Generate tab — a browser window opens asking you to sign in and allow access. Do so once and the token is cached forever (auto-refreshed).
+
+**Your files land in** Google Drive → "Mediterranean Meal Plans" folder. Open the Drive app on your phone, find the file, and cast it to your Nest Hub.
+        """)
 
     st.divider()
 

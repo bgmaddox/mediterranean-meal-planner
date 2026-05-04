@@ -244,11 +244,32 @@ def get_season(date_str: str) -> str:
         return "fall"
 
 
+def _describe_children(children: list[dict]) -> str:
+    """Return a natural-language description of the children, e.g. 'Emma (age 5) and a 2-year-old'."""
+    if not children:
+        return "no children"
+    parts = []
+    for child in children:
+        name = child.get("name", "").strip()
+        age = child.get("age", 0)
+        if name:
+            parts.append(f"{name} (age {age})")
+        else:
+            parts.append(f"{age}-year-old")
+    if len(parts) == 1:
+        return parts[0]
+    elif len(parts) == 2:
+        return f"{parts[0]} and {parts[1]}"
+    else:
+        return ", ".join(parts[:-1]) + f", and {parts[-1]}"
+
+
 def build_system_prompt(
     history: list[dict] | None = None,
     favorites: list[dict] | None = None,
     constraints: list[str] | None = None,
     lunch_adult_count: int = 1,
+    children: list[dict] | None = None,
     budget: Optional[str] = None,
     current_date: Optional[str] = None,
     week_notes: Optional[str] = None,
@@ -268,6 +289,8 @@ def build_system_prompt(
         Additional food constraints beyond hardcoded defaults.
     lunch_adult_count : int
         How many adults bring lunch to the office. Default 1.
+    children : list[dict] or None
+        Each dict has 'name' (str) and 'age' (int). Defaults to one 5-year-old and one 2-year-old.
     budget : str or None
         Optional weekly grocery budget, e.g. '$150/week'.
     current_date : str or None
@@ -281,6 +304,16 @@ def build_system_prompt(
     """
     if current_date is None:
         current_date = date.today().isoformat()
+
+    if children is None:
+        children = [{"name": "", "age": 5}, {"name": "", "age": 2}]
+
+    kids_count = len(children)
+    kids_desc = _describe_children(children)
+    family_size = 2 + kids_count
+
+    # Youngest child's age drives portion and texture guidance
+    youngest_age = min(c.get("age", 99) for c in children) if children else 99
 
     season = get_season(current_date)
 
@@ -406,7 +439,10 @@ def build_system_prompt(
     else:
         notes_block = ""
 
-    schema_str = json.dumps(OUTPUT_SCHEMA, indent=2)
+    import copy
+    schema_with_kids = copy.deepcopy(OUTPUT_SCHEMA)
+    schema_with_kids["week_plan"]["dinners"][0]["servings"]["kids"] = kids_count
+    schema_str = json.dumps(schema_with_kids, indent=2)
     staples_str = json.dumps(PANTRY_STAPLES, indent=2)
 
     cost_block = """\
@@ -446,9 +482,9 @@ Today's date: {current_date} (Season: {season})
 - **Adults:** 2. Both are adventurous eaters who welcome bold flavors from any cuisine — Mediterranean (harissa, za'atar, ras el hanout, \
 preserved lemon, sumac), Asian (soy, miso, ginger, sesame, fish sauce), Latin (cumin, chipotle, lime, cilantro), Indian (turmeric, garam masala, \
 curry), and beyond.
-- **Children:** 5-year-old and 2-year-old. Need milder versions of the same dishes — same meal, less spice, \
-sauces on the side, familiar textures.
-- **Dinner servings:** 2 adults + 2 kids (family of 4).
+- **Children:** {kids_desc}. Need milder versions of the same dishes — same meal, less spice, \
+sauces on the side, familiar textures.{"  The youngest is under 3 — prioritize soft textures and finger-food adaptations." if youngest_age < 3 else ""}
+- **Dinner servings:** 2 adults + {kids_count} kid{"s" if kids_count != 1 else ""} (family of {family_size}).
 - **Lunch servings:** {lunch_adult_count} adult(s) bringing lunch to a weekday office.
 
 ---
@@ -531,6 +567,8 @@ Include this as a `uric_acid_tip` in relevant recipes.
 
 # COOKING EQUIPMENT
 
+The following equipment is available. Use whatever makes the best recipe — do NOT try to spread meals across different equipment or ensure each tool gets used. It is completely fine to have all stovetop meals, all sheet pan meals, or any other combination. Equipment variety is never a goal.
+
 - **Normal oven + convection toaster oven:** Sheet pan meals, roasting, baking
 - **Instant Pot / pressure cooker:** Dried beans in 25 min, stews in 20 min, pulled chicken in 15 min
 - **Slow cooker / Crockpot:** Set before work (6–8 hr); dinner ready at 6pm — ≤10 min active prep
@@ -544,7 +582,7 @@ Include this as a `uric_acid_tip` in relevant recipes.
 # MEAL PLANNING RULES
 
 ## Dinners — 5 per week
-- Family of 4 (2 adults + 2 kids)
+- Family of {family_size} (2 adults + {kids_count} kid{"s" if kids_count != 1 else ""})
 - 30–45 min active cook/prep time. Slow cooker and Instant Pot meals may take longer but are fine.
 - **Kid adaptation is mandatory on every dinner.** Specific and practical — not a placeholder.
 - Protein targets: 2–3 fish, ≤2 red meat, 1–2 vegetarian per week.
@@ -565,7 +603,9 @@ Include this as a `uric_acid_tip` in relevant recipes.
 
 # INGREDIENT EFFICIENCY
 
-## Pantry Staples — never on the shopping list:
+## Pantry Staples
+Items the family always has on hand. **Include every pantry staple in the `ingredients` array with accurate quantities and units — the cook needs to know how much to use.** Set `pantry_staple: true` so the app can exclude them from the shopping list, but they must appear in the ingredient list.
+
 {staples_str}
 
 ## Special Ingredient Rule:
@@ -614,7 +654,7 @@ The response must begin with `{{` and end with `}}`.
 {schema_str}
 
 ## Output rules:
-1. `pantry_staple: true` only for items in the staples list above.
+1. Every ingredient — pantry or not — must appear in the `ingredients` array with a quantity and unit. Set `pantry_staple: true` for items in the staples list; the app uses this flag to separate them from the shopping list. Never omit a pantry staple from the ingredient list.
 2. `special: true` means non-staple purchased this week — must appear in 2+ meals.
 3. `generates_lunch: true` dinners must include `lunch_scaling_instructions`.
 4. `sunday_prep` is the task string (or null).

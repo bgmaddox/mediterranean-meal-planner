@@ -130,7 +130,9 @@ def build_shopping_list(
     for ing in all_ingredients:
         name_key = ing["name"].lower().strip()
         if ing.get("pantry_staple", False) or name_key in _STAPLES_SET:
-            if name_key not in pantry_seen:
+            if name_key in pantry_seen:
+                pantry_seen[name_key].merge(ing.get("quantity", ""), ing.get("unit", ""))
+            else:
                 pantry_seen[name_key] = ShoppingItem(
                     name=ing["name"],
                     quantity=ing.get("quantity", ""),

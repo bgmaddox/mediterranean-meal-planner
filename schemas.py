@@ -128,6 +128,15 @@ class FavoriteMeal(TypedDict):
     source_meal: Optional[DinnerMeal]   # The full meal dict, for reference
 
 
+class RecipeLibraryEntry(TypedDict):
+    """A meal ever generated, auto-saved to the recipe library."""
+    id: str                             # UUID string
+    name: str
+    meal_type: str                      # 'dinner' or 'lunch'
+    last_generated: str                 # ISO date of most recent generation
+    meal: DinnerMeal                    # Full meal dict (DinnerMeal or LunchMeal)
+
+
 class MealHistoryEntry(TypedDict):
     """A single week's worth of meals, recorded after generation."""
     week_start: str                     # ISO date string e.g. '2026-03-24' (Monday of that week)
@@ -142,8 +151,17 @@ class ConstraintEntry(TypedDict):
     active: bool                        # When False, constraint is saved but not sent to Claude
 
 
+class Child(TypedDict):
+    """A child in the household, for portion sizing and kid adaptations."""
+    name: str   # Display name — empty string if unnamed
+    age: int    # Age in years
+
+
 class UserPreferences(TypedDict):
     """Top-level user preferences stored in data/preferences.json."""
+    # Household
+    children: list[Child]              # e.g. [{"name": "Emma", "age": 5}, {"name": "", "age": 2}]
+
     # Meal planning
     lunch_adult_count: int              # How many adults bring lunch (currently 1; configurable)
     budget: Optional[str]              # e.g. '$150/week' or None

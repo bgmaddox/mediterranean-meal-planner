@@ -223,11 +223,12 @@ def build_pdf_bytes(
             pdf.ln(1)
 
         # Ingredients
-        ingredients = [i for i in dinner.get("ingredients", []) if not i.get("pantry_staple")]
+        ingredients = dinner.get("ingredients", [])
         if ingredients:
-            pdf.label("Ingredients (non-pantry)")
+            pdf.label("Ingredients")
             for ing in ingredients:
-                pdf.bullet(f"{ing.get('quantity', '')} {ing.get('unit', '')} {ing['name']}".strip())
+                pantry_tag = " (pantry)" if ing.get("pantry_staple") else ""
+                pdf.bullet(f"{ing.get('quantity', '')} {ing.get('unit', '')} {ing['name']}{pantry_tag}".strip())
 
         # Instructions
         instructions = dinner.get("instructions", [])
@@ -305,11 +306,12 @@ def build_pdf_bytes(
             pdf._reset_x()
             pdf.ln(1)
 
-        ingredients = [i for i in lunch.get("ingredients", []) if not i.get("pantry_staple")]
+        ingredients = lunch.get("ingredients", [])
         if ingredients:
-            pdf.label("Ingredients (non-pantry)")
+            pdf.label("Ingredients")
             for ing in ingredients:
-                pdf.bullet(f"{ing.get('quantity', '')} {ing.get('unit', '')} {ing['name']}".strip())
+                pantry_tag = " (pantry)" if ing.get("pantry_staple") else ""
+                pdf.bullet(f"{ing.get('quantity', '')} {ing.get('unit', '')} {ing['name']}{pantry_tag}".strip())
 
         serving_sizes = lunch.get("serving_sizes", [])
         if serving_sizes:
@@ -374,18 +376,30 @@ def build_pdf_bytes(
     pdf.add_page()
     if shopping_sections:
         pdf.section_title("SHOPPING LIST")
-        for section, items in shopping_sections.items():
-            if not items:
-                continue
-            pdf.set_font("Helvetica", "B", 10)
-            pdf.set_text_color(*_SLATE)
-            pdf._reset_x()
-            pdf.multi_cell(pdf.epw, 6, section)
-            pdf.set_text_color(*_DARK)
-            for item in items:
-                pdf.bullet(f"{item.name} - {item.display_quantity()}")
-            pdf._reset_x()
-            pdf.ln(2)
+
+        col_w = (pdf.epw - 8) / 2   # 8 mm gutter between columns
+        col2_x = pdf.l_margin + col_w + 8
+
+        section_list = [(s, itms) for s, itms in shopping_sections.items() if itms]
+        mid = (len(section_list) + 1) // 2
+        columns = [section_list[:mid], section_list[mid:]]
+        x_offsets = [pdf.l_margin, col2_x]
+
+        start_y = pdf.get_y()
+        for col_sections, x_off in zip(columns, x_offsets):
+            pdf.set_xy(x_off, start_y)
+            for section, items in col_sections:
+                pdf.set_x(x_off)
+                pdf.set_font("Helvetica", "B", 10)
+                pdf.set_text_color(*_SLATE)
+                pdf.multi_cell(col_w, 6, _s(section))
+                pdf.set_text_color(*_DARK)
+                for item in items:
+                    pdf.set_x(x_off)
+                    pdf.set_font("Helvetica", "", 9)
+                    pdf.multi_cell(col_w, 5, _s(f"  *  {item.name} - {item.display_quantity()}"))
+                pdf.set_x(x_off)
+                pdf.ln(2)
 
     buf = BytesIO()
     pdf.output(buf)
