@@ -250,6 +250,7 @@ def update_preferences(**kwargs) -> UserPreferences:
         "children",
         "lunch_adult_count",
         "budget",
+        "portion_scale",
         "recipient_email",
         "auto_send_email",
         "target_calories_lunch_dinner",

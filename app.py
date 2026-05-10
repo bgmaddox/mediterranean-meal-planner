@@ -56,6 +56,8 @@ if "pending_system_prompt" not in st.session_state:
     st.session_state.pending_system_prompt: str = ""
 if "pending_user_message" not in st.session_state:
     st.session_state.pending_user_message: str = ""
+if "pending_days" not in st.session_state:
+    st.session_state.pending_days: int = 5
 if "swapping" not in st.session_state:
     # Tuple of (meal_id, meal_type, meal_name) while dialog is open; None otherwise
     st.session_state.swapping: tuple | None = None
@@ -108,7 +110,8 @@ def _prompt_preview_dialog():
             with st.spinner("Asking Claude to plan your week..."):
                 try:
                     plan = meal_planner.generate_week_plan_from_prompts(
-                        system_edited, user_edited
+                        system_edited, user_edited,
+                        expected_days=st.session_state.pending_days,
                     )
                 except MealPlanError as e:
                     st.error(f"Could not generate plan: {e}")
@@ -196,22 +199,37 @@ with tab_generate:
         placeholder="e.g. 'All Mediterranean' · 'One Asian meal' · '2 Mexican-inspired dinners' · 'Surprise me'",
         help="Override the default mix. Leave blank for the usual 3–4 Mediterranean + 1–2 other cuisines.",
     )
+    use_up_ingredients = st.text_area(
+        "Ingredients to use up this week (optional)",
+        placeholder="e.g. Carrots (approx. 1 lb)\nBaby spinach (one bag, starting to wilt)\nLeftover Greek yogurt",
+        height=100,
+        help="Claude will work these into at least 1–2 meals and won't put them on the shopping list.",
+    )
+    days = st.number_input(
+        "Days of meals this week",
+        min_value=3, max_value=7, value=5, step=1,
+        help="Reduce for holiday weeks or travel. Scales dinners, lunches, and protein balance proportionally.",
+    )
 
     col_btn, col_note = st.columns([1, 4])
     with col_btn:
         generate_clicked = st.button("Generate Week", type="primary", use_container_width=True)
     with col_note:
         st.caption(
-            "Claude generates 5 dinners + 5 lunches. Meals aren't assigned to days — "
+            f"Claude generates {int(days)} dinners + {int(days)} lunches. Meals aren't assigned to days — "
             "arrange them however suits your week."
         )
 
     if generate_clicked:
         sys_p, usr_m = meal_planner.build_generation_prompts(
-            week_notes or None, cuisine_notes or None
+            week_notes or None,
+            cuisine_notes or None,
+            use_up_ingredients=use_up_ingredients.strip() or None,
+            days=int(days),
         )
         st.session_state.pending_system_prompt = sys_p
         st.session_state.pending_user_message = usr_m
+        st.session_state.pending_days = int(days)
         st.session_state.show_prompt_dialog = True
 
     if st.session_state.show_prompt_dialog:
@@ -844,10 +862,28 @@ with tab_settings:
         placeholder="e.g. $150/week — leave blank for no constraint",
     )
 
+    _portion_options = {
+        "Normal (full portions)": 1.0,
+        "Slightly less (−10%)": 0.9,
+        "Slightly more (+10%)": 1.1,
+    }
+    _current_scale = prefs.get("portion_scale", 1.0)
+    _current_label = next(
+        (k for k, v in _portion_options.items() if abs(v - _current_scale) < 0.01),
+        "Normal (full portions)",
+    )
+    portion_label = st.selectbox(
+        "Portion size",
+        options=list(_portion_options.keys()),
+        index=list(_portion_options.keys()).index(_current_label),
+        help="Adjusts ingredient quantities in the prompt. Claude handles the math contextually — '3/4 lb salmon' won't become '0.675 lb'.",
+    )
+
     if st.button("Save Meal Planning Preferences"):
         data_store.update_preferences(
             lunch_adult_count=int(lunch_count),
             budget=budget_input.strip() if budget_input.strip() else None,
+            portion_scale=_portion_options[portion_label],
         )
         st.success("Saved.")
 

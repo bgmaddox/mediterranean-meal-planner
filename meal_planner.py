@@ -69,6 +69,8 @@ _DEFAULT_USER_MESSAGE = (
 def build_generation_prompts(
     week_notes: str | None = None,
     cuisine_notes: str | None = None,
+    use_up_ingredients: str | None = None,
+    days: int = 5,
 ) -> tuple[str, str]:
     """
     Build the system prompt and user message for generate_week_plan without
@@ -89,11 +91,14 @@ def build_generation_prompts(
         current_date=date.today().isoformat(),
         week_notes=week_notes,
         cuisine_notes=cuisine_notes,
+        portion_scale=prefs.get("portion_scale", 1.0),
+        use_up_ingredients=use_up_ingredients,
+        days=days,
     )
     return system_prompt, _DEFAULT_USER_MESSAGE
 
 
-def generate_week_plan_from_prompts(system_prompt: str, user_message: str) -> WeekPlan:
+def generate_week_plan_from_prompts(system_prompt: str, user_message: str, expected_days: int = 5) -> WeekPlan:
     """
     Call Claude with pre-built prompts and return a validated WeekPlan.
     Used after the prompt-preview dialog allows editing.
@@ -127,11 +132,11 @@ def generate_week_plan_from_prompts(system_prompt: str, user_message: str) -> We
         )
 
     plan: WeekPlan = data["week_plan"]
-    _validate_plan(plan)
+    _validate_plan(plan, expected_days)
     return plan
 
 
-def generate_week_plan(week_notes: str | None = None, cuisine_notes: str | None = None) -> WeekPlan:
+def generate_week_plan(week_notes: str | None = None, cuisine_notes: str | None = None, use_up_ingredients: str | None = None, days: int = 5) -> WeekPlan:
     """
     Generate a full weekly meal plan using Claude.
 
@@ -153,19 +158,19 @@ def generate_week_plan(week_notes: str | None = None, cuisine_notes: str | None 
     ------
     MealPlanError on API or parse failure.
     """
-    system_prompt, user_message = build_generation_prompts(week_notes, cuisine_notes)
-    return generate_week_plan_from_prompts(system_prompt, user_message)
+    system_prompt, user_message = build_generation_prompts(week_notes, cuisine_notes, use_up_ingredients, days)
+    return generate_week_plan_from_prompts(system_prompt, user_message, expected_days=days)
 
 
-def _validate_plan(plan: WeekPlan) -> None:
+def _validate_plan(plan: WeekPlan, days: int = 5) -> None:
     if not plan.get("dinners"):
         raise MealPlanError("Plan has no dinners.")
     if not plan.get("lunches"):
         raise MealPlanError("Plan has no lunches.")
-    if len(plan["dinners"]) != 5:
-        raise MealPlanError(f"Expected 5 dinners, got {len(plan['dinners'])}.")
-    if len(plan["lunches"]) != 5:
-        raise MealPlanError(f"Expected 5 lunches, got {len(plan['lunches'])}.")
+    if len(plan["dinners"]) != days:
+        raise MealPlanError(f"Expected {days} dinners, got {len(plan['dinners'])}.")
+    if len(plan["lunches"]) != days:
+        raise MealPlanError(f"Expected {days} lunches, got {len(plan['lunches'])}.")
     for dinner in plan["dinners"]:
         if not dinner.get("kid_adaptation"):
             raise MealPlanError(

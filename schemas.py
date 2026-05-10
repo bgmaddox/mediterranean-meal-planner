@@ -165,6 +165,7 @@ class UserPreferences(TypedDict):
     # Meal planning
     lunch_adult_count: int              # How many adults bring lunch (currently 1; configurable)
     budget: Optional[str]              # e.g. '$150/week' or None
+    portion_scale: float               # Default 1.0; 0.9 = ~10% smaller, 1.1 = ~10% larger
 
     # Email
     recipient_email: Optional[str]     # Where to send the weekly email report

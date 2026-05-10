@@ -264,6 +264,15 @@ def _describe_children(children: list[dict]) -> str:
         return ", ".join(parts[:-1]) + f", and {parts[-1]}"
 
 
+_PROTEIN_TARGETS = {
+    3: "1–2 fish, ≤1 red meat, 1 vegetarian",
+    4: "2 fish, ≤1 red meat, 1–2 vegetarian",
+    5: "2–3 fish, ≤2 red meat, 1–2 vegetarian",
+    6: "3 fish, ≤2 red meat, 1–2 vegetarian",
+    7: "3–4 fish, ≤2 red meat, 2 vegetarian",
+}
+
+
 def build_system_prompt(
     history: list[dict] | None = None,
     favorites: list[dict] | None = None,
@@ -274,6 +283,9 @@ def build_system_prompt(
     current_date: Optional[str] = None,
     week_notes: Optional[str] = None,
     cuisine_notes: Optional[str] = None,
+    portion_scale: float = 1.0,
+    use_up_ingredients: Optional[str] = None,
+    days: int = 5,
 ) -> str:
     """
     Build the full system prompt for weekly meal plan generation.
@@ -439,9 +451,38 @@ def build_system_prompt(
     else:
         notes_block = ""
 
+    # --- Use-up ingredients section ---
+    if use_up_ingredients and use_up_ingredients.strip():
+        lines = [f"  - {line.strip()}" for line in use_up_ingredients.strip().splitlines() if line.strip()]
+        use_up_block = (
+            "## Ingredients to Use Up\n"
+            "The following items are already on hand and should be prioritized in this week's recipes. "
+            "Work them into at least 1–2 meals. Do not add them to the shopping list.\n"
+            + "\n".join(lines)
+        )
+    else:
+        use_up_block = ""
+
+    # --- Portion scale instruction ---
+    if abs(portion_scale - 1.0) > 0.01:
+        pct = int(round(abs(portion_scale - 1.0) * 100))
+        direction = "down" if portion_scale < 1.0 else "up"
+        portion_scale_instruction = (
+            f"Scale all ingredient quantities {direction} by {pct}% from a standard serving. "
+            f"Apply this proportionally — e.g., '3/4 lb salmon' becomes "
+            f"{'approx. 11 oz' if direction == 'down' else 'approx. 13 oz'}. "
+            f"Use your judgment for items like '1 large onion' (no change needed) vs. measured proteins and grains."
+        )
+    else:
+        portion_scale_instruction = ""
+
+    protein_targets = _PROTEIN_TARGETS.get(days, _PROTEIN_TARGETS[5])
+
     import copy
     schema_with_kids = copy.deepcopy(OUTPUT_SCHEMA)
     schema_with_kids["week_plan"]["dinners"][0]["servings"]["kids"] = kids_count
+    schema_with_kids["week_plan"]["dinners"][0]["id"] = f"string — 'd1' through 'd{days}'"
+    schema_with_kids["week_plan"]["lunches"][0]["id"] = f"string — 'l1' through 'l{days}'"
     schema_str = json.dumps(schema_with_kids, indent=2)
     staples_str = json.dumps(PANTRY_STAPLES, indent=2)
 
@@ -581,13 +622,13 @@ The following equipment is available. Use whatever makes the best recipe — do 
 
 # MEAL PLANNING RULES
 
-## Dinners — 5 per week
+## Dinners — {days} per week
 - Family of {family_size} (2 adults + {kids_count} kid{"s" if kids_count != 1 else ""})
 - 30–45 min active cook/prep time. Slow cooker and Instant Pot meals may take longer but are fine.
 - **Kid adaptation is mandatory on every dinner.** Specific and practical — not a placeholder.
-- Protein targets: 2–3 fish, ≤2 red meat, 1–2 vegetarian per week.
+- Protein targets: {protein_targets}.{chr(10) + "- " + portion_scale_instruction if portion_scale_instruction else ""}
 
-## Lunches — 5 per week, {lunch_adult_count} adult(s)
+## Lunches — {days} per week, {lunch_adult_count} adult(s)
 - Office, weekdays. Microwave available; cold lunches are equally welcome.
 - **No fish in any form.**
 - ≤5 min to assemble/reheat at the office.
@@ -625,7 +666,7 @@ Confirm explicitly in `ingredient_overlap_notes`.
 {budget_block}
 
 ---
-{(chr(10) + notes_block + chr(10) + "---") if notes_block else ""}
+{(chr(10) + notes_block + chr(10) + "---") if notes_block else ""}{(chr(10) + chr(10) + use_up_block + chr(10) + chr(10) + "---") if use_up_block else ""}
 
 # NUTRITION ESTIMATES
 
