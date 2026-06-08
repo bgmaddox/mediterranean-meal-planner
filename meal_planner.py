@@ -393,6 +393,164 @@ Return ONLY this JSON structure:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# Substitute an ingredient
+# ─────────────────────────────────────────────────────────────────────────────
+
+_SUBSTITUTE_SYSTEM = """You are revising a single recipe to remove one disliked ingredient. \
+Replace the named ingredient with the most appropriate substitute that preserves the dish's \
+character, cuisine, and ALL health constraints — the same rules used for full meal generation:
+
+- Uric acid management: avoid organ meats, sardines as a staple, fructose/juice, meat stocks; \
+  encourage dairy, vitamin C foods, cherries.
+- Cholesterol improvement: salmon 2–3x/week, legumes, oats/barley, EVOO, walnuts.
+- Weight loss: high fiber, high protein, low glycemic, olive oil as the primary fat.
+
+Adjust only what the substitution requires: update the `ingredients` array, any affected \
+`instructions`, `health_highlights`, `nutrition_estimate`, `cost_estimate`, and `serving_sizes`. \
+Keep the meal `id`, the `name` (unless the name directly references the removed ingredient), and \
+all unrelated fields unchanged. Honor all active food constraints (listed in the message).
+
+Return ONLY the full updated meal object(s) as JSON — no preamble, no markdown fences."""
+
+
+def substitute_ingredient(
+    week_plan: WeekPlan,
+    meal_id: str,
+    meal_type: str,
+    ingredient_name: str,
+    reason: str = "",
+) -> WeekPlan:
+    """
+    Replace a single disliked ingredient in one dinner or lunch with a
+    Mediterranean-appropriate substitute, returning the full updated meal.
+
+    Claude rewrites the whole meal object (keeping everything else as close to the
+    original as possible) so instructions, nutrition, cost, and serving sizes stay
+    coherent after the swap.
+
+    If the target is a dinner that has a paired leftover lunch, that lunch is sent
+    along and updated in the same call (its ingredients may now be stale).
+
+    Parameters
+    ----------
+    week_plan : WeekPlan
+        The current week's plan (modified in place and returned).
+    meal_id : str
+        The id of the meal to revise (e.g. 'd2' or 'l3').
+    meal_type : str
+        'dinner' or 'lunch'.
+    ingredient_name : str
+        The ingredient to remove.
+    reason : str
+        Optional free-text reason (passed to Claude for context).
+
+    Returns
+    -------
+    WeekPlan with the revised meal inserted.
+
+    Raises
+    ------
+    MealPlanError on API failure, parse error, or meal_id not found.
+    """
+    if meal_type == "dinner":
+        meals = week_plan["dinners"]
+    else:
+        meals = week_plan["lunches"]
+
+    idx = next((i for i, m in enumerate(meals) if m["id"] == meal_id), None)
+    if idx is None:
+        raise MealPlanError(f"Meal '{meal_id}' not found in {meal_type}s.")
+
+    meal = meals[idx]
+
+    # Food constraints: hardcoded defaults + active user constraints
+    all_constraints = [
+        "No mushrooms",
+        "No oranges or orange juice",
+        "No fish in lunches",
+    ] + data_store.active_constraints_for_prompt()
+
+    # Lunch coherence: if this dinner yields a paired leftover lunch, update it too.
+    paired_lunch_idx = None
+    paired_lunch = None
+    if meal_type == "dinner":
+        paired_lunch_idx = next(
+            (i for i, l in enumerate(week_plan["lunches"])
+             if l.get("leftover_from_dinner_id") == meal_id),
+            None,
+        )
+        if paired_lunch_idx is not None:
+            paired_lunch = week_plan["lunches"][paired_lunch_idx]
+
+    reason_note = f'\nWhy they dislike it: "{reason}"' if reason else ""
+
+    if paired_lunch is not None:
+        response_instruction = (
+            "This dinner generates a leftover lunch (included below). The substitution may make "
+            "the leftover lunch's ingredients stale, so update it to stay consistent. "
+            "Return BOTH full objects:\n"
+            '{"updated_meal": { ...full dinner... }, "updated_lunch": { ...full lunch... }}'
+        )
+        payload = {"dinner": meal, "paired_leftover_lunch": paired_lunch}
+    else:
+        response_instruction = (
+            "Return the full updated meal object:\n"
+            '{"updated_meal": { ...full meal... }}'
+        )
+        payload = {"meal": meal}
+
+    constraints_block = "\n".join(f"- {c}" for c in all_constraints)
+    paired_note = " (and paired lunch)" if paired_lunch is not None else ""
+
+    user_message = f"""Remove this ingredient from the {meal_type} below: "{ingredient_name}"{reason_note}
+
+Find the best Mediterranean-appropriate substitute and revise the recipe so it stays coherent.
+
+Food constraints to honor:
+{constraints_block}
+
+{response_instruction}
+
+Current {meal_type}{paired_note} as JSON:
+{json.dumps(payload, indent=2)}"""
+
+    try:
+        response = _client().messages.create(
+            model=MODEL,
+            max_tokens=3000,
+            system=_SUBSTITUTE_SYSTEM,
+            messages=[{"role": "user", "content": user_message}],
+        )
+    except anthropic.APIError as e:
+        raise MealPlanError(f"Claude API error during substitution: {e}") from e
+
+    raw = _strip_fences(response.content[0].text)
+
+    try:
+        data = json.loads(raw)
+    except json.JSONDecodeError as e:
+        raise MealPlanError(f"Substitution response was not valid JSON: {e}") from e
+
+    updated_meal = data.get("updated_meal")
+    if not updated_meal:
+        raise MealPlanError("Substitution response missing 'updated_meal'.")
+
+    # Preserve the original id no matter what Claude returns
+    updated_meal["id"] = meal["id"]
+    meals[idx] = updated_meal
+
+    # Update the paired leftover lunch if one was sent
+    if paired_lunch is not None and paired_lunch_idx is not None:
+        updated_lunch = data.get("updated_lunch")
+        if updated_lunch:
+            updated_lunch["id"] = paired_lunch["id"]
+            updated_lunch["leftover_from_dinner_id"] = meal_id
+            week_plan["lunches"][paired_lunch_idx] = updated_lunch
+
+    return week_plan
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # Kid meal notes
 # ─────────────────────────────────────────────────────────────────────────────
 

@@ -296,4 +296,58 @@ Tick "avoid in future," regenerate, and confirm the ingredient is absent.
 - [x] Phase 1 — Bug B (0-children)
 - [x] Phase 2 — Bug A (swap consistency)
 - [x] Phase 3 — `@st.fragment`
-- [ ] Phase 4 — Ingredient substitution
+- [x] Phase 4 — Ingredient substitution
+
+---
+
+## Implementation Notes (Phase 1–3, 2026-06-08)
+
+**Branch:** `feature/substitute-and-fixes`
+**Commit:** `ec43ae2`
+
+### Phase 1
+
+- Added `has_kids = kids_count > 0` after `kids_count = len(children)` in `build_system_prompt()`.
+- Pre-computed four conditional string variables just before the `import copy` / schema block: `_children_profile_line`, `_kid_adaptation_rule`, `_kid_output_rule_5`, `_kid_portion_sentence`. These are inserted into the f-string at the four gating points, keeping the f-string readable.
+- Schema modification: `schema_with_kids["week_plan"]["dinners"][0].pop("kid_adaptation", None)` when `not has_kids`; also zeroes out `kid_portion` in all `serving_sizes` entries.
+- `_validate_plan` now takes `require_kid_adaptation: bool = True`; the kid loop is gated on that flag.
+- `build_generation_prompts` now returns a **3-tuple** `(system_prompt, user_message, require_kid)`. Updated callers: `generate_week_plan` unpacks it and passes `require_kid_adaptation=require_kid` to `generate_week_plan_from_prompts`. `app.py` stores `require_kid` as `st.session_state.pending_require_kid` and passes it to the prompt preview dialog.
+- `swap_meal` dinner schema: `"kid_adaptation"` hint is `"string — required"` when kids exist, `"string or null"` when not.
+
+### Phase 2
+
+- Replaced `generates_lunch = ... replaced_meal.get("generates_lunch", False)` with `has_paired_lunch = any(l.get("leftover_from_dinner_id") == meal_id ...)` — detects actual pairing by data, not flag.
+- When `has_paired_lunch`, the replacement_lunch schema now uses `source: "leftover or standalone"` with conditional `leftover_from_dinner_id`, and the user_message includes explicit instructions telling Claude to return a standalone lunch if the replacement doesn't naturally yield leftovers.
+- Post-parse: if `has_paired_lunch` and Claude returns `replacement_lunch`, `generates_lunch` on the new dinner is set to `source == "leftover"`. If Claude omits `replacement_lunch` (fallback), the existing lunch slot has its `leftover_from_dinner_id` updated to the new dinner's id. If `not has_paired_lunch`, `generates_lunch` and `lunch_scaling_instructions` are forced to `False`/`None` on the new dinner.
+
+### Phase 3
+
+- `_settings_fragment()` decorated with `@st.fragment` and called from `with tab_settings:`. All six `st.rerun()` calls inside it changed to `st.rerun(scope="fragment")` — covers: delete child, add child (form submit), toggle constraint, delete constraint, add constraint.
+- `_favorite_edit_fragment(fav)` is a per-item `@st.fragment` that renders tags/rating/feedback/save. "Save changes" uses `scope="fragment"`. "Remove favorite" is outside the fragment and keeps a full `st.rerun()` (it changes the list length, which the outer loop sees).
+- **Note:** `st.form` inside a fragment works fine in Streamlit ≥1.37. The add-child form behaves identically to before.
+- **Note:** Settings preferences (lunch count, budget, portion scale, nutrition targets) still use `st.success("Saved.")` with no rerun — they don't need one since the values are read from disk at generation time, not from session state.
+
+### Phase 4 — what to know before starting
+
+- The `substitute_ingredient` function will mirror `swap_meal` closely. Key reuse: `_strip_fences`, `MealPlanError`, `MODEL`, `data_store.active_constraints_for_prompt()`.
+- The lunch coherence path (paired leftover lunch update) can reuse the same `leftover_from_dinner_id` detection pattern from Phase 2.
+- `app.py` already has `st.session_state.swapping` as a model for `st.session_state.substituting`; the dialog pattern is established.
+- The selectbox of non-pantry ingredients needs `[ing for ing in meal["ingredients"] if not ing.get("pantry_staple")]` — `pantry_staple` flag is reliable on all Claude-generated meals.
+- Recommend Opus 4.8 per the spec — the substitution prompt requires nuanced judgment to keep the dish coherent while swapping a single ingredient.
+
+### Phase 4 — as implemented (2026-06-08)
+
+**`meal_planner.py`**
+- New `_SUBSTITUTE_SYSTEM` constant and `substitute_ingredient(week_plan, meal_id, meal_type, ingredient_name, reason="")`.
+- Locates the meal by id (same `next(... enumerate ...)` pattern as `swap_meal`); raises `MealPlanError` if not found. `meals` is a live reference into `week_plan`, so `meals[idx] = updated_meal` mutates the plan in place.
+- Food constraints sent to Claude = hardcoded defaults (`No mushrooms`, `No oranges or orange juice`, `No fish in lunches`) + `data_store.active_constraints_for_prompt()`.
+- **Lunch coherence (pass-and-update path chosen):** when the target is a dinner with a paired leftover lunch (`leftover_from_dinner_id == meal_id`), both the dinner and that lunch are sent in one call and Claude returns `{"updated_meal": ..., "updated_lunch": ...}`. Otherwise just `{"updated_meal": ...}`. The original `id` (and the lunch's `leftover_from_dinner_id`) are re-stamped after parsing so Claude can't drift them.
+- Reuses `MODEL`, `max_tokens=3000`, `_strip_fences`, and the same JSON-parse error handling as `swap_meal`.
+
+**`app.py`**
+- Added `st.session_state.substituting` (4-tuple: `meal_id, meal_type, meal_name, ingredient_name`) to the init block next to `swapping`.
+- Added `@st.dialog("Substitute Ingredient", width="small") _substitute_dialog()` modeled on `_swap_dialog`: optional reason `text_input`, "Also avoid this ingredient in future plans" checkbox, then calls `substitute_ingredient`, optionally `data_store.add_constraint(f"No {ingredient_name} — disliked, avoid in future plans.")`, rebuilds shopping, updates history, full `st.rerun()`.
+- Triggered alongside `_swap_dialog` (`if st.session_state.substituting: _substitute_dialog()`).
+- Each dinner and lunch card has a `st.selectbox` (placeholder, `index=None`) of non-pantry ingredient names + a "Substitute" button. Button guards on a chosen ingredient (warns if none), sets `substituting`, and `st.rerun()`s to open the dialog.
+- **Note:** unlike the swap button (which relies on the implicit button-click rerun), the substitute button calls `st.rerun()` explicitly because the selectbox + button live in the same widget row — the explicit rerun guarantees the dialog opens on the click that has a valid selection.
+- No `schemas.py` change — substitution reuses `DinnerMeal` / `LunchMeal`.

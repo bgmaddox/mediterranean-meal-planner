@@ -61,6 +61,9 @@ if "pending_days" not in st.session_state:
 if "swapping" not in st.session_state:
     # Tuple of (meal_id, meal_type, meal_name) while dialog is open; None otherwise
     st.session_state.swapping: tuple | None = None
+if "substituting" not in st.session_state:
+    # Tuple of (meal_id, meal_type, meal_name, ingredient_name) while dialog is open
+    st.session_state.substituting: tuple | None = None
 if "pending_require_kid" not in st.session_state:
     st.session_state.pending_require_kid: bool = True
 if "deleted_meals" not in st.session_state:
@@ -185,6 +188,47 @@ def _swap_dialog():
             st.rerun()
 
 
+@st.dialog("Substitute Ingredient", width="small")
+def _substitute_dialog():
+    meal_id, meal_type, meal_name, ingredient_name = st.session_state.substituting
+    st.markdown(f"Replace **{ingredient_name}** in **{meal_name}**?")
+    st.caption(
+        "Claude will find a Mediterranean-appropriate substitute and revise the "
+        "recipe, nutrition, and cost to stay coherent."
+    )
+    reason = st.text_input(
+        "Reason (optional — helps Claude pick a better substitute)",
+        placeholder="e.g. 'don't like the texture' · 'allergic'",
+    )
+    also_avoid = st.checkbox("Also avoid this ingredient in future plans")
+
+    col_confirm, col_cancel = st.columns(2)
+    with col_confirm:
+        if st.button("Find substitute", type="primary", use_container_width=True):
+            with st.spinner(f"Finding a substitute for '{ingredient_name}'..."):
+                try:
+                    updated = meal_planner.substitute_ingredient(
+                        st.session_state.week_plan, meal_id, meal_type,
+                        ingredient_name, reason=reason,
+                    )
+                    if also_avoid:
+                        data_store.add_constraint(
+                            f"No {ingredient_name} — disliked, avoid in future plans."
+                        )
+                    st.session_state.week_plan = updated
+                    st.session_state.substituting = None
+                    _rebuild_shopping()
+                    data_store.update_history_plan(updated, st.session_state.week_start)
+                    st.success("Ingredient substituted!")
+                    st.rerun()
+                except MealPlanError as e:
+                    st.error(f"Substitution failed: {e}")
+    with col_cancel:
+        if st.button("Cancel", use_container_width=True):
+            st.session_state.substituting = None
+            st.rerun()
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Tab: Generate
 # ─────────────────────────────────────────────────────────────────────────────
@@ -241,6 +285,9 @@ with tab_generate:
 
     if st.session_state.swapping:
         _swap_dialog()
+
+    if st.session_state.substituting:
+        _substitute_dialog()
 
     # ── Load a previous week ──────────────────────────────────────────────────
     history = data_store.load_history()
@@ -404,6 +451,25 @@ with tab_generate:
                 data_store.update_history_plan(plan, st.session_state.week_start)
                 st.rerun()
 
+            # Substitute-ingredient row (non-pantry ingredients only)
+            sub_options = [i["name"] for i in dinner.get("ingredients", []) if not i.get("pantry_staple")]
+            if sub_options:
+                sub_col, sub_btn_col = st.columns([8, 2])
+                chosen_ing = sub_col.selectbox(
+                    "Substitute an ingredient",
+                    options=sub_options,
+                    index=None,
+                    key=f"subsel_{did}",
+                    label_visibility="collapsed",
+                    placeholder="Substitute an ingredient…",
+                )
+                if sub_btn_col.button("Substitute", key=f"subbtn_{did}", use_container_width=True):
+                    if chosen_ing:
+                        st.session_state.substituting = (did, "dinner", dinner["name"], chosen_ing)
+                        st.rerun()
+                    else:
+                        st.warning("Pick an ingredient to substitute first.")
+
             with st.expander("Recipe & details", expanded=False):
                 if dinner.get("health_highlights"):
                     st.caption(" · ".join(dinner["health_highlights"]))
@@ -534,6 +600,25 @@ with tab_generate:
                 _rebuild_shopping()
                 data_store.update_history_plan(plan, st.session_state.week_start)
                 st.rerun()
+
+            # Substitute-ingredient row (non-pantry ingredients only)
+            lunch_sub_options = [i["name"] for i in lunch.get("ingredients", []) if not i.get("pantry_staple")]
+            if lunch_sub_options:
+                sub_col, sub_btn_col = st.columns([8, 2])
+                chosen_ing = sub_col.selectbox(
+                    "Substitute an ingredient",
+                    options=lunch_sub_options,
+                    index=None,
+                    key=f"subsel_{lid}",
+                    label_visibility="collapsed",
+                    placeholder="Substitute an ingredient…",
+                )
+                if sub_btn_col.button("Substitute", key=f"subbtn_{lid}", use_container_width=True):
+                    if chosen_ing:
+                        st.session_state.substituting = (lid, "lunch", lunch["name"], chosen_ing)
+                        st.rerun()
+                    else:
+                        st.warning("Pick an ingredient to substitute first.")
 
             with st.expander("Recipe & details", expanded=False):
                 if lunch.get("health_highlights"):
