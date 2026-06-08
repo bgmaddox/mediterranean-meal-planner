@@ -78,7 +78,7 @@ def build_generation_prompts(
 
     Returns
     -------
-    (system_prompt, user_message)
+    (system_prompt, user_message, require_kid_adaptation)
     """
     prefs = data_store.load_preferences()
     system_prompt = build_system_prompt(
@@ -95,10 +95,11 @@ def build_generation_prompts(
         use_up_ingredients=use_up_ingredients,
         days=days,
     )
-    return system_prompt, _DEFAULT_USER_MESSAGE
+    require_kid = bool(prefs.get("children"))
+    return system_prompt, _DEFAULT_USER_MESSAGE, require_kid
 
 
-def generate_week_plan_from_prompts(system_prompt: str, user_message: str, expected_days: int = 5) -> WeekPlan:
+def generate_week_plan_from_prompts(system_prompt: str, user_message: str, expected_days: int = 5, require_kid_adaptation: bool = True) -> WeekPlan:
     """
     Call Claude with pre-built prompts and return a validated WeekPlan.
     Used after the prompt-preview dialog allows editing.
@@ -132,7 +133,7 @@ def generate_week_plan_from_prompts(system_prompt: str, user_message: str, expec
         )
 
     plan: WeekPlan = data["week_plan"]
-    _validate_plan(plan, expected_days)
+    _validate_plan(plan, expected_days, require_kid_adaptation=require_kid_adaptation)
     return plan
 
 
@@ -158,11 +159,11 @@ def generate_week_plan(week_notes: str | None = None, cuisine_notes: str | None 
     ------
     MealPlanError on API or parse failure.
     """
-    system_prompt, user_message = build_generation_prompts(week_notes, cuisine_notes, use_up_ingredients, days)
-    return generate_week_plan_from_prompts(system_prompt, user_message, expected_days=days)
+    system_prompt, user_message, require_kid = build_generation_prompts(week_notes, cuisine_notes, use_up_ingredients, days)
+    return generate_week_plan_from_prompts(system_prompt, user_message, expected_days=days, require_kid_adaptation=require_kid)
 
 
-def _validate_plan(plan: WeekPlan, days: int = 5) -> None:
+def _validate_plan(plan: WeekPlan, days: int = 5, require_kid_adaptation: bool = True) -> None:
     if not plan.get("dinners"):
         raise MealPlanError("Plan has no dinners.")
     if not plan.get("lunches"):
@@ -171,11 +172,12 @@ def _validate_plan(plan: WeekPlan, days: int = 5) -> None:
         raise MealPlanError(f"Expected {days} dinners, got {len(plan['dinners'])}.")
     if len(plan["lunches"]) != days:
         raise MealPlanError(f"Expected {days} lunches, got {len(plan['lunches'])}.")
-    for dinner in plan["dinners"]:
-        if not dinner.get("kid_adaptation"):
-            raise MealPlanError(
-                f"Dinner '{dinner.get('name')}' is missing kid_adaptation."
-            )
+    if require_kid_adaptation:
+        for dinner in plan["dinners"]:
+            if not dinner.get("kid_adaptation"):
+                raise MealPlanError(
+                    f"Dinner '{dinner.get('name')}' is missing kid_adaptation."
+                )
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -245,7 +247,9 @@ def swap_meal(
         raise MealPlanError(f"Meal '{meal_id}' not found in {meal_type}s.")
 
     replaced_meal = meals[idx]
-    generates_lunch = meal_type == "dinner" and replaced_meal.get("generates_lunch", False)
+    has_paired_lunch = meal_type == "dinner" and any(
+        l.get("leftover_from_dinner_id") == meal_id for l in week_plan["lunches"]
+    )
 
     # Build context: what's already in the week
     other_dinners = [d["name"] for d in week_plan["dinners"] if d["id"] != meal_id]
@@ -273,18 +277,18 @@ def swap_meal(
                 "ingredients": [{"name": "str", "quantity": "str", "unit": "str", "pantry_staple": "bool", "special": "bool"}],
                 "instructions": ["string"],
                 "sunday_prep": "string or null",
-                "kid_adaptation": "string — required",
+                "kid_adaptation": "string — required" if bool(prefs.get("children")) else "string or null",
                 "health_highlights": ["string"],
                 "uric_acid_tip": "string or null",
                 "nutrition_estimate": {"calories_per_adult_serving": "int", "protein_g": "int", "fiber_g": "int", "fat_g": "int", "saturated_fat_note": "string or null"},
             }
         }
-        if generates_lunch:
+        if has_paired_lunch:
             schema["replacement_lunch"] = {
                 "id": "string — use the id of the lunch being replaced",
                 "name": "string",
-                "source": "leftover",
-                "leftover_from_dinner_id": replaced_meal["id"],
+                "source": "string — 'leftover' if this dinner naturally yields leftovers, 'standalone' if not",
+                "leftover_from_dinner_id": f"string — '{replaced_meal['id']}' if source is 'leftover', null if standalone",
                 "reheat": "string",
                 "prep_at_lunchtime_minutes": "integer",
                 "servings": 1,
@@ -310,7 +314,14 @@ def swap_meal(
             }
         }
 
-    user_message = f"""Replace this {meal_type}: "{replaced_meal['name']}"{reason_note}
+    _lunch_slot_note = (
+        f"\nA paired lunch slot exists for this dinner. If your replacement dinner naturally yields a leftover lunch, "
+        f"return replacement_lunch with source: 'leftover' and leftover_from_dinner_id: '{replaced_meal['id']}'. "
+        f"If it does not, return a standalone lunch (source: 'standalone', leftover_from_dinner_id: null). "
+        f"Always return replacement_lunch when it appears in the schema."
+    ) if has_paired_lunch else ""
+
+    user_message = f"""Replace this {meal_type}: "{replaced_meal['name']}"{reason_note}{_lunch_slot_note}
 
 Other meals already in this week (do not repeat):
 Dinners: {", ".join(other_dinners)}
@@ -351,18 +362,27 @@ Return ONLY this JSON structure:
             raise MealPlanError("Swap response missing 'replacement_dinner'.")
         week_plan["dinners"][idx] = new_dinner
 
-        # Auto-swap paired lunch if the original generated one
-        if generates_lunch:
+        if has_paired_lunch:
+            lunch_idx = next(
+                (i for i, l in enumerate(week_plan["lunches"])
+                 if l.get("leftover_from_dinner_id") == meal_id),
+                None,
+            )
             new_lunch = data.get("replacement_lunch")
-            if new_lunch:
-                lunch_idx = next(
-                    (i for i, l in enumerate(week_plan["lunches"])
-                     if l.get("leftover_from_dinner_id") == meal_id),
-                    None,
-                )
-                if lunch_idx is not None:
-                    new_lunch["id"] = week_plan["lunches"][lunch_idx]["id"]
-                    week_plan["lunches"][lunch_idx] = new_lunch
+            if new_lunch and lunch_idx is not None:
+                new_lunch["id"] = week_plan["lunches"][lunch_idx]["id"]
+                is_leftover = new_lunch.get("source") == "leftover"
+                new_dinner["generates_lunch"] = is_leftover
+                if not is_leftover:
+                    new_lunch["leftover_from_dinner_id"] = None
+                    new_dinner["lunch_scaling_instructions"] = None
+                week_plan["lunches"][lunch_idx] = new_lunch
+            elif lunch_idx is not None:
+                # Fallback: keep old lunch but update its dinner reference
+                week_plan["lunches"][lunch_idx]["leftover_from_dinner_id"] = new_dinner["id"]
+        else:
+            new_dinner["generates_lunch"] = False
+            new_dinner["lunch_scaling_instructions"] = None
     else:
         new_lunch = data.get("replacement_lunch")
         if not new_lunch:

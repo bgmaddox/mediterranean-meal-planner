@@ -61,6 +61,8 @@ if "pending_days" not in st.session_state:
 if "swapping" not in st.session_state:
     # Tuple of (meal_id, meal_type, meal_name) while dialog is open; None otherwise
     st.session_state.swapping: tuple | None = None
+if "pending_require_kid" not in st.session_state:
+    st.session_state.pending_require_kid: bool = True
 if "deleted_meals" not in st.session_state:
     # List of {"type": "dinner"|"lunch", "meal": dict, "removed_lunches": list}
     st.session_state.deleted_meals: list = []
@@ -112,6 +114,7 @@ def _prompt_preview_dialog():
                     plan = meal_planner.generate_week_plan_from_prompts(
                         system_edited, user_edited,
                         expected_days=st.session_state.pending_days,
+                        require_kid_adaptation=st.session_state.pending_require_kid,
                     )
                 except MealPlanError as e:
                     st.error(f"Could not generate plan: {e}")
@@ -221,7 +224,7 @@ with tab_generate:
         )
 
     if generate_clicked:
-        sys_p, usr_m = meal_planner.build_generation_prompts(
+        sys_p, usr_m, require_kid = meal_planner.build_generation_prompts(
             week_notes or None,
             cuisine_notes or None,
             use_up_ingredients=use_up_ingredients.strip() or None,
@@ -230,6 +233,7 @@ with tab_generate:
         st.session_state.pending_system_prompt = sys_p
         st.session_state.pending_user_message = usr_m
         st.session_state.pending_days = int(days)
+        st.session_state.pending_require_kid = require_kid
         st.session_state.show_prompt_dialog = True
 
     if st.session_state.show_prompt_dialog:
@@ -644,6 +648,36 @@ with tab_shopping:
 # ─────────────────────────────────────────────────────────────────────────────
 # Tab: Favorites
 # ─────────────────────────────────────────────────────────────────────────────
+
+@st.fragment
+def _favorite_edit_fragment(fav: dict):
+    all_tags = [
+        "kids loved it", "great leftover", "make again soon",
+        "easy to make", "bold flavors", "comfort food",
+        "too time-consuming", "needs adjustment",
+    ]
+    new_tags = st.multiselect(
+        "Tags", options=all_tags, default=fav.get("tags", []),
+        key=f"tags_{fav['id']}",
+    )
+    new_rating = st.slider(
+        "Rating", min_value=1, max_value=5, value=fav["rating"],
+        key=f"rating_{fav['id']}",
+    )
+    new_feedback = st.text_input(
+        "Notes for Claude",
+        value=fav.get("feedback", ""),
+        placeholder="e.g. 'Kids liked it more with the sauce on the side'",
+        key=f"feedback_{fav['id']}",
+    )
+    if st.button("Save changes", key=f"save_{fav['id']}"):
+        data_store.update_favorite(
+            fav["id"], rating=new_rating, tags=new_tags, feedback=new_feedback
+        )
+        st.success("Updated!")
+        st.rerun(scope="fragment")
+
+
 with tab_favorites:
     st.header("Favorite Meals")
     st.caption("Claude works these into future plans naturally, based on ratings and how recently they were made.")
@@ -657,38 +691,11 @@ with tab_favorites:
             with st.expander(
                 f"**{fav['name']}** {stars}  ·  Last made: {fav['last_made']}"
             ):
-                all_tags = [
-                    "kids loved it", "great leftover", "make again soon",
-                    "easy to make", "bold flavors", "comfort food",
-                    "too time-consuming", "needs adjustment",
-                ]
-                new_tags = st.multiselect(
-                    "Tags", options=all_tags, default=fav.get("tags", []),
-                    key=f"tags_{fav['id']}",
-                )
-                new_rating = st.slider(
-                    "Rating", min_value=1, max_value=5, value=fav["rating"],
-                    key=f"rating_{fav['id']}",
-                )
-                new_feedback = st.text_input(
-                    "Notes for Claude",
-                    value=fav.get("feedback", ""),
-                    placeholder="e.g. 'Kids liked it more with the sauce on the side'",
-                    key=f"feedback_{fav['id']}",
-                )
-                col_save, col_delete = st.columns(2)
-                with col_save:
-                    if st.button("Save changes", key=f"save_{fav['id']}"):
-                        data_store.update_favorite(
-                            fav["id"], rating=new_rating, tags=new_tags, feedback=new_feedback
-                        )
-                        st.success("Updated!")
-                        st.rerun()
-                with col_delete:
-                    if st.button("Remove favorite", key=f"del_{fav['id']}"):
-                        data_store.delete_favorite(fav["id"])
-                        st.warning(f"'{fav['name']}' removed.")
-                        st.rerun()
+                _favorite_edit_fragment(fav)
+                if st.button("Remove favorite", key=f"del_{fav['id']}"):
+                    data_store.delete_favorite(fav["id"])
+                    st.warning(f"'{fav['name']}' removed.")
+                    st.rerun()
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -802,8 +809,9 @@ with tab_library:
 # ─────────────────────────────────────────────────────────────────────────────
 # Tab: Settings
 # ─────────────────────────────────────────────────────────────────────────────
-with tab_settings:
-    st.header("Settings")
+
+@st.fragment
+def _settings_fragment():
     prefs = data_store.load_preferences()
 
     # ── Children ──────────────────────────────────────────────────────────────
@@ -831,7 +839,7 @@ with tab_settings:
         if col_del.button("✕", key=f"del_child_{i}"):
             children = [c for j, c in enumerate(children) if j != i]
             data_store.update_preferences(children=children)
-            st.rerun()
+            st.rerun(scope="fragment")
         if new_name != child.get("name", "") or new_age != child.get("age"):
             children[i] = {"name": new_name, "age": int(new_age)}
             data_store.update_preferences(children=children)
@@ -843,7 +851,7 @@ with tab_settings:
         if st.form_submit_button("Add child", use_container_width=True):
             children = prefs.get("children", []) + [{"name": add_name.strip(), "age": int(add_age)}]
             data_store.update_preferences(children=children)
-            st.rerun()
+            st.rerun(scope="fragment")
 
     st.divider()
 
@@ -939,13 +947,13 @@ with tab_settings:
                 )
                 if active != c["active"]:
                     data_store.toggle_constraint(c["id"])
-                    st.rerun()
+                    st.rerun(scope="fragment")
             with col_text:
                 st.write(c["text"])
             with col_del:
                 if st.button("✕", key=f"delc_{c['id']}"):
                     data_store.delete_constraint(c["id"])
-                    st.rerun()
+                    st.rerun(scope="fragment")
     else:
         st.caption("No custom constraints yet.")
 
@@ -957,7 +965,7 @@ with tab_settings:
     if st.button("Add Constraint") and new_constraint.strip():
         data_store.add_constraint(new_constraint.strip())
         st.success("Constraint added.")
-        st.rerun()
+        st.rerun(scope="fragment")
 
     st.divider()
 
@@ -1005,3 +1013,8 @@ with tab_settings:
                     st.markdown(f"- {name}")
     else:
         st.caption("No history yet.")
+
+
+with tab_settings:
+    st.header("Settings")
+    _settings_fragment()

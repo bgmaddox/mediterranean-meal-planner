@@ -321,6 +321,7 @@ def build_system_prompt(
         children = [{"name": "", "age": 5}, {"name": "", "age": 2}]
 
     kids_count = len(children)
+    has_kids = kids_count > 0
     kids_desc = _describe_children(children)
     family_size = 2 + kids_count
 
@@ -478,11 +479,34 @@ def build_system_prompt(
 
     protein_targets = _PROTEIN_TARGETS.get(days, _PROTEIN_TARGETS[5])
 
+    # Pre-computed conditional strings for kid-related prompt sections
+    _children_profile_line = (
+        f"- **Children:** {kids_desc}. Need milder versions of the same dishes — same meal, less spice, "
+        f"sauces on the side, familiar textures."
+        + ("  The youngest is under 3 — prioritize soft textures and finger-food adaptations." if youngest_age < 3 else "")
+    ) if has_kids else ""
+
+    _kid_adaptation_rule = (
+        "- **Kid adaptation is mandatory on every dinner.** Specific and practical — not a placeholder."
+    ) if has_kids else ""
+
+    _kid_output_rule_5 = (
+        "5. `kid_adaptation` is required on every dinner. Never null or empty."
+    ) if has_kids else ""
+
+    _kid_portion_sentence = (
+        "Kid portions should be roughly half of adult portions. For lunches, kid_portion can be an empty string."
+    ) if has_kids else "kid_portion should always be an empty string."
+
     import copy
     schema_with_kids = copy.deepcopy(OUTPUT_SCHEMA)
     schema_with_kids["week_plan"]["dinners"][0]["servings"]["kids"] = kids_count
     schema_with_kids["week_plan"]["dinners"][0]["id"] = f"string — 'd1' through 'd{days}'"
     schema_with_kids["week_plan"]["lunches"][0]["id"] = f"string — 'l1' through 'l{days}'"
+    if not has_kids:
+        schema_with_kids["week_plan"]["dinners"][0].pop("kid_adaptation", None)
+        for ss in schema_with_kids["week_plan"]["dinners"][0].get("serving_sizes", []):
+            ss["kid_portion"] = ""
     schema_str = json.dumps(schema_with_kids, indent=2)
     staples_str = json.dumps(PANTRY_STAPLES, indent=2)
 
@@ -523,8 +547,7 @@ Today's date: {current_date} (Season: {season})
 - **Adults:** 2. Both are adventurous eaters who welcome bold flavors from any cuisine — Mediterranean (harissa, za'atar, ras el hanout, \
 preserved lemon, sumac), Asian (soy, miso, ginger, sesame, fish sauce), Latin (cumin, chipotle, lime, cilantro), Indian (turmeric, garam masala, \
 curry), and beyond.
-- **Children:** {kids_desc}. Need milder versions of the same dishes — same meal, less spice, \
-sauces on the side, familiar textures.{"  The youngest is under 3 — prioritize soft textures and finger-food adaptations." if youngest_age < 3 else ""}
+{_children_profile_line}
 - **Dinner servings:** 2 adults + {kids_count} kid{"s" if kids_count != 1 else ""} (family of {family_size}).
 - **Lunch servings:** {lunch_adult_count} adult(s) bringing lunch to a weekday office.
 
@@ -625,7 +648,7 @@ The following equipment is available. Use whatever makes the best recipe — do 
 ## Dinners — {days} per week
 - Family of {family_size} (2 adults + {kids_count} kid{"s" if kids_count != 1 else ""})
 - 30–45 min active cook/prep time. Slow cooker and Instant Pot meals may take longer but are fine.
-- **Kid adaptation is mandatory on every dinner.** Specific and practical — not a placeholder.
+{_kid_adaptation_rule}
 - Protein targets: {protein_targets}.{chr(10) + "- " + portion_scale_instruction if portion_scale_instruction else ""}
 
 ## Lunches — {days} per week, {lunch_adult_count} adult(s)
@@ -699,7 +722,7 @@ The response must begin with `{{` and end with `}}`.
 2. `special: true` means non-staple purchased this week — must appear in 2+ meals.
 3. `generates_lunch: true` dinners must include `lunch_scaling_instructions`.
 4. `sunday_prep` is the task string (or null).
-5. `kid_adaptation` is required on every dinner. Never null or empty.
+{_kid_output_rule_5}
 6. `uric_acid_tip` when a technique meaningfully reduces purines.
 7. `ingredient_overlap_notes` must account for every special ingredient.
 8. `cook_time_minutes` reflects realistic home-cook active time.
@@ -707,5 +730,5 @@ The response must begin with `{{` and end with `}}`.
 10. `cost_estimate` is required on every dinner and lunch.
 11. `serving_sizes` is required on every dinner and lunch. List every main component (protein, grain/starch, vegetable sides). \
 Base adult portions on a ~500–550 kcal dinner plate for weight loss: typically 4–6 oz protein, 1/2 cup grain, 1–2 cups vegetables. \
-Kid portions should be roughly half of adult portions. For lunches, kid_portion can be an empty string.
+{_kid_portion_sentence}
 """
