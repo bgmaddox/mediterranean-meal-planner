@@ -29,3 +29,9 @@ PDFs/
 .env
 email_report.py
 CLAUDE.md
+
+# Local tooling / agent scratch
+.claude/
+.antigravitycli/
+.playwright-mcp/
+temp/

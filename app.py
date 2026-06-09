@@ -20,6 +20,7 @@ from datetime import date
 
 import streamlit as st
 
+import card_html
 import data_store
 import drive_upload
 import meal_planner
@@ -38,6 +39,9 @@ st.set_page_config(
 )
 
 st.title("🫒 Mediterranean Meal Planner")
+
+# Inject the scoped card stylesheet once; all tabs share the same DOM.
+st.html(card_html.CARD_STYLES)
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Session state initialisation
@@ -86,10 +90,6 @@ def _rebuild_shopping():
         st.session_state.shopping_sections = shopping.build_shopping_list(
             st.session_state.week_plan
         )
-
-
-def _on_track_icon(value: int, target: int) -> str:
-    return "✅" if value >= target else "⚠️"
 
 
 @st.dialog("Review & Edit Prompt", width="large")
@@ -333,29 +333,17 @@ with tab_generate:
         t_prot = prefs.get("target_protein_g", 100)
         t_fib = prefs.get("target_fiber_g", 18)
 
-        c1, c2, c3, c4, c5, c6 = st.columns(6)
-        c1.metric("Fish meals", summary.get("fish_meal_count", "-"))
-        c2.metric("Red meat meals", summary.get("red_meat_meal_count", "-"))
-        c3.metric("Vegetarian meals", summary.get("vegetarian_meal_count", "-"))
         weekly_cost = summary.get("estimated_weekly_grocery_cost_usd")
-        if weekly_cost:
-            c1.metric("Est. grocery cost", f"${weekly_cost:.0f}", help="Non-pantry ingredients only. Publix/Kroger pricing. ±20–30%.")
-        c4.metric(
-            f"Avg cal/day L+D {_on_track_icon(avg_cal, t_cal)}",
-            f"{avg_cal} kcal",
-            help=f"Target: {t_cal} kcal",
-        )
-        c5.metric(
-            f"Avg protein/day {_on_track_icon(avg_protein, t_prot)}",
-            f"{avg_protein}g",
-            help=f"Target: {t_prot}g",
-        )
-        c6.metric(
-            f"Avg fiber/day {_on_track_icon(avg_fiber, t_fib)}",
-            f"{avg_fiber}g",
-            help=f"Target: {t_fib}g",
-        )
-        st.caption("Nutrition covers lunch + dinner only. Breakfast and snacks not tracked. Estimates ±15–20%.")
+        st.html(card_html.render_week_summary_card(
+            fish=summary.get("fish_meal_count", 0),
+            red_meat=summary.get("red_meat_meal_count", 0),
+            veg=summary.get("vegetarian_meal_count", 0),
+            weekly_cost=weekly_cost,
+            avg_cal=avg_cal, t_cal=t_cal,
+            avg_protein=avg_protein, t_prot=t_prot,
+            avg_fiber=avg_fiber, t_fib=t_fib,
+        ))
+        st.caption("Nutrition covers lunch + dinner only. Breakfast and snacks not tracked. Cost: non-pantry only, ±20–30%. Nutrition ±15–20%.")
 
         special = summary.get("special_ingredients", [])
         if special:
@@ -430,13 +418,11 @@ with tab_generate:
         for dinner in plan.get("dinners", []):
             did = dinner["id"]
 
-            # Header row: meal name + swap + remove buttons
-            hdr_col, swap_col, remove_col = st.columns([8, 1, 1])
-            hdr_col.markdown(
-                f"**{dinner['name']}** &nbsp;·&nbsp; {dinner['cook_time_minutes']} min"
-                f" &nbsp;·&nbsp; {dinner['primary_equipment']}",
-                unsafe_allow_html=True,
-            )
+            # Stitch-designed summary card (display only)
+            st.html(card_html.render_dinner_card(dinner))
+
+            # Controls row: swap + remove buttons
+            _, swap_col, remove_col = st.columns([8, 1, 1])
             if swap_col.button("🔄 Swap", key=f"swap_{did}", use_container_width=True):
                 st.session_state.swapping = (did, "dinner", dinner["name"])
             if remove_col.button("✕ Remove", key=f"remove_{did}", use_container_width=True):
@@ -580,15 +566,12 @@ with tab_generate:
         st.subheader("Lunches")
         for lunch in plan.get("lunches", []):
             lid = lunch["id"]
-            source_label = "Leftover from dinner" if lunch["source"] == "leftover" else "Standalone"
-            reheat_label = "Microwave" if lunch["reheat"] == "microwave" else "Cold (no reheat)"
 
-            # Header row: meal name + swap + remove buttons
-            hdr_col, swap_col, remove_col = st.columns([8, 1, 1])
-            hdr_col.markdown(
-                f"**{lunch['name']}** &nbsp;·&nbsp; {source_label} &nbsp;·&nbsp; {reheat_label}",
-                unsafe_allow_html=True,
-            )
+            # Stitch-designed summary card (display only)
+            st.html(card_html.render_lunch_card(lunch))
+
+            # Controls row: swap + remove buttons
+            _, swap_col, remove_col = st.columns([8, 1, 1])
             if swap_col.button("🔄 Swap", key=f"swap_{lid}", use_container_width=True):
                 st.session_state.swapping = (lid, "lunch", lunch["name"])
             if remove_col.button("✕ Remove", key=f"remove_{lid}", use_container_width=True):
@@ -675,11 +658,7 @@ with tab_generate:
         sunday_tasks = plan.get("sunday_prep_list", [])
         if sunday_tasks:
             for task in sunday_tasks:
-                with st.expander(f"**{task['task']}**", expanded=True):
-                    if task.get("yields_for"):
-                        st.markdown("*Used in:* " + ", ".join(task["yields_for"]))
-                    if task.get("storage"):
-                        st.caption(f"Storage: {task['storage']}")
+                st.html(card_html.render_prep_card(task))
         else:
             st.caption("No Sunday prep suggested for this week.")
 
@@ -724,10 +703,8 @@ with tab_shopping:
         for col, chunk in ((col_left, section_list[:mid]), (col_right, section_list[mid:])):
             with col:
                 for section, items in chunk:
-                    st.markdown(f"**{section}**")
-                    for item in items:
-                        st.markdown(f"- {item.name} — {item.display_quantity()}")
-                    st.write("")
+                    rows = [(item.name, item.display_quantity()) for item in items]
+                    st.html(card_html.render_shopping_section(section, rows))
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -772,10 +749,8 @@ with tab_favorites:
         st.info("No favorites yet. Generate a plan and save meals you enjoy.")
     else:
         for fav in sorted(favorites, key=lambda f: f["rating"], reverse=True):
-            stars = "★" * fav["rating"] + "☆" * (5 - fav["rating"])
-            with st.expander(
-                f"**{fav['name']}** {stars}  ·  Last made: {fav['last_made']}"
-            ):
+            st.html(card_html.render_favorite_card(fav))
+            with st.expander("✏️ Rate & edit"):
                 _favorite_edit_fragment(fav)
                 if st.button("Remove favorite", key=f"del_{fav['id']}"):
                     data_store.delete_favorite(fav["id"])
@@ -826,9 +801,7 @@ with tab_library:
                 meal = rec["meal"]
                 with st.expander(f"**{rec['name']}** &nbsp;·&nbsp; Last generated: {rec['last_generated']}", expanded=False):
                     if rec["meal_type"] == "dinner":
-                        st.caption(f"{meal.get('cook_time_minutes', '?')} min · {meal.get('primary_equipment', '')}")
-                        if meal.get("health_highlights"):
-                            st.caption(" · ".join(meal["health_highlights"]))
+                        st.html(card_html.render_dinner_card(meal))
 
                         cols = st.columns([3, 2])
                         with cols[0]:
@@ -846,8 +819,7 @@ with tab_library:
                         if meal.get("uric_acid_tip"):
                             st.success(f"**Uric acid tip:** {meal['uric_acid_tip']}")
                     else:
-                        source_label = "Leftover from dinner" if meal.get("source") == "leftover" else "Standalone"
-                        st.caption(source_label)
+                        st.html(card_html.render_lunch_card(meal))
                         st.markdown("**Ingredients**")
                         for ing in meal.get("ingredients", []):
                             staple = " *(pantry)*" if ing.get("pantry_staple") else ""

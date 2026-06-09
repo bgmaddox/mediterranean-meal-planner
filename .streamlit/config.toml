@@ -1,0 +1,8 @@
+# Mediterranean palette — warms the whole app to match the meal cards.
+[theme]
+base = "light"
+primaryColor = "#5B7553"            # olive green (buttons, accents)
+backgroundColor = "#FBF8F0"         # warm off-white page
+secondaryBackgroundColor = "#F2ECDD" # sidebar / cards / expanders
+textColor = "#233044"               # deep navy text
+font = "sans serif"
