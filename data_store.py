@@ -180,6 +180,10 @@ def delete_favorite(favorite_id: str) -> bool:
 # ─────────────────────────────────────────────────────────────────────────────
 
 def load_constraints() -> list[ConstraintEntry]:
+    # constraints.json is gitignored (personal data) and not shipped; treat a
+    # missing file as "no custom constraints". It is recreated on first add.
+    if not CONSTRAINTS_FILE.exists():
+        return []
     return _read(CONSTRAINTS_FILE)
 
 
