@@ -56,6 +56,7 @@ st.html("""
   .stTextArea textarea { font-size: 18px; }
   label, .stSelectbox label, .stTextInput label, .stNumberInput label,
   .stTextArea label, .stSlider label, .stMultiSelect label { font-size: 17.5px !important; }
+  [data-testid="stWidgetLabel"] p { font-size: 17.5px !important; }
   h1 { font-size: 2.3rem; }
   h2 { font-size: 1.7rem; }
   h3 { font-size: 1.35rem; }
