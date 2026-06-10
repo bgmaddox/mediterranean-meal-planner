@@ -40,8 +40,9 @@ st.set_page_config(
 )
 
 # ── Global legibility pass ────────────────────────────────────────────────────
-# Streamlit's defaults run small; bump the base type and key widgets a notch.
-st.html("""
+# Must use st.markdown (not st.html) so styles reach native Streamlit widgets;
+# st.html() renders in a sandboxed iframe and can't pierce the parent DOM.
+st.markdown("""
 <style>
   html, body, [class*="st-"], .stMarkdown, .stMarkdown p, .stMarkdown li {
     font-size: 16.5px;
@@ -54,8 +55,6 @@ st.html("""
   .stButton button, .stDownloadButton button { font-size: 15.5px; font-weight: 500; }
   .stTextInput input, .stNumberInput input, .stSelectbox div[data-baseweb="select"],
   .stTextArea textarea { font-size: 18px; }
-  label, .stSelectbox label, .stTextInput label, .stNumberInput label,
-  .stTextArea label, .stSlider label, .stMultiSelect label { font-size: 17.5px !important; }
   [data-testid="stWidgetLabel"] p { font-size: 17.5px !important; }
   h1 { font-size: 2.3rem; }
   h2 { font-size: 1.7rem; }
@@ -69,7 +68,7 @@ st.html("""
     font-size:2.3rem; color:#233044; margin:0; line-height:1.1;
   }
 </style>
-""")
+""", unsafe_allow_html=True)
 
 # Inject the scoped card stylesheet + icon mask classes once; tabs share the DOM.
 st.html(card_html.CARD_STYLES)
