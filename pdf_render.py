@@ -154,47 +154,50 @@ body {
 /* ── Meal card wrapper ───────────────────────────────────────────────────── */
 .pr-meal {
   border: 1pt solid #E7DFCD;
-  border-radius: 10pt;
-  padding: 16pt 18pt;
-  margin-bottom: 16pt;
+  border-radius: 8pt;
+  padding: 10pt 12pt;
+  margin-bottom: 10pt;
   background: #FFFDF8;
 }
 /* Dinners after the first get their own page */
 .pr-meal--dinner + .pr-meal--dinner { break-before: page; }
 .pr-meal__title {
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 20pt;
+  font-size: 16pt;
   font-weight: bold;
   color: #233044;
   line-height: 1.2;
-  margin-bottom: 7pt;
+  margin-bottom: 3pt;
   break-after: avoid;
 }
 
+/* Keeps counter+title+meta+tags+divider together; prevents split before content */
+.pr-meal-header { break-after: avoid; }
+
 /* Dinner counter badge (e.g. "DINNER 2 OF 5") */
 .pr-dinner-counter {
-  font-size: 7.5pt;
+  font-size: 7pt;
   font-weight: 700;
   letter-spacing: .1em;
   text-transform: uppercase;
   color: #5B7553;
-  margin-bottom: 6pt;
+  margin-bottom: 2pt;
 }
 .pr-meal__meta {
-  font-size: 9pt;
+  font-size: 8pt;
   color: #5A6472;
-  margin-bottom: 8pt;
+  margin-bottom: 3pt;
 }
 .pr-meal__meta span + span::before { content: " · "; color: #C56A3D; }
 
 /* Health highlight tags */
-.pr-tags { display: flex; flex-wrap: wrap; gap: 5pt; margin-bottom: 10pt; }
+.pr-tags { display: flex; flex-wrap: wrap; gap: 3pt; margin-bottom: 5pt; }
 .pr-tag {
   background: rgba(91,117,83,.12);
   color: #5B7553;
-  font-size: 8pt;
+  font-size: 7pt;
   font-weight: 600;
-  padding: 2.5pt 8pt;
+  padding: 1pt 5pt;
   border-radius: 99pt;
 }
 
@@ -202,38 +205,38 @@ body {
 .pr-divider {
   border: none;
   border-top: 1pt solid #E7DFCD;
-  margin: 10pt 0;
+  margin: 5pt 0;
 }
 
 /* ── Two-column ingredient + instruction layout ───────────────────────────── */
 .pr-columns {
   display: flex;
-  gap: 18pt;
-  margin-bottom: 4pt;
+  gap: 14pt;
+  margin-bottom: 2pt;
 }
 .pr-col-left  { flex: 0 0 42%; }
 .pr-col-right { flex: 1; }
 
 /* ── Labels (Ingredients / Instructions / etc.) ──────────────────────────── */
 .pr-label {
-  font-size: 8pt;
+  font-size: 7.5pt;
   font-weight: 700;
   letter-spacing: .07em;
   text-transform: uppercase;
   color: #5A6472;
-  margin-bottom: 5pt;
+  margin-bottom: 3pt;
   break-after: avoid;
 }
 
 /* ── Ingredient list ─────────────────────────────────────────────────────── */
 .pr-ingredients { list-style: none; }
 .pr-ingredients li {
-  font-size: 9.5pt;
+  font-size: 9pt;
   color: #233044;
-  padding: 2pt 0;
+  padding: 1.5pt 0;
   border-bottom: .5pt solid #F1EBDC;
   display: flex;
-  gap: 6pt;
+  gap: 5pt;
 }
 .pr-ingredients li:last-child { border-bottom: none; }
 .pr-ingredients li::before { content: "·"; color: #C56A3D; flex-shrink: 0; }
@@ -243,9 +246,9 @@ body {
 .pr-steps { list-style: none; counter-reset: steps; }
 .pr-steps li {
   counter-increment: steps;
-  font-size: 9.5pt;
+  font-size: 9pt;
   color: #233044;
-  padding: 3pt 0 3pt 20pt;
+  padding: 2pt 0 2pt 18pt;
   position: relative;
   border-bottom: .5pt solid #F1EBDC;
 }
@@ -254,7 +257,7 @@ body {
   content: counter(steps);
   position: absolute;
   left: 0;
-  top: 3pt;
+  top: 2pt;
   background: #5B7553;
   color: #FFFDF8;
   font-size: 7pt;
@@ -290,18 +293,18 @@ body {
 
 /* ── Callout boxes ───────────────────────────────────────────────────────── */
 .pr-callout {
-  border-radius: 6pt;
-  padding: 7pt 10pt;
-  margin-top: 8pt;
-  font-size: 9pt;
+  border-radius: 4pt;
+  padding: 4pt 8pt;
+  margin-top: 4pt;
+  font-size: 8pt;
   break-inside: avoid;
 }
 .pr-callout__label {
-  font-size: 7.5pt;
+  font-size: 7pt;
   font-weight: 700;
   letter-spacing: .07em;
   text-transform: uppercase;
-  margin-bottom: 3pt;
+  margin-bottom: 2pt;
 }
 .pr-callout--kids   { background: #FFF8DC; border-left: 3pt solid #D8A24A; }
 .pr-callout--tip    { background: #EAF4EA; border-left: 3pt solid #5B7553; }
@@ -312,10 +315,10 @@ body {
 
 /* ── Nutrition + cost footnote ───────────────────────────────────────────── */
 .pr-footer-note {
-  font-size: 8pt;
+  font-size: 7.5pt;
   color: #9aa1ab;
-  margin-top: 8pt;
-  padding-top: 6pt;
+  margin-top: 4pt;
+  padding-top: 3pt;
   border-top: .5pt solid #E7DFCD;
 }
 .pr-footer-note span + span::before { content: " · "; }
@@ -337,10 +340,12 @@ body {
 
 /* ── Shopping list ───────────────────────────────────────────────────────── */
 .pr-shop-grid {
-  columns: 2;
-  column-gap: 16pt;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 16pt;
 }
 .pr-shop-section {
+  width: calc(50% - 8pt);
   break-inside: avoid;
   margin-bottom: 12pt;
 }
@@ -556,10 +561,12 @@ def _dinner(d: dict, n: int = 0, total: int = 0) -> str:
     )
     return (
         '<div class="pr-meal pr-meal--dinner">'
+        '<div class="pr-meal-header">'
         f'{counter_html}'
-        f'<div class="pr-meal__title keep-with-next">{_e(name)}</div>'
+        f'<div class="pr-meal__title">{_e(name)}</div>'
         f'{meta_html}{tags_html}'
         '<hr class="pr-divider">'
+        '</div>'
         f'{columns_html}'
         f'{servings_html}'
         f'{callouts}'
