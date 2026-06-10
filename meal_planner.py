@@ -551,6 +551,128 @@ Current {meal_type}{paired_note} as JSON:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# Scale a meal up or down
+# ─────────────────────────────────────────────────────────────────────────────
+
+_SCALE_SYSTEM = """You are resizing a single recipe to make more or fewer servings. \
+The dish, ingredients, cuisine, and cooking method stay exactly the same — only the \
+QUANTITIES change to match the new serving count.
+
+Rules:
+- Rescale every ingredient quantity proportionally to the new serving target, then round \
+  to amounts a home cook would actually use. Never produce awkward fractions of \
+  whole-unit items: "1 can" scaled by 1.5 becomes "1–2 cans", not "1.5 cans"; \
+  "2 cloves garlic" might become "3 cloves". Pantry staples (oil, salt, spices) can stay \
+  approximate ("to taste") rather than being scaled precisely.
+- Update the `servings` field to the new target.
+- Update `cost_estimate.total_ingredient_cost_usd` to reflect the new quantities. \
+  Keep `cost_per_serving_usd` roughly the same (it is per serving).
+- Keep `nutrition_estimate` UNCHANGED — those numbers are per adult serving and do not \
+  change when you scale the whole recipe.
+- Adjust cooking `instructions` only where the amount genuinely matters (e.g. pan size, \
+  liquid volume, cook time for a larger tray). Otherwise leave them as-is.
+- Keep the meal `id`, `name`, and all unrelated fields unchanged.
+
+Return ONLY the full updated meal object as JSON — no preamble, no markdown fences:
+{"updated_meal": { ...full meal... }}"""
+
+
+def _describe_servings(meal_type: str, target) -> str:
+    if meal_type == "dinner":
+        adults = target.get("adults", 0)
+        kids = target.get("kids", 0)
+        parts = []
+        if adults:
+            parts.append(f"{adults} adult{'s' if adults != 1 else ''}")
+        if kids:
+            parts.append(f"{kids} kid{'s' if kids != 1 else ''}")
+        return " + ".join(parts) if parts else "0 servings"
+    n = int(target)
+    return f"{n} serving{'s' if n != 1 else ''}"
+
+
+def scale_meal(
+    week_plan: WeekPlan,
+    meal_id: str,
+    meal_type: str,
+    new_servings,
+    reason: str = "",
+) -> WeekPlan:
+    """
+    Resize one dinner or lunch to a new serving count, returning the full updated meal.
+
+    Claude rewrites the whole meal object — ingredient quantities and totals scale to the
+    new serving target while the dish, method, and per-serving nutrition stay the same.
+
+    Parameters
+    ----------
+    week_plan : WeekPlan
+        The current week's plan (modified in place and returned).
+    meal_id : str
+        The id of the meal to resize (e.g. 'd2' or 'l3').
+    meal_type : str
+        'dinner' or 'lunch'.
+    new_servings : dict | int
+        For a dinner: {"adults": int, "kids": int}. For a lunch: an int serving count.
+    reason : str
+        Optional free-text reason (e.g. 'kids eating elsewhere', 'guest joining').
+
+    Returns
+    -------
+    WeekPlan with the resized meal inserted.
+
+    Raises
+    ------
+    MealPlanError on API failure, parse error, or meal_id not found.
+    """
+    meals = week_plan["dinners"] if meal_type == "dinner" else week_plan["lunches"]
+
+    idx = next((i for i, m in enumerate(meals) if m["id"] == meal_id), None)
+    if idx is None:
+        raise MealPlanError(f"Meal '{meal_id}' not found in {meal_type}s.")
+
+    meal = meals[idx]
+    current_desc = _describe_servings(meal_type, meal.get("servings", 0))
+    target_desc = _describe_servings(meal_type, new_servings)
+    reason_note = f'\nReason: "{reason}"' if reason else ""
+
+    user_message = f"""Resize this {meal_type} from {current_desc} to {target_desc}.{reason_note}
+
+Set the `servings` field to: {json.dumps(new_servings)}
+
+Current {meal_type} as JSON:
+{json.dumps({"meal": meal}, indent=2)}"""
+
+    try:
+        response = _client().messages.create(
+            model=MODEL,
+            max_tokens=3000,
+            system=_SCALE_SYSTEM,
+            messages=[{"role": "user", "content": user_message}],
+        )
+    except anthropic.APIError as e:
+        raise MealPlanError(f"Claude API error during resize: {e}") from e
+
+    raw = _strip_fences(response.content[0].text)
+
+    try:
+        data = json.loads(raw)
+    except json.JSONDecodeError as e:
+        raise MealPlanError(f"Resize response was not valid JSON: {e}") from e
+
+    updated_meal = data.get("updated_meal")
+    if not updated_meal:
+        raise MealPlanError("Resize response missing 'updated_meal'.")
+
+    # Preserve the original id and force the requested servings no matter what.
+    updated_meal["id"] = meal["id"]
+    updated_meal["servings"] = new_servings
+    meals[idx] = updated_meal
+
+    return week_plan
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # Kid meal notes
 # ─────────────────────────────────────────────────────────────────────────────
 

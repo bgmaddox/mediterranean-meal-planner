@@ -11,9 +11,11 @@ Cast the Chrome tab to your Nest Hub while cooking.
 import html as _html
 import streamlit as st
 
+import icons
+
 st.set_page_config(
     page_title="Kitchen Mode",
-    page_icon="🍳",
+    page_icon=":material/skillet:",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
@@ -264,6 +266,9 @@ div[data-testid="stColumns"] .stButton > button {{
 </style>
 """, unsafe_allow_html=True)
 
+# Icon mask classes (Streamlit strips inline <svg>; masked spans survive).
+st.markdown(icons.ICON_CSS, unsafe_allow_html=True)
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Helpers
@@ -283,7 +288,11 @@ def _render_dinner_card(meal: dict, badge: str) -> str:
     equip = meal.get("primary_equipment", "")
     time_min = meal.get("cook_time_minutes", "")
 
-    meta_parts = [p for p in [f"⏱ {time_min} min" if time_min else "", equip] if p]
+    meta_parts = []
+    if time_min:
+        meta_parts.append(f'{icons.icon("clock", size=15)} {_e(time_min)} min')
+    if equip:
+        meta_parts.append(_e(equip))
     meta = "  ·  ".join(meta_parts)
 
     pills = "".join(
@@ -307,11 +316,11 @@ def _render_dinner_card(meal: dict, badge: str) -> str:
     )
 
     kid_block = (
-        f'<div class="kid-callout"><strong>👧 Kids:</strong>  {_e(kid)}</div>'
+        f'<div class="kid-callout"><strong>{icons.icon("child", size=17)} Kids:</strong>  {_e(kid)}</div>'
         if kid else ""
     )
     tip_block = (
-        f'<div class="tip-callout">💡 {_e(tip)}</div>'
+        f'<div class="tip-callout">{icons.icon("bulb", size=16)} {_e(tip)}</div>'
         if tip else ""
     )
 
@@ -323,9 +332,9 @@ def _render_dinner_card(meal: dict, badge: str) -> str:
     return f"""
 <div class="recipe-card">
   <div class="card-header">
-    <div class="card-badge">{_e(badge)}</div>
+    <div class="card-badge">{badge}</div>
     <div class="card-meal-name">{_e(meal.get("name",""))}</div>
-    <div class="card-meta">{_e(meta)}</div>
+    <div class="card-meta">{meta}</div>
   </div>
 
   <div class="card-highlights">{pills if pills else "&nbsp;"}</div>
@@ -364,7 +373,8 @@ def _render_lunch_card(meal: dict, badge: str) -> str:
 
     source_label = "Leftover from dinner" if source == "leftover" else "Standalone lunch"
     reheat_label = "· Microwave" if "microwave" in (reheat or "").lower() else "· Cold (no reheat)"
-    meta = f"🥗 {source_label}  {reheat_label}"
+    _meta_icon = "box" if source == "leftover" else "bowl"
+    meta = f'{icons.icon(_meta_icon, size=15)} {_e(source_label)}  {_e(reheat_label)}'
 
     pills = "".join(
         f'<span class="highlight-pill">{_e(h)}</span>' for h in highlights
@@ -379,7 +389,7 @@ def _render_lunch_card(meal: dict, badge: str) -> str:
     )
 
     pack_block = (
-        f'<div class="pack-callout">🎒 <strong>Pack:</strong>  {_e(pack)}</div>'
+        f'<div class="pack-callout">{icons.icon("backpack", size=16)} <strong>Pack:</strong>  {_e(pack)}</div>'
         if pack else ""
     )
 
@@ -391,9 +401,9 @@ def _render_lunch_card(meal: dict, badge: str) -> str:
     return f"""
 <div class="recipe-card">
   <div class="card-header lunch">
-    <div class="card-badge">{_e(badge)}</div>
+    <div class="card-badge">{badge}</div>
     <div class="card-meal-name">{_e(meal.get("name",""))}</div>
-    <div class="card-meta">{_e(meta)}</div>
+    <div class="card-meta">{meta}</div>
   </div>
 
   <div class="card-highlights">{pills if pills else "&nbsp;"}</div>
@@ -432,9 +442,9 @@ if "kitchen_idx" not in st.session_state:
 plan = st.session_state.get("week_plan")
 
 if plan is None:
-    st.markdown("""
+    st.markdown(f"""
     <div style="text-align:center; margin-top:80px; font-family:Georgia,serif;">
-      <div style="font-size:3rem; margin-bottom:16px;">🍳</div>
+      <div style="color:#4a6741; margin-bottom:16px;">{icons.icon("skillet", size=52)}</div>
       <div style="font-size:1.5rem; color:#4a6741; margin-bottom:10px;">Kitchen Mode</div>
       <div style="font-size:1.1rem; color:#666;">No meal plan loaded yet.<br>
            Go to the main app and generate a week first.</div>
@@ -467,11 +477,11 @@ lunch_count = sum(1 for _, t in all_meals[:idx + 1] if t == "lunch")
 
 if meal_type == "dinner":
     d_num = dinner_count
-    badge = f"🍽  Dinner {d_num} of {len(dinners)}"
+    badge = f'{icons.icon("plate", size=15)}  Dinner {d_num} of {len(dinners)}'
     card_html = _render_dinner_card(meal, badge)
 else:
     l_num = lunch_count
-    badge = f"🥗  Lunch {l_num} of {len(lunches)}"
+    badge = f'{icons.icon("bowl", size=15)}  Lunch {l_num} of {len(lunches)}'
     card_html = _render_lunch_card(meal, badge)
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -485,7 +495,7 @@ st.markdown("<div style='height:18px'></div>", unsafe_allow_html=True)
 col_prev, col_pos, col_next = st.columns([1, 2, 1])
 
 with col_prev:
-    if st.button("◀  Prev", type="secondary", use_container_width=True, disabled=(idx == 0)):
+    if st.button("Prev", icon=":material/chevron_left:", type="secondary", use_container_width=True, disabled=(idx == 0)):
         st.session_state.kitchen_idx = idx - 1
         st.rerun()
 
@@ -500,6 +510,6 @@ with col_pos:
     )
 
 with col_next:
-    if st.button("Next  ▶", type="primary", use_container_width=True, disabled=(idx == total - 1)):
+    if st.button("Next", icon=":material/chevron_right:", type="primary", use_container_width=True, disabled=(idx == total - 1)):
         st.session_state.kitchen_idx = idx + 1
         st.rerun()

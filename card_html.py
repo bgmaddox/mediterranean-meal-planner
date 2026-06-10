@@ -28,6 +28,7 @@ Public renderers
 
 from html import escape
 
+import icons
 from schemas import DinnerMeal, LunchMeal, SundayPrepTask
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -45,6 +46,9 @@ CARD_STYLES = """
 .med-card,.med-card *,.med-summary,.med-summary *,.med-prep,.med-prep *,
 .med-shop,.med-shop *,.med-fav,.med-fav *{box-sizing:border-box;}
 
+/* Inline line-drawing icons inherit text colour and sit like type. */
+.med-ico{display:inline-block;vertical-align:-0.16em;flex-shrink:0;}
+
 /* ── Base meal card (dinner / lunch) ─────────────────────────────────────── */
 .med-card{
   max-width:560px;background:#FFFDF8;border:1px solid #E7DFCD;border-radius:16px;
@@ -58,13 +62,13 @@ CARD_STYLES = """
 }
 .med-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;}
 .med-chip{
-  display:inline-flex;align-items:center;gap:5px;background:#EFEADC;
-  color:#5A6472;font-size:13px;font-weight:500;padding:4px 12px;border-radius:999px;
+  display:inline-flex;align-items:center;gap:6px;background:#EFEADC;
+  color:#5A6472;font-size:14.5px;font-weight:500;padding:5px 13px;border-radius:999px;
 }
 .med-tags{display:flex;flex-wrap:wrap;gap:8px;}
 .med-tag{
   display:inline-flex;background:rgba(91,117,83,.12);color:#5B7553;
-  font-size:12px;font-weight:500;padding:3px 10px;border-radius:999px;
+  font-size:13px;font-weight:500;padding:4px 11px;border-radius:999px;
 }
 .med-divider{border:none;border-top:1px solid #E7DFCD;margin:16px 0;}
 
@@ -83,10 +87,10 @@ CARD_STYLES = """
 .med-stat__val--ok{color:#5B7553;}
 .med-stat__val--warn{color:#B5722E;}
 .med-stat__label{
-  font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;
+  font-size:12.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;
   color:#5A6472;margin-top:4px;
 }
-.med-stat__sub{font-size:10px;color:#9aa1ab;margin-top:2px;}
+.med-stat__sub{font-size:11.5px;color:#9aa1ab;margin-top:2px;}
 @media (max-width:520px){
   .med-stat{flex:1 1 50%;}
   .med-stat:nth-child(3){border-left:none;}
@@ -114,8 +118,8 @@ CARD_STYLES = """
   border-radius:12px;padding:14px 18px;margin:8px 0;
   font-family:'Inter',system-ui,sans-serif;box-shadow:0 2px 10px rgba(35,48,68,.04);
 }
-.med-prep__task{font-size:15px;font-weight:600;color:#233044;margin:0 0 8px;}
-.med-prep__storage{font-size:12px;color:#5A6472;margin-top:8px;}
+.med-prep__task{font-size:16px;font-weight:600;color:#233044;margin:0 0 8px;}
+.med-prep__storage{font-size:13px;color:#5A6472;margin-top:8px;}
 .med-prep__storage b{color:#5B7553;font-weight:600;}
 
 /* ── Shopping-list section card ──────────────────────────────────────────── */
@@ -128,10 +132,10 @@ CARD_STYLES = """
   display:flex;align-items:center;justify-content:space-between;
   background:#F2ECDD;padding:10px 16px;border-bottom:1px solid #E7DFCD;
 }
-.med-shop__name{font-size:14px;font-weight:600;color:#233044;
-  display:inline-flex;align-items:center;gap:7px;}
+.med-shop__name{font-size:15.5px;font-weight:600;color:#233044;
+  display:inline-flex;align-items:center;gap:8px;}
 .med-shop__count{
-  font-size:11px;font-weight:600;color:#5A6472;background:#FFFDF8;
+  font-size:12px;font-weight:600;color:#5A6472;background:#FFFDF8;
   border:1px solid #E7DFCD;border-radius:999px;padding:1px 9px;
 }
 .med-shop__row{
@@ -139,8 +143,8 @@ CARD_STYLES = """
   padding:8px 16px;border-bottom:1px solid #F1EBDC;
 }
 .med-shop__row:last-child{border-bottom:none;}
-.med-shop__item{font-size:14px;color:#233044;}
-.med-shop__qty{font-size:13px;color:#5A6472;text-align:right;white-space:nowrap;}
+.med-shop__item{font-size:15.5px;color:#233044;}
+.med-shop__qty{font-size:14.5px;color:#5A6472;text-align:right;white-space:nowrap;}
 
 /* ── Favorite card ───────────────────────────────────────────────────────── */
 .med-fav{
@@ -151,9 +155,9 @@ CARD_STYLES = """
 .med-fav__top{display:flex;align-items:baseline;justify-content:space-between;gap:12px;}
 .med-fav__name{font-family:'Fraunces',Georgia,serif;font-size:20px;font-weight:600;
   color:#233044;line-height:1.2;}
-.med-fav__stars{font-size:16px;color:#D8A24A;white-space:nowrap;letter-spacing:1px;}
+.med-fav__stars{color:#D8A24A;white-space:nowrap;line-height:1;display:inline-flex;gap:1px;}
 .med-fav__stars .dim{color:#E0D7C2;}
-.med-fav__meta{font-size:12px;color:#5A6472;margin-top:6px;}
+.med-fav__meta{font-size:13px;color:#5A6472;margin-top:6px;}
 </style>
 """
 
@@ -219,10 +223,10 @@ def render_dinner_card(dinner: DinnerMeal) -> str:
     chips = []
     cook = dinner.get("cook_time_minutes")
     if cook:
-        chips.append(_chip(f"⏱ {int(cook)} min"))
+        chips.append(_chip(f"{icons.icon('clock')} {int(cook)} min"))
     equip = dinner.get("primary_equipment")
     if equip:
-        chips.append(_chip(f"🔥 {escape(equip)}"))
+        chips.append(_chip(f"{icons.icon('flame')} {escape(equip)}"))
     return _meal_card(
         dinner.get("name") or "Untitled",
         chips,
@@ -235,16 +239,16 @@ def render_lunch_card(lunch: LunchMeal) -> str:
     """Display-only summary card for one lunch."""
     chips = []
     if lunch.get("source") == "leftover":
-        chips.append(_chip("🍱 Leftover from dinner"))
+        chips.append(_chip(f"{icons.icon('box')} Leftover from dinner"))
     else:
-        chips.append(_chip("🥗 Standalone"))
+        chips.append(_chip(f"{icons.icon('bowl')} Standalone"))
     if lunch.get("reheat") == "microwave":
-        chips.append(_chip("🔥 Microwave"))
+        chips.append(_chip(f"{icons.icon('microwave')} Microwave"))
     else:
-        chips.append(_chip("❄️ Cold (no reheat)"))
+        chips.append(_chip(f"{icons.icon('snowflake')} Cold (no reheat)"))
     prep = lunch.get("prep_at_lunchtime_minutes")
     if prep:
-        chips.append(_chip(f"⏱ {int(prep)} min prep"))
+        chips.append(_chip(f"{icons.icon('clock')} {int(prep)} min prep"))
     return _meal_card(
         lunch.get("name") or "Untitled",
         chips,
@@ -307,15 +311,15 @@ def render_prep_card(task: SundayPrepTask) -> str:
 
 
 _SECTION_ICONS = {
-    "Produce": "🥬", "Proteins": "🐟", "Dairy & Eggs": "🧀",
-    "Pantry": "🫙", "Frozen": "🧊", "Other": "🛒",
-    "Pantry Staples (check stock)": "🧂",
+    "Produce": "leaf", "Proteins": "fish", "Dairy & Eggs": "cheese",
+    "Pantry": "jar", "Frozen": "snowflake", "Other": "cart",
+    "Pantry Staples (check stock)": "salt",
 }
 
 
 def render_shopping_section(section_name: str, rows: list[tuple[str, str]]) -> str:
     """A grouped shopping-list section: header + item rows. `rows` = (name, qty)."""
-    icon = _SECTION_ICONS.get(section_name, "🛒")
+    icon = icons.icon(_SECTION_ICONS.get(section_name, "cart"), size=17)
     row_html = "".join(
         '<div class="med-shop__row">'
         f'<span class="med-shop__item">{escape(name)}</span>'
@@ -339,8 +343,8 @@ def render_favorite_card(fav: dict) -> str:
     rating = int(fav.get("rating", 0) or 0)
     stars = (
         '<span class="med-fav__stars">'
-        + "★" * rating
-        + f'<span class="dim">{"★" * (5 - rating)}</span>'
+        + icons.star(filled=True) * rating
+        + f'<span class="dim">{icons.star(filled=False) * (5 - rating)}</span>'
         + "</span>"
     )
     tags = fav.get("tags") or []
