@@ -23,6 +23,7 @@ import streamlit as st
 import card_html
 import data_store
 import drive_upload
+import icons
 import meal_planner
 import pdf_export
 import shopping
@@ -34,14 +35,50 @@ from schemas import WeekPlan
 # ─────────────────────────────────────────────────────────────────────────────
 st.set_page_config(
     page_title="Mediterranean Meal Planner",
-    page_icon="🫒",
+    page_icon=":material/local_dining:",
     layout="wide",
 )
 
-st.title("🫒 Mediterranean Meal Planner")
+# ── Global legibility pass ────────────────────────────────────────────────────
+# Streamlit's defaults run small; bump the base type and key widgets a notch.
+st.html("""
+<style>
+  html, body, [class*="st-"], .stMarkdown, .stMarkdown p, .stMarkdown li {
+    font-size: 16.5px;
+  }
+  [data-testid="stMarkdownContainer"] p,
+  [data-testid="stMarkdownContainer"] li { font-size: 16.5px; line-height: 1.6; }
+  .stCaption, [data-testid="stCaptionContainer"], [data-testid="stCaptionContainer"] p {
+    font-size: 13.5px !important;
+  }
+  .stButton button, .stDownloadButton button { font-size: 15.5px; font-weight: 500; }
+  .stTextInput input, .stNumberInput input, .stSelectbox div[data-baseweb="select"],
+  .stTextArea textarea { font-size: 15.5px; }
+  label, .stSelectbox label, .stTextInput label, .stNumberInput label,
+  .stTextArea label, .stSlider label, .stMultiSelect label { font-size: 15px !important; }
+  h1 { font-size: 2.3rem; }
+  h2 { font-size: 1.7rem; }
+  h3 { font-size: 1.35rem; }
+  .stTabs [data-baseweb="tab"] { font-size: 16px; }
+  /* App header logo lockup */
+  .med-app-header { display:flex; align-items:center; gap:13px; margin:0 0 6px; }
+  .med-app-header .med-ico { color:#5B7553; }
+  .med-app-header h1 {
+    font-family:'Fraunces','Source Serif 4',Georgia,serif; font-weight:600;
+    font-size:2.3rem; color:#233044; margin:0; line-height:1.1;
+  }
+</style>
+""")
 
-# Inject the scoped card stylesheet once; all tabs share the same DOM.
+# Inject the scoped card stylesheet + icon mask classes once; tabs share the DOM.
 st.html(card_html.CARD_STYLES)
+st.html(icons.ICON_CSS)
+
+st.html(
+    '<div class="med-app-header">'
+    + icons.icon("olive", size=38)
+    + "<h1>Mediterranean Meal Planner</h1></div>"
+)
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Session state initialisation
@@ -68,6 +105,9 @@ if "swapping" not in st.session_state:
 if "substituting" not in st.session_state:
     # Tuple of (meal_id, meal_type, meal_name, ingredient_name) while dialog is open
     st.session_state.substituting: tuple | None = None
+if "scaling" not in st.session_state:
+    # Tuple of (meal_id, meal_type, meal_name) while the resize dialog is open
+    st.session_state.scaling: tuple | None = None
 if "pending_require_kid" not in st.session_state:
     st.session_state.pending_require_kid: bool = True
 if "deleted_meals" not in st.session_state:
@@ -229,6 +269,71 @@ def _substitute_dialog():
             st.rerun()
 
 
+@st.dialog("Resize Meal", width="small")
+def _scale_dialog():
+    meal_id, meal_type, meal_name = st.session_state.scaling
+    plan = st.session_state.week_plan
+    meals = plan["dinners"] if meal_type == "dinner" else plan["lunches"]
+    meal = next((m for m in meals if m["id"] == meal_id), None)
+    if not meal:
+        st.session_state.scaling = None
+        st.rerun()
+
+    st.markdown(f"Resize **{meal_name}**")
+    st.caption(
+        "Adjust how many people this recipe makes — Claude rescales the ingredient "
+        "amounts to match. Per-serving nutrition stays the same."
+    )
+
+    if meal_type == "dinner":
+        cur = meal.get("servings") if isinstance(meal.get("servings"), dict) else {}
+        col_a, col_k = st.columns(2)
+        new_a = col_a.number_input(
+            "Adults", min_value=0, max_value=12,
+            value=int(cur.get("adults", 2)), step=1,
+        )
+        new_k = col_k.number_input(
+            "Kids", min_value=0, max_value=12,
+            value=int(cur.get("kids", 0)), step=1,
+        )
+        new_servings = {"adults": int(new_a), "kids": int(new_k)}
+        invalid = (new_a + new_k) == 0
+    else:
+        cur_n = meal.get("servings", 1)
+        cur_n = int(cur_n) if isinstance(cur_n, (int, float)) else 1
+        new_n = st.number_input(
+            "Servings", min_value=1, max_value=12, value=max(cur_n, 1), step=1,
+        )
+        new_servings = int(new_n)
+        invalid = False
+
+    reason = st.text_input(
+        "Reason (optional)",
+        placeholder="e.g. 'kids eating at grandma's' · 'a guest is joining us'",
+    )
+
+    col_confirm, col_cancel = st.columns(2)
+    with col_confirm:
+        if st.button("Resize it", type="primary", use_container_width=True, disabled=invalid):
+            with st.spinner(f"Resizing '{meal_name}'..."):
+                try:
+                    updated = meal_planner.scale_meal(
+                        plan, meal_id, meal_type, new_servings, reason=reason,
+                    )
+                    st.session_state.week_plan = updated
+                    st.session_state.scaling = None
+                    _rebuild_shopping()
+                    data_store.update_history_plan(updated, st.session_state.week_start)
+                    st.success("Meal resized!")
+                    st.rerun()
+                except MealPlanError as e:
+                    st.error(f"Resize failed: {e}")
+    with col_cancel:
+        if st.button("Cancel", use_container_width=True):
+            st.session_state.scaling = None
+            st.rerun()
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Tab: Generate
 # ─────────────────────────────────────────────────────────────────────────────
@@ -288,6 +393,9 @@ with tab_generate:
 
     if st.session_state.substituting:
         _substitute_dialog()
+
+    if st.session_state.scaling:
+        _scale_dialog()
 
     # ── Load a previous week ──────────────────────────────────────────────────
     history = data_store.load_history()
@@ -356,7 +464,7 @@ with tab_generate:
         exp_col1, exp_col2 = st.columns([1, 1])
 
         with exp_col1:
-            if st.button("📄 Build & Download Weekly PDF", use_container_width=True):
+            if st.button("Build & Download Weekly PDF", icon=":material/picture_as_pdf:", use_container_width=True):
                 if not st.session_state.shopping_sections:
                     _rebuild_shopping()
                 with st.spinner("Building PDF..."):
@@ -367,7 +475,8 @@ with tab_generate:
                             week_start=st.session_state.week_start,
                         )
                         st.download_button(
-                            "⬇ Download PDF",
+                            "Download PDF",
+                            icon=":material/download:",
                             data=pdf_bytes,
                             file_name=f"meal_plan_{st.session_state.week_start}.pdf",
                             mime="application/pdf",
@@ -384,7 +493,8 @@ with tab_generate:
                 else "client_secrets.json not found — see Drive Setup in Settings."
             )
             if st.button(
-                "☁ Upload PDF to Drive",
+                "Upload PDF to Drive",
+                icon=":material/cloud_upload:",
                 use_container_width=True,
                 disabled=not drive_ready,
                 help=drive_help,
@@ -421,11 +531,13 @@ with tab_generate:
             # Stitch-designed summary card (display only)
             st.html(card_html.render_dinner_card(dinner))
 
-            # Controls row: swap + remove buttons
-            _, swap_col, remove_col = st.columns([8, 1, 1])
-            if swap_col.button("🔄 Swap", key=f"swap_{did}", use_container_width=True):
+            # Controls row: resize + swap + remove buttons
+            _, scale_col, swap_col, remove_col = st.columns([6, 1.3, 1.1, 1.2])
+            if scale_col.button("Resize", icon=":material/group:", key=f"scale_{did}", use_container_width=True):
+                st.session_state.scaling = (did, "dinner", dinner["name"])
+            if swap_col.button("Swap", icon=":material/swap_horiz:", key=f"swap_{did}", use_container_width=True):
                 st.session_state.swapping = (did, "dinner", dinner["name"])
-            if remove_col.button("✕ Remove", key=f"remove_{did}", use_container_width=True):
+            if remove_col.button("Remove", icon=":material/close:", key=f"remove_{did}", use_container_width=True):
                 removed_lunches = [l for l in plan["lunches"] if l.get("leftover_from_dinner_id") == did]
                 st.session_state.deleted_meals.append({
                     "type": "dinner", "meal": dinner, "removed_lunches": removed_lunches,
@@ -537,7 +649,7 @@ with tab_generate:
 
         # ── Export Kid Notes ──────────────────────────────────────────────────
         st.markdown("")
-        if st.button("📋 Export Kid Notes (Babysitter Guide)"):
+        if st.button("Export Kid Notes (Babysitter Guide)", icon=":material/description:"):
             with st.spinner("Generating babysitter-friendly guide..."):
                 try:
                     notes = meal_planner.generate_kid_notes(plan)
@@ -570,11 +682,13 @@ with tab_generate:
             # Stitch-designed summary card (display only)
             st.html(card_html.render_lunch_card(lunch))
 
-            # Controls row: swap + remove buttons
-            _, swap_col, remove_col = st.columns([8, 1, 1])
-            if swap_col.button("🔄 Swap", key=f"swap_{lid}", use_container_width=True):
+            # Controls row: resize + swap + remove buttons
+            _, scale_col, swap_col, remove_col = st.columns([6, 1.3, 1.1, 1.2])
+            if scale_col.button("Resize", icon=":material/group:", key=f"scale_{lid}", use_container_width=True):
+                st.session_state.scaling = (lid, "lunch", lunch["name"])
+            if swap_col.button("Swap", icon=":material/swap_horiz:", key=f"swap_{lid}", use_container_width=True):
                 st.session_state.swapping = (lid, "lunch", lunch["name"])
-            if remove_col.button("✕ Remove", key=f"remove_{lid}", use_container_width=True):
+            if remove_col.button("Remove", icon=":material/close:", key=f"remove_{lid}", use_container_width=True):
                 st.session_state.deleted_meals.append({
                     "type": "lunch", "meal": lunch, "removed_lunches": [],
                 })
@@ -750,7 +864,7 @@ with tab_favorites:
     else:
         for fav in sorted(favorites, key=lambda f: f["rating"], reverse=True):
             st.html(card_html.render_favorite_card(fav))
-            with st.expander("✏️ Rate & edit"):
+            with st.expander("Rate & edit", icon=":material/edit:"):
                 _favorite_edit_fragment(fav)
                 if st.button("Remove favorite", key=f"del_{fav['id']}"):
                     data_store.delete_favorite(fav["id"])
@@ -893,7 +1007,7 @@ def _settings_fragment():
             key=f"child_age_{i}",
             label_visibility="collapsed",
         )
-        if col_del.button("✕", key=f"del_child_{i}"):
+        if col_del.button(":material/close:", key=f"del_child_{i}", help="Remove child"):
             children = [c for j, c in enumerate(children) if j != i]
             data_store.update_preferences(children=children)
             st.rerun(scope="fragment")
@@ -1008,7 +1122,7 @@ def _settings_fragment():
             with col_text:
                 st.write(c["text"])
             with col_del:
-                if st.button("✕", key=f"delc_{c['id']}"):
+                if st.button(":material/close:", key=f"delc_{c['id']}", help="Delete constraint"):
                     data_store.delete_constraint(c["id"])
                     st.rerun(scope="fragment")
     else:
@@ -1030,11 +1144,11 @@ def _settings_fragment():
     st.subheader("Google Drive Setup")
     if drive_upload.credentials_configured():
         st.success(
-            "✅ `data/client_secrets.json` found — Drive upload is ready. "
+            "`data/client_secrets.json` found — Drive upload is ready. "
             "Your token is stored at `data/drive_token.json` after the first upload."
         )
     else:
-        st.warning("⚠️ `data/client_secrets.json` not found — Drive upload is disabled.")
+        st.warning("`data/client_secrets.json` not found — Drive upload is disabled.")
 
     with st.expander("Step-by-step: connect Google Drive"):
         st.markdown("""
@@ -1052,7 +1166,7 @@ def _settings_fragment():
    - Application type: **Desktop app** → Name it anything → **Create**
 6. Click **⬇ Download JSON** on the new credential → save that file as **`data/client_secrets.json`** in this project folder.
 7. Come back to the app, refresh the Settings tab — the warning above should turn green.
-8. Click **☁ Upload PDF to Drive** in the Generate tab — a browser window opens asking you to sign in and allow access. Do so once and the token is cached forever (auto-refreshed).
+8. Click **Upload PDF to Drive** in the Generate tab — a browser window opens asking you to sign in and allow access. Do so once and the token is cached forever (auto-refreshed).
 
 **Your files land in** Google Drive → "Mediterranean Meal Plans" folder. Open the Drive app on your phone, find the file, and cast it to your Nest Hub.
         """)
