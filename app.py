@@ -132,6 +132,18 @@ def _rebuild_shopping():
         )
 
 
+def _section_header(label: str, icon_name: str | None = None) -> None:
+    icon_html = icons.icon(icon_name, size=22) + " " if icon_name else ""
+    st.html(
+        f'<div style="display:flex;align-items:center;gap:14px;margin:28px 0 4px;">'
+        f'<span style="font-family:\'Fraunces\',Georgia,serif;font-size:1.75rem;'
+        f'font-weight:600;color:#233044;white-space:nowrap;">{icon_html}{label}</span>'
+        f'<div style="flex:1;height:2px;background:linear-gradient(90deg,#C8BFA8,transparent);'
+        f'border-radius:1px;margin-top:2px;"></div>'
+        f'</div>'
+    )
+
+
 @st.dialog("Review & Edit Prompt", width="large")
 def _prompt_preview_dialog():
     st.caption(
@@ -524,7 +536,7 @@ with tab_generate:
         st.divider()
 
         # ── Dinners ──────────────────────────────────────────────────────────
-        st.subheader("Dinners")
+        _section_header("Dinners", "plate")
         for dinner in plan.get("dinners", []):
             did = dinner["id"]
 
@@ -532,7 +544,7 @@ with tab_generate:
             st.html(card_html.render_dinner_card(dinner))
 
             # Controls row: resize + swap + remove buttons
-            _, scale_col, swap_col, remove_col = st.columns([6, 1.3, 1.1, 1.2])
+            scale_col, swap_col, remove_col, _ = st.columns([1.3, 1.1, 1.2, 6])
             if scale_col.button("Resize", icon=":material/group:", key=f"scale_{did}", use_container_width=True):
                 st.session_state.scaling = (did, "dinner", dinner["name"])
             if swap_col.button("Swap", icon=":material/swap_horiz:", key=f"swap_{did}", use_container_width=True):
@@ -552,7 +564,7 @@ with tab_generate:
             # Substitute-ingredient row (non-pantry ingredients only)
             sub_options = [i["name"] for i in dinner.get("ingredients", []) if not i.get("pantry_staple")]
             if sub_options:
-                sub_col, sub_btn_col = st.columns([8, 2])
+                sub_col, sub_btn_col, _ = st.columns([3.5, 1.5, 5])
                 chosen_ing = sub_col.selectbox(
                     "Substitute an ingredient",
                     options=sub_options,
@@ -675,7 +687,7 @@ with tab_generate:
         st.divider()
 
         # ── Lunches ──────────────────────────────────────────────────────────
-        st.subheader("Lunches")
+        _section_header("Lunches", "bowl")
         for lunch in plan.get("lunches", []):
             lid = lunch["id"]
 
@@ -683,7 +695,7 @@ with tab_generate:
             st.html(card_html.render_lunch_card(lunch))
 
             # Controls row: resize + swap + remove buttons
-            _, scale_col, swap_col, remove_col = st.columns([6, 1.3, 1.1, 1.2])
+            scale_col, swap_col, remove_col, _ = st.columns([1.3, 1.1, 1.2, 6])
             if scale_col.button("Resize", icon=":material/group:", key=f"scale_{lid}", use_container_width=True):
                 st.session_state.scaling = (lid, "lunch", lunch["name"])
             if swap_col.button("Swap", icon=":material/swap_horiz:", key=f"swap_{lid}", use_container_width=True):
@@ -701,7 +713,7 @@ with tab_generate:
             # Substitute-ingredient row (non-pantry ingredients only)
             lunch_sub_options = [i["name"] for i in lunch.get("ingredients", []) if not i.get("pantry_staple")]
             if lunch_sub_options:
-                sub_col, sub_btn_col = st.columns([8, 2])
+                sub_col, sub_btn_col, _ = st.columns([3.5, 1.5, 5])
                 chosen_ing = sub_col.selectbox(
                     "Substitute an ingredient",
                     options=lunch_sub_options,
@@ -768,7 +780,7 @@ with tab_generate:
         st.divider()
 
         # ── Sunday Prep ───────────────────────────────────────────────────────
-        st.subheader("Sunday Prep List")
+        _section_header("Sunday Prep List", "box")
         sunday_tasks = plan.get("sunday_prep_list", [])
         if sunday_tasks:
             for task in sunday_tasks:
