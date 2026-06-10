@@ -53,9 +53,9 @@ st.html("""
   }
   .stButton button, .stDownloadButton button { font-size: 15.5px; font-weight: 500; }
   .stTextInput input, .stNumberInput input, .stSelectbox div[data-baseweb="select"],
-  .stTextArea textarea { font-size: 15.5px; }
+  .stTextArea textarea { font-size: 18px; }
   label, .stSelectbox label, .stTextInput label, .stNumberInput label,
-  .stTextArea label, .stSlider label, .stMultiSelect label { font-size: 15px !important; }
+  .stTextArea label, .stSlider label, .stMultiSelect label { font-size: 17.5px !important; }
   h1 { font-size: 2.3rem; }
   h2 { font-size: 1.7rem; }
   h3 { font-size: 1.35rem; }
