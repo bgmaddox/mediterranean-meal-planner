@@ -15,6 +15,7 @@ Files managed:
 
 import json
 import random
+import re
 import uuid
 from datetime import date
 from pathlib import Path
@@ -36,7 +37,8 @@ FAVORITES_FILE = DATA_DIR / "favorites.json"
 CONSTRAINTS_FILE = DATA_DIR / "constraints.json"
 PREFERENCES_FILE = DATA_DIR / "preferences.json"
 LIBRARY_FILE = DATA_DIR / "recipe_library.json"
-ANCHOR_RECIPES_FILE = DATA_DIR / "anchor_recipes.json"
+ANCHOR_RECIPES_FILE = DATA_DIR / "anchor_recipes.json"          # shipped seed (git-tracked)
+ANCHOR_RECIPES_USER_FILE = DATA_DIR / "anchor_recipes_user.json"  # user additions (gitignored)
 
 MAX_HISTORY_WEEKS = 12     # stored
 HISTORY_WEEKS_FOR_PROMPT = 6  # passed to Claude
@@ -335,11 +337,92 @@ def delete_from_library(recipe_id: str) -> bool:
 # Anchor Recipes (curated real-world seed set used to ground generation)
 # ─────────────────────────────────────────────────────────────────────────────
 
-def load_anchor_recipes() -> list[AnchorRecipe]:
-    """Return the curated anchor recipe seed set (empty list if missing)."""
+def _slugify(text: str) -> str:
+    """Turn a recipe name into a URL-safe id stub, e.g. 'Greek Lemon Chicken' -> 'greek-lemon-chicken'."""
+    slug = re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")
+    return slug or "recipe"
+
+
+def load_anchor_seed_recipes() -> list[AnchorRecipe]:
+    """Return only the shipped (git-tracked) anchor seed recipes."""
     if not ANCHOR_RECIPES_FILE.exists():
         return []
     return _read(ANCHOR_RECIPES_FILE)
+
+
+def load_anchor_user_recipes() -> list[AnchorRecipe]:
+    """Return only the user-added anchor recipes (gitignored, never overwritten by deploys)."""
+    if not ANCHOR_RECIPES_USER_FILE.exists():
+        return []
+    return _read(ANCHOR_RECIPES_USER_FILE)
+
+
+def load_anchor_recipes() -> list[AnchorRecipe]:
+    """
+    Return all anchor recipes: the shipped seed plus user additions.
+
+    User recipes are kept in a separate gitignored file so they survive deploys
+    and never conflict with updates to the shipped seed. A user entry whose id
+    matches a seed entry overrides it (keeps the seed's position).
+    """
+    by_id: dict[str, AnchorRecipe] = {r["id"]: r for r in load_anchor_seed_recipes()}
+    for r in load_anchor_user_recipes():
+        by_id[r["id"]] = r
+    return list(by_id.values())
+
+
+def add_anchor_recipe(
+    name: str,
+    cuisine: str = "",
+    meal_type: str = "either",
+    key_ingredients: list[str] | None = None,
+    summary: str = "",
+) -> AnchorRecipe:
+    """
+    Add a user-defined anchor recipe to the gitignored user file.
+
+    Returns the new entry. Raises ValueError if the name is blank.
+    """
+    name = name.strip()
+    if not name:
+        raise ValueError("Recipe name is required.")
+    if meal_type not in ("dinner", "lunch", "either"):
+        meal_type = "either"
+
+    existing_ids = {r["id"] for r in load_anchor_recipes()}
+    base = _slugify(name)
+    rid = base
+    n = 2
+    while rid in existing_ids:
+        rid = f"{base}-{n}"
+        n += 1
+
+    entry: AnchorRecipe = {
+        "id": rid,
+        "name": name,
+        "cuisine": cuisine.strip() or "Other",
+        "meal_type": meal_type,
+        "key_ingredients": [k.strip() for k in (key_ingredients or []) if k.strip()],
+        "summary": summary.strip(),
+    }
+    user = load_anchor_user_recipes()
+    user.append(entry)
+    _write(ANCHOR_RECIPES_USER_FILE, user)
+    return entry
+
+
+def delete_anchor_recipe(recipe_id: str) -> bool:
+    """
+    Delete a user-added anchor recipe. Returns True if found and deleted.
+
+    Only user-added recipes can be deleted; shipped seed recipes are read-only.
+    """
+    user = load_anchor_user_recipes()
+    updated = [r for r in user if r["id"] != recipe_id]
+    if len(updated) == len(user):
+        return False
+    _write(ANCHOR_RECIPES_USER_FILE, updated)
+    return True
 
 
 def select_anchor_recipes(count: int = 10, days: int = 5) -> list[AnchorRecipe]:

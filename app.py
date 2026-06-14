@@ -1090,6 +1090,60 @@ def _settings_fragment():
         )
         st.success("Saved.")
 
+    # ── Manage the anchor recipe library ──────────────────────────────────────
+    _user_recipes = data_store.load_anchor_user_recipes()
+    _seed_count = _anchor_count - len(_user_recipes)
+    with st.expander(f"Manage recipe library ({_anchor_count} recipes)"):
+        st.caption(
+            "These real-world recipes are given to Claude as inspiration when "
+            "\"Base meals on real recipes\" is on. Claude adapts them to your health "
+            "rules — it never copies them verbatim. Add your own below."
+        )
+
+        with st.form("add_anchor_recipe", clear_on_submit=True):
+            st.markdown("**Add a recipe**")
+            new_name = st.text_input(
+                "Recipe name", placeholder="e.g. Grandma's Lemon Chicken"
+            )
+            fc1, fc2 = st.columns(2)
+            new_cuisine = fc1.text_input("Cuisine", placeholder="e.g. Greek")
+            new_type = fc2.selectbox(
+                "Meal type", options=["either", "dinner", "lunch"], index=0,
+                help="'either' means it works as a dinner or a lunch.",
+            )
+            new_ings = st.text_input(
+                "Key ingredients (comma-separated)",
+                placeholder="chicken thighs, lemon, oregano, potatoes",
+            )
+            new_summary = st.text_area(
+                "One-line method",
+                placeholder="Marinate chicken in lemon and herbs, roast over potatoes.",
+                height=70,
+            )
+            if st.form_submit_button("Add recipe", type="primary"):
+                if not new_name.strip():
+                    st.error("Recipe name is required.")
+                else:
+                    data_store.add_anchor_recipe(
+                        new_name, new_cuisine, new_type,
+                        new_ings.split(","), new_summary,
+                    )
+                    st.success(f"Added '{new_name.strip()}' to the library.")
+                    st.rerun()
+
+        if _user_recipes:
+            st.markdown("**Your added recipes**")
+            for r in _user_recipes:
+                rc1, rc2 = st.columns([5, 1])
+                meta = " · ".join(x for x in [r.get("cuisine", ""), r.get("meal_type", "")] if x)
+                rc1.markdown(f"- **{r['name']}**  \n  <small>{meta}</small>", unsafe_allow_html=True)
+                if rc2.button("Delete", key=f"anchor_del_{r['id']}", use_container_width=True):
+                    data_store.delete_anchor_recipe(r["id"])
+                    st.rerun()
+            st.caption(f"Plus {_seed_count} built-in recipes (read-only).")
+        else:
+            st.caption(f"{_seed_count} built-in recipes. Your added recipes will appear here.")
+
     st.divider()
 
     # ── Nutrition Targets ─────────────────────────────────────────────────────

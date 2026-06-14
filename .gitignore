@@ -16,6 +16,7 @@ data/favorites.json
 data/preferences.json
 data/constraints.json
 data/recipe_library.json
+data/anchor_recipes_user.json
 
 # Google Drive credentials — never commit
 data/client_secrets.json
