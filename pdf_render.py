@@ -161,6 +161,16 @@ body {
 }
 /* Dinners after the first get their own page */
 .pr-meal--dinner + .pr-meal--dinner { break-before: page; }
+
+/* ── Dinner-only compaction (keep recipes to one page each) ───────────────── */
+.pr-meal--dinner { padding: 8pt 10pt; line-height: 1.4; }
+.pr-meal--dinner .pr-meal__title { font-size: 14pt; }
+.pr-meal--dinner .pr-columns { gap: 12pt; }
+.pr-meal--dinner .pr-ingredients li,
+.pr-meal--dinner .pr-steps li { font-size: 8pt; padding-top: 1pt; padding-bottom: 1pt; }
+.pr-meal--dinner .pr-ing__pantry { font-size: 7.5pt; }
+.pr-meal--dinner .pr-servings { font-size: 8pt; }
+.pr-meal--dinner .pr-callout { font-size: 7.5pt; }
 .pr-meal__title {
   font-family: Georgia, "Times New Roman", serif;
   font-size: 16pt;
