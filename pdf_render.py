@@ -350,12 +350,10 @@ body {
 
 /* ── Shopping list ───────────────────────────────────────────────────────── */
 .pr-shop-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0 16pt;
+  columns: 2;
+  column-gap: 16pt;
 }
 .pr-shop-section {
-  width: calc(50% - 8pt);
   break-inside: avoid;
   margin-bottom: 12pt;
 }
