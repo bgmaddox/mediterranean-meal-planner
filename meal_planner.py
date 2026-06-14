@@ -81,6 +81,11 @@ def build_generation_prompts(
     (system_prompt, user_message, require_kid_adaptation)
     """
     prefs = data_store.load_preferences()
+    anchor_recipes = (
+        data_store.select_anchor_recipes(days=days)
+        if prefs.get("use_anchor_recipes", True)
+        else None
+    )
     system_prompt = build_system_prompt(
         history=data_store.history_for_prompt(),
         favorites=data_store.load_favorites(),
@@ -94,6 +99,7 @@ def build_generation_prompts(
         portion_scale=prefs.get("portion_scale", 1.0),
         use_up_ingredients=use_up_ingredients,
         days=days,
+        anchor_recipes=anchor_recipes,
     )
     require_kid = bool(prefs.get("children"))
     return system_prompt, _DEFAULT_USER_MESSAGE, require_kid

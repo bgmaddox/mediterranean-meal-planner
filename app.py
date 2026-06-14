@@ -1070,11 +1070,23 @@ def _settings_fragment():
         help="Adjusts ingredient quantities in the prompt. Claude handles the math contextually — '3/4 lb salmon' won't become '0.675 lb'.",
     )
 
+    _anchor_count = len(data_store.load_anchor_recipes())
+    use_anchors = st.checkbox(
+        "Base meals on real recipes",
+        value=prefs.get("use_anchor_recipes", True),
+        help=(
+            f"When on, a rotating sample from a curated library of {_anchor_count} real-world "
+            "recipes is given to Claude as inspiration. Claude adapts them freely to fit your "
+            "health rules — it doesn't copy them verbatim. Turn off for fully from-scratch plans."
+        ),
+    )
+
     if st.button("Save Meal Planning Preferences"):
         data_store.update_preferences(
             lunch_adult_count=int(lunch_count),
             budget=budget_input.strip() if budget_input.strip() else None,
             portion_scale=_portion_options[portion_label],
+            use_anchor_recipes=bool(use_anchors),
         )
         st.success("Saved.")
 

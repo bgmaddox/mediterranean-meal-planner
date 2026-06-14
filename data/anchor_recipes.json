@@ -1,0 +1,562 @@
+[
+  {
+    "id": "greek-lemon-chicken",
+    "name": "Greek Lemon Chicken with Roasted Potatoes",
+    "cuisine": "Greek",
+    "meal_type": "dinner",
+    "key_ingredients": ["chicken thighs", "yukon gold potatoes", "lemon", "fresh oregano"],
+    "summary": "Marinate chicken in lemon, garlic, and oregano, then roast over potatoes until golden."
+  },
+  {
+    "id": "sheet-pan-salmon-asparagus",
+    "name": "Sheet-Pan Salmon with Lemon and Asparagus",
+    "cuisine": "Mediterranean",
+    "meal_type": "dinner",
+    "key_ingredients": ["salmon fillets", "asparagus", "lemon", "dill"],
+    "summary": "Roast salmon and asparagus on one pan with olive oil, lemon, and herbs."
+  },
+  {
+    "id": "shakshuka",
+    "name": "Shakshuka (Eggs Poached in Spiced Tomato Sauce)",
+    "cuisine": "North African / Levantine",
+    "meal_type": "either",
+    "key_ingredients": ["eggs", "bell peppers", "feta"],
+    "summary": "Simmer peppers and tomatoes with cumin and paprika, poach eggs in the sauce, finish with feta."
+  },
+  {
+    "id": "greek-salad-chickpeas",
+    "name": "Greek Salad with Chickpeas",
+    "cuisine": "Greek",
+    "meal_type": "lunch",
+    "key_ingredients": ["cucumber", "cherry tomatoes", "feta", "red onion"],
+    "summary": "Toss cucumber, tomato, olives, and chickpeas with feta and a red-wine vinaigrette."
+  },
+  {
+    "id": "lentil-soup",
+    "name": "Mediterranean Lentil Soup",
+    "cuisine": "Mediterranean",
+    "meal_type": "either",
+    "key_ingredients": ["carrots", "celery", "spinach"],
+    "summary": "Simmer green lentils with mirepoix, cumin, and tomato; stir in spinach and lemon at the end."
+  },
+  {
+    "id": "mediterranean-quinoa-bowl",
+    "name": "Mediterranean Quinoa Bowl with Feta and Cucumber",
+    "cuisine": "Mediterranean",
+    "meal_type": "lunch",
+    "key_ingredients": ["cucumber", "cherry tomatoes", "feta", "parsley"],
+    "summary": "Layer quinoa with chickpeas, chopped veg, feta, and a lemon-tahini drizzle."
+  },
+  {
+    "id": "baked-cod-tomatoes-olives",
+    "name": "Baked Cod with Tomatoes, Olives, and Capers",
+    "cuisine": "Italian",
+    "meal_type": "dinner",
+    "key_ingredients": ["cod fillets", "cherry tomatoes", "kalamata olives", "capers"],
+    "summary": "Bake cod in a puttanesca-style tomato, olive, and caper sauce."
+  },
+  {
+    "id": "falafel-bowls",
+    "name": "Baked Falafel Bowls with Tahini",
+    "cuisine": "Levantine",
+    "meal_type": "either",
+    "key_ingredients": ["chickpeas", "parsley", "cucumber", "tahini"],
+    "summary": "Bake spiced chickpea falafel and serve over greens with cucumber, tomato, and tahini sauce."
+  },
+  {
+    "id": "white-bean-kale-stew",
+    "name": "Tuscan White Bean and Kale Stew",
+    "cuisine": "Italian",
+    "meal_type": "either",
+    "key_ingredients": ["cannellini beans", "lacinato kale", "carrots"],
+    "summary": "Simmer white beans with kale, garlic, and tomato into a hearty rosemary-scented stew."
+  },
+  {
+    "id": "chicken-souvlaki-tzatziki",
+    "name": "Chicken Souvlaki with Tzatziki",
+    "cuisine": "Greek",
+    "meal_type": "dinner",
+    "key_ingredients": ["chicken breast", "greek yogurt", "cucumber", "lemon"],
+    "summary": "Grill lemon-oregano chicken skewers; serve with cucumber-yogurt tzatziki and a chopped salad."
+  },
+  {
+    "id": "stuffed-bell-peppers",
+    "name": "Turkey and Brown Rice Stuffed Bell Peppers",
+    "cuisine": "Mediterranean",
+    "meal_type": "dinner",
+    "key_ingredients": ["bell peppers", "ground turkey", "brown rice"],
+    "summary": "Stuff peppers with spiced turkey, brown rice, and tomato; bake until tender."
+  },
+  {
+    "id": "pasta-white-beans-tomatoes",
+    "name": "Whole Wheat Pasta with Cherry Tomatoes, White Beans, and Basil",
+    "cuisine": "Italian",
+    "meal_type": "dinner",
+    "key_ingredients": ["whole wheat pasta", "cherry tomatoes", "white beans", "basil"],
+    "summary": "Burst cherry tomatoes in olive oil and garlic, toss with pasta, white beans, and basil."
+  },
+  {
+    "id": "mujadara",
+    "name": "Mujadara (Lentils and Rice with Crispy Onions)",
+    "cuisine": "Levantine",
+    "meal_type": "either",
+    "key_ingredients": ["green lentils", "brown rice", "onions"],
+    "summary": "Cook lentils and rice with cumin; top with deeply caramelized onions and a yogurt dollop."
+  },
+  {
+    "id": "grilled-chicken-salad",
+    "name": "Grilled Mediterranean Chicken Salad",
+    "cuisine": "Mediterranean",
+    "meal_type": "lunch",
+    "key_ingredients": ["chicken breast", "mixed greens", "cucumber", "feta"],
+    "summary": "Slice grilled chicken over greens with cucumber, tomato, olives, and a lemon vinaigrette."
+  },
+  {
+    "id": "salmon-nicoise",
+    "name": "Salmon Niçoise-Style Salad",
+    "cuisine": "French",
+    "meal_type": "dinner",
+    "key_ingredients": ["salmon fillets", "green beans", "eggs", "baby potatoes"],
+    "summary": "Compose seared salmon with blanched green beans, eggs, potatoes, and a dijon vinaigrette."
+  },
+  {
+    "id": "tabbouleh-grilled-chicken",
+    "name": "Tabbouleh with Grilled Chicken",
+    "cuisine": "Levantine",
+    "meal_type": "lunch",
+    "key_ingredients": ["parsley", "bulgur", "cherry tomatoes", "chicken breast"],
+    "summary": "Toss a parsley-forward bulgur tabbouleh with lemon and olive oil; top with sliced grilled chicken."
+  },
+  {
+    "id": "eggplant-chickpea-tagine",
+    "name": "Eggplant and Chickpea Tagine",
+    "cuisine": "Moroccan",
+    "meal_type": "dinner",
+    "key_ingredients": ["eggplant", "chickpeas", "apricots"],
+    "summary": "Stew eggplant and chickpeas with warm spices and a touch of dried fruit; serve over couscous or farro."
+  },
+  {
+    "id": "yogurt-marinated-chicken-farro",
+    "name": "Yogurt-Marinated Grilled Chicken with Farro",
+    "cuisine": "Mediterranean",
+    "meal_type": "dinner",
+    "key_ingredients": ["chicken thighs", "greek yogurt", "farro", "lemon"],
+    "summary": "Marinate chicken in spiced yogurt and grill; serve over farro with a herb salad."
+  },
+  {
+    "id": "teriyaki-salmon-bowl",
+    "name": "Teriyaki Salmon Bowl with Brown Rice and Edamame",
+    "cuisine": "Japanese",
+    "meal_type": "dinner",
+    "key_ingredients": ["salmon fillets", "edamame", "brown rice", "scallions"],
+    "summary": "Glaze salmon with a light teriyaki, serve over brown rice with edamame and cucumber."
+  },
+  {
+    "id": "thai-chicken-stir-fry",
+    "name": "Thai-Inspired Chicken and Vegetable Stir-Fry",
+    "cuisine": "Thai",
+    "meal_type": "dinner",
+    "key_ingredients": ["chicken breast", "bell peppers", "snap peas", "basil"],
+    "summary": "Stir-fry chicken and crisp vegetables in a garlic-ginger-fish-sauce glaze; serve over brown rice."
+  },
+  {
+    "id": "korean-beef-bowl",
+    "name": "Korean-Style Beef Bowl (Bulgogi)",
+    "cuisine": "Korean",
+    "meal_type": "dinner",
+    "key_ingredients": ["lean beef sirloin", "brown rice", "scallions", "cucumber"],
+    "summary": "Sear thin-sliced marinated beef; serve over brown rice with quick-pickled cucumber and greens."
+  },
+  {
+    "id": "viet-chicken-lettuce-wraps",
+    "name": "Vietnamese Chicken Lettuce Wraps",
+    "cuisine": "Vietnamese",
+    "meal_type": "either",
+    "key_ingredients": ["ground chicken", "butter lettuce", "carrots", "lime"],
+    "summary": "Saute ground chicken with ginger and lime; spoon into lettuce cups with shredded carrot and herbs."
+  },
+  {
+    "id": "miso-cod-bok-choy",
+    "name": "Miso-Glazed Cod with Bok Choy",
+    "cuisine": "Japanese",
+    "meal_type": "dinner",
+    "key_ingredients": ["cod fillets", "baby bok choy", "white miso"],
+    "summary": "Broil miso-glazed cod and serve with quick-seared bok choy and brown rice."
+  },
+  {
+    "id": "ginger-chicken-soba",
+    "name": "Ginger Chicken with Soba Noodles",
+    "cuisine": "Japanese",
+    "meal_type": "dinner",
+    "key_ingredients": ["chicken breast", "soba noodles", "ginger", "snap peas"],
+    "summary": "Toss seared ginger chicken and vegetables with soba in a light soy-sesame sauce."
+  },
+  {
+    "id": "sesame-tofu-broccoli",
+    "name": "Sesame Tofu and Broccoli Stir-Fry",
+    "cuisine": "Chinese",
+    "meal_type": "either",
+    "key_ingredients": ["firm tofu", "broccoli", "sesame seeds"],
+    "summary": "Crisp tofu and stir-fry with broccoli in a garlic-sesame-soy sauce over brown rice."
+  },
+  {
+    "id": "black-bean-sweet-potato-tacos",
+    "name": "Black Bean and Sweet Potato Tacos",
+    "cuisine": "Mexican",
+    "meal_type": "either",
+    "key_ingredients": ["black beans", "sweet potatoes", "corn tortillas", "lime"],
+    "summary": "Roast cumin-spiced sweet potato, fold into tortillas with black beans, avocado, and lime slaw."
+  },
+  {
+    "id": "chicken-fajita-bowls",
+    "name": "Chicken Fajita Bowls",
+    "cuisine": "Mexican",
+    "meal_type": "dinner",
+    "key_ingredients": ["chicken breast", "bell peppers", "black beans", "brown rice"],
+    "summary": "Sear fajita-spiced chicken and peppers; build bowls with brown rice, beans, and avocado."
+  },
+  {
+    "id": "peruvian-chicken-green-sauce",
+    "name": "Peruvian-Style Grilled Chicken with Green Sauce",
+    "cuisine": "Peruvian",
+    "meal_type": "dinner",
+    "key_ingredients": ["chicken thighs", "cilantro", "lime"],
+    "summary": "Grill cumin-lime marinated chicken; serve with a creamy yogurt-cilantro green sauce."
+  },
+  {
+    "id": "shrimp-avocado-salad",
+    "name": "Shrimp and Avocado Salad",
+    "cuisine": "Latin",
+    "meal_type": "lunch",
+    "key_ingredients": ["shrimp", "avocado", "lime", "cherry tomatoes"],
+    "summary": "Toss poached shrimp with avocado, tomato, and a lime-cilantro dressing over greens."
+  },
+  {
+    "id": "turkey-black-bean-chili",
+    "name": "Turkey and Black Bean Chili",
+    "cuisine": "American",
+    "meal_type": "either",
+    "key_ingredients": ["ground turkey", "black beans", "bell peppers"],
+    "summary": "Simmer lean turkey with beans, peppers, and tomato in a smoky chili spice blend."
+  },
+  {
+    "id": "chana-masala",
+    "name": "Chana Masala (Chickpea Curry)",
+    "cuisine": "Indian",
+    "meal_type": "either",
+    "key_ingredients": ["chickpeas", "ginger", "garam masala"],
+    "summary": "Simmer chickpeas in a tomato-onion masala with ginger and warm spices; serve over brown rice."
+  },
+  {
+    "id": "tandoori-chicken-raita",
+    "name": "Tandoori-Style Chicken with Cucumber Raita",
+    "cuisine": "Indian",
+    "meal_type": "dinner",
+    "key_ingredients": ["chicken thighs", "greek yogurt", "cucumber", "garam masala"],
+    "summary": "Roast yogurt-and-spice marinated chicken; serve with cooling cucumber raita and brown rice."
+  },
+  {
+    "id": "red-lentil-dal-spinach",
+    "name": "Red Lentil Dal with Spinach",
+    "cuisine": "Indian",
+    "meal_type": "either",
+    "key_ingredients": ["red lentils", "spinach", "ginger"],
+    "summary": "Simmer red lentils with turmeric, ginger, and tomato; wilt in spinach and finish with a spice tempering."
+  },
+  {
+    "id": "turkey-meatballs-marinara",
+    "name": "Turkey Meatballs with Marinara over Whole Wheat Pasta",
+    "cuisine": "Italian",
+    "meal_type": "dinner",
+    "key_ingredients": ["ground turkey", "whole wheat pasta", "marinara"],
+    "summary": "Bake herbed turkey meatballs, simmer in marinara, and serve over whole wheat pasta."
+  },
+  {
+    "id": "chicken-sausage-peppers-beans",
+    "name": "Sheet-Pan Chicken Sausage with Peppers and White Beans",
+    "cuisine": "Mediterranean",
+    "meal_type": "dinner",
+    "key_ingredients": ["chicken sausage", "bell peppers", "white beans"],
+    "summary": "Roast chicken sausage with peppers and onions, toss with white beans and a splash of vinegar."
+  },
+  {
+    "id": "cobb-style-chicken-salad",
+    "name": "Cobb-Style Salad with Grilled Chicken",
+    "cuisine": "American",
+    "meal_type": "lunch",
+    "key_ingredients": ["chicken breast", "eggs", "avocado", "cherry tomatoes"],
+    "summary": "Arrange grilled chicken, egg, avocado, and tomato over greens with a light vinaigrette."
+  },
+  {
+    "id": "spinach-feta-frittata",
+    "name": "Spinach and Feta Frittata",
+    "cuisine": "Mediterranean",
+    "meal_type": "either",
+    "key_ingredients": ["eggs", "spinach", "feta"],
+    "summary": "Bake eggs with wilted spinach, scallions, and feta into a sliceable frittata."
+  },
+  {
+    "id": "moroccan-salmon-chermoula",
+    "name": "Moroccan Salmon with Chermoula",
+    "cuisine": "Moroccan",
+    "meal_type": "dinner",
+    "key_ingredients": ["salmon fillets", "cilantro", "lemon", "cumin"],
+    "summary": "Coat salmon in a cilantro-cumin chermoula and roast; serve with couscous or farro and greens."
+  },
+  {
+    "id": "spanish-chickpea-spinach-stew",
+    "name": "Spanish Chickpea and Spinach Stew (Garbanzos con Espinacas)",
+    "cuisine": "Spanish",
+    "meal_type": "either",
+    "key_ingredients": ["chickpeas", "spinach", "smoked paprika"],
+    "summary": "Simmer chickpeas and spinach with smoked paprika, cumin, and tomato until thick and silky."
+  },
+  {
+    "id": "turkish-white-bean-stew",
+    "name": "Turkish White Bean Stew (Fasulye)",
+    "cuisine": "Turkish",
+    "meal_type": "either",
+    "key_ingredients": ["cannellini beans", "carrots", "tomato paste"],
+    "summary": "Stew white beans with carrot, onion, and tomato paste; brighten with lemon and parsley."
+  },
+  {
+    "id": "lebanese-chicken-fattoush",
+    "name": "Chicken Fattoush Salad",
+    "cuisine": "Lebanese",
+    "meal_type": "lunch",
+    "key_ingredients": ["chicken breast", "romaine", "cucumber", "sumac"],
+    "summary": "Toss crisp greens, cucumber, tomato, and grilled chicken with a sumac-lemon dressing and toasted pita."
+  },
+  {
+    "id": "baked-trout-herbs",
+    "name": "Baked Trout with Lemon and Herbs",
+    "cuisine": "Mediterranean",
+    "meal_type": "dinner",
+    "key_ingredients": ["trout fillets", "lemon", "parsley", "dill"],
+    "summary": "Roast trout with lemon, garlic, and fresh herbs; serve with a grain and greens."
+  },
+  {
+    "id": "shrimp-garlic-zucchini",
+    "name": "Garlic Shrimp with Zucchini and Quinoa",
+    "cuisine": "Mediterranean",
+    "meal_type": "dinner",
+    "key_ingredients": ["shrimp", "zucchini", "lemon", "quinoa"],
+    "summary": "Saute shrimp in garlic and lemon with ribboned zucchini; serve over quinoa."
+  },
+  {
+    "id": "greek-baked-fish-plaki",
+    "name": "Greek Baked Fish (Psari Plaki)",
+    "cuisine": "Greek",
+    "meal_type": "dinner",
+    "key_ingredients": ["white fish fillets", "tomatoes", "red onion", "parsley"],
+    "summary": "Bake white fish over a bed of stewed tomatoes, onions, and herbs in olive oil."
+  },
+  {
+    "id": "caprese-farro-salad",
+    "name": "Caprese Farro Salad",
+    "cuisine": "Italian",
+    "meal_type": "lunch",
+    "key_ingredients": ["farro", "cherry tomatoes", "fresh mozzarella", "basil"],
+    "summary": "Toss cooked farro with tomatoes, a little fresh mozzarella, and basil in a balsamic dressing."
+  },
+  {
+    "id": "minestrone-soup",
+    "name": "Minestrone Soup",
+    "cuisine": "Italian",
+    "meal_type": "either",
+    "key_ingredients": ["cannellini beans", "zucchini", "carrots", "whole wheat pasta"],
+    "summary": "Simmer a vegetable, bean, and small-pasta soup in a light tomato base with herbs."
+  },
+  {
+    "id": "ratatouille-white-beans",
+    "name": "Ratatouille with White Beans",
+    "cuisine": "French",
+    "meal_type": "either",
+    "key_ingredients": ["eggplant", "zucchini", "bell peppers", "white beans"],
+    "summary": "Stew eggplant, zucchini, peppers, and tomato; fold in white beans for a protein-rich main."
+  },
+  {
+    "id": "salmon-patties-greens",
+    "name": "Salmon Patties with Lemon Yogurt over Greens",
+    "cuisine": "Mediterranean",
+    "meal_type": "dinner",
+    "key_ingredients": ["salmon", "egg", "dill", "greek yogurt"],
+    "summary": "Pan-sear herbed salmon patties; serve over dressed greens with a lemon-yogurt sauce."
+  },
+  {
+    "id": "chicken-shawarma-bowl",
+    "name": "Chicken Shawarma Bowl",
+    "cuisine": "Levantine",
+    "meal_type": "dinner",
+    "key_ingredients": ["chicken thighs", "cucumber", "tomatoes", "tahini"],
+    "summary": "Roast shawarma-spiced chicken; build bowls with brown rice, chopped salad, and tahini sauce."
+  },
+  {
+    "id": "harissa-chicken-couscous",
+    "name": "Harissa Chicken with Couscous",
+    "cuisine": "North African",
+    "meal_type": "dinner",
+    "key_ingredients": ["chicken breast", "harissa", "whole wheat couscous", "bell peppers"],
+    "summary": "Roast harissa-glazed chicken and peppers; serve over whole wheat couscous with herbs."
+  },
+  {
+    "id": "zaatar-chicken-thighs",
+    "name": "Za'atar Roasted Chicken Thighs with Vegetables",
+    "cuisine": "Levantine",
+    "meal_type": "dinner",
+    "key_ingredients": ["chicken thighs", "za'atar", "cherry tomatoes", "red onion"],
+    "summary": "Sheet-pan roast za'atar chicken with tomatoes and onion; finish with lemon."
+  },
+  {
+    "id": "greek-yogurt-chicken-salad-wrap",
+    "name": "Greek Yogurt Chicken Salad Wrap",
+    "cuisine": "Mediterranean",
+    "meal_type": "lunch",
+    "key_ingredients": ["chicken breast", "greek yogurt", "celery", "whole wheat wrap"],
+    "summary": "Bind shredded chicken with yogurt, celery, and herbs; roll into a whole wheat wrap with greens."
+  },
+  {
+    "id": "hummus-veggie-power-bowl",
+    "name": "Hummus and Roasted Veggie Power Bowl",
+    "cuisine": "Mediterranean",
+    "meal_type": "lunch",
+    "key_ingredients": ["chickpeas", "roasted vegetables", "quinoa", "tahini"],
+    "summary": "Top quinoa with hummus, roasted vegetables, and chickpeas; drizzle with lemon-tahini."
+  },
+  {
+    "id": "chicken-tikka-masala-lite",
+    "name": "Lightened Chicken Tikka Masala",
+    "cuisine": "Indian",
+    "meal_type": "dinner",
+    "key_ingredients": ["chicken breast", "greek yogurt", "garam masala", "tomatoes"],
+    "summary": "Simmer yogurt-marinated chicken in a tomato-spice sauce lightened with yogurt; serve over brown rice."
+  },
+  {
+    "id": "palak-chickpeas",
+    "name": "Palak Chana (Spinach and Chickpea Curry)",
+    "cuisine": "Indian",
+    "meal_type": "either",
+    "key_ingredients": ["spinach", "chickpeas", "ginger", "garam masala"],
+    "summary": "Simmer chickpeas in a pureed spinach-ginger-spice sauce; serve over brown rice."
+  },
+  {
+    "id": "korean-bibimbap-veg",
+    "name": "Vegetable Bibimbap",
+    "cuisine": "Korean",
+    "meal_type": "either",
+    "key_ingredients": ["brown rice", "spinach", "carrots", "egg"],
+    "summary": "Top brown rice with sauteed and seasoned vegetables and a fried egg; serve with a light gochujang sauce."
+  },
+  {
+    "id": "thai-red-curry-tofu",
+    "name": "Thai Red Curry with Tofu and Vegetables",
+    "cuisine": "Thai",
+    "meal_type": "either",
+    "key_ingredients": ["firm tofu", "bell peppers", "light coconut milk", "basil"],
+    "summary": "Simmer tofu and vegetables in a red curry with light coconut milk; serve over brown rice."
+  },
+  {
+    "id": "filipino-chicken-adobo",
+    "name": "Chicken Adobo",
+    "cuisine": "Filipino",
+    "meal_type": "dinner",
+    "key_ingredients": ["chicken thighs", "soy sauce", "garlic", "bay leaves"],
+    "summary": "Braise chicken in soy, vinegar, garlic, and bay until tender; serve over brown rice with greens."
+  },
+  {
+    "id": "mexican-shrimp-tacos",
+    "name": "Chili-Lime Shrimp Tacos with Slaw",
+    "cuisine": "Mexican",
+    "meal_type": "dinner",
+    "key_ingredients": ["shrimp", "corn tortillas", "cabbage", "lime"],
+    "summary": "Sear chili-lime shrimp; tuck into tortillas with a crunchy cabbage-lime slaw and avocado."
+  },
+  {
+    "id": "cuban-black-beans-rice",
+    "name": "Cuban Black Beans and Brown Rice",
+    "cuisine": "Cuban",
+    "meal_type": "either",
+    "key_ingredients": ["black beans", "bell peppers", "brown rice"],
+    "summary": "Simmer black beans with sofrito and cumin; serve over brown rice with a squeeze of lime."
+  },
+  {
+    "id": "southwest-quinoa-salad",
+    "name": "Southwest Quinoa Salad",
+    "cuisine": "American",
+    "meal_type": "lunch",
+    "key_ingredients": ["quinoa", "black beans", "corn", "bell peppers"],
+    "summary": "Toss quinoa with black beans, corn, peppers, and avocado in a cumin-lime dressing."
+  },
+  {
+    "id": "greek-turkey-burgers-tzatziki",
+    "name": "Greek Turkey Burgers with Tzatziki",
+    "cuisine": "Greek",
+    "meal_type": "dinner",
+    "key_ingredients": ["ground turkey", "feta", "spinach", "greek yogurt"],
+    "summary": "Grill turkey burgers studded with feta and spinach; top with cucumber-yogurt tzatziki."
+  },
+  {
+    "id": "sheet-pan-chicken-veg",
+    "name": "Mediterranean Sheet-Pan Chicken and Vegetables",
+    "cuisine": "Mediterranean",
+    "meal_type": "dinner",
+    "key_ingredients": ["chicken thighs", "zucchini", "cherry tomatoes", "red onion"],
+    "summary": "Roast chicken with seasonal vegetables, olive oil, oregano, and lemon on one pan."
+  },
+  {
+    "id": "balela-chickpea-salad",
+    "name": "Balela (Mediterranean Chickpea and Bean Salad)",
+    "cuisine": "Levantine",
+    "meal_type": "lunch",
+    "key_ingredients": ["chickpeas", "black beans", "cherry tomatoes", "parsley"],
+    "summary": "Toss chickpeas and beans with tomato, parsley, and mint in a lemon-olive oil dressing."
+  },
+  {
+    "id": "sicilian-cauliflower-pasta",
+    "name": "Sicilian Cauliflower Pasta",
+    "cuisine": "Italian",
+    "meal_type": "dinner",
+    "key_ingredients": ["cauliflower", "whole wheat pasta", "raisins", "pine nuts"],
+    "summary": "Roast cauliflower and toss with pasta, a little raisin and pine nut, garlic, and chili."
+  },
+  {
+    "id": "ethiopian-misir-wot",
+    "name": "Misir Wot (Ethiopian Red Lentil Stew)",
+    "cuisine": "Ethiopian",
+    "meal_type": "either",
+    "key_ingredients": ["red lentils", "berbere spice", "onions"],
+    "summary": "Simmer red lentils with onion and berbere into a richly spiced stew; serve with greens and brown rice."
+  },
+  {
+    "id": "moroccan-harira",
+    "name": "Harira (Moroccan Lentil and Chickpea Soup)",
+    "cuisine": "Moroccan",
+    "meal_type": "either",
+    "key_ingredients": ["lentils", "chickpeas", "tomatoes", "cilantro"],
+    "summary": "Simmer lentils and chickpeas in a spiced tomato base finished with lemon and cilantro."
+  },
+  {
+    "id": "greek-gigantes-beans",
+    "name": "Gigantes Plaki (Greek Baked Giant Beans)",
+    "cuisine": "Greek",
+    "meal_type": "either",
+    "key_ingredients": ["large white beans", "tomatoes", "dill"],
+    "summary": "Bake large white beans in a tomato-herb sauce until creamy; serve with greens and feta."
+  },
+  {
+    "id": "chicken-skewers-chimichurri",
+    "name": "Grilled Chicken Skewers with Chimichurri",
+    "cuisine": "Argentine",
+    "meal_type": "dinner",
+    "key_ingredients": ["chicken breast", "parsley", "oregano", "red wine vinegar"],
+    "summary": "Grill chicken skewers and vegetables; spoon over a bright herb chimichurri."
+  },
+  {
+    "id": "seared-tuna-salad",
+    "name": "Seared Tuna Niçoise-Style Plate",
+    "cuisine": "Mediterranean",
+    "meal_type": "dinner",
+    "key_ingredients": ["tuna steak", "green beans", "baby potatoes", "egg"],
+    "summary": "Sear tuna rare; plate with blanched green beans, potatoes, egg, and a dijon vinaigrette."
+  }
+]

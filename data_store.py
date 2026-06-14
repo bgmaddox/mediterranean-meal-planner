@@ -14,11 +14,13 @@ Files managed:
 """
 
 import json
+import random
 import uuid
 from datetime import date
 from pathlib import Path
 
 from schemas import (
+    AnchorRecipe,
     ConstraintEntry,
     FavoriteMeal,
     MealHistoryEntry,
@@ -34,6 +36,7 @@ FAVORITES_FILE = DATA_DIR / "favorites.json"
 CONSTRAINTS_FILE = DATA_DIR / "constraints.json"
 PREFERENCES_FILE = DATA_DIR / "preferences.json"
 LIBRARY_FILE = DATA_DIR / "recipe_library.json"
+ANCHOR_RECIPES_FILE = DATA_DIR / "anchor_recipes.json"
 
 MAX_HISTORY_WEEKS = 12     # stored
 HISTORY_WEEKS_FOR_PROMPT = 6  # passed to Claude
@@ -255,6 +258,7 @@ def update_preferences(**kwargs) -> UserPreferences:
         "lunch_adult_count",
         "budget",
         "portion_scale",
+        "use_anchor_recipes",
         "recipient_email",
         "auto_send_email",
         "target_calories_lunch_dinner",
@@ -325,3 +329,49 @@ def delete_from_library(recipe_id: str) -> bool:
         return False
     _write(LIBRARY_FILE, updated)
     return True
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Anchor Recipes (curated real-world seed set used to ground generation)
+# ─────────────────────────────────────────────────────────────────────────────
+
+def load_anchor_recipes() -> list[AnchorRecipe]:
+    """Return the curated anchor recipe seed set (empty list if missing)."""
+    if not ANCHOR_RECIPES_FILE.exists():
+        return []
+    return _read(ANCHOR_RECIPES_FILE)
+
+
+def select_anchor_recipes(count: int = 10, days: int = 5) -> list[AnchorRecipe]:
+    """
+    Return a rotating random sample of anchor recipes to inject as inspiration.
+
+    Excludes lunch-only recipes from crowding out dinner ideas, but keeps
+    'either' recipes in the pool. The sample is randomized each call so weekly
+    plans draw on different anchors over time.
+
+    Parameters
+    ----------
+    count : int
+        How many anchors to return. Capped at the library size.
+    days : int
+        Days being planned; used to scale the sample up a little for longer weeks.
+    """
+    anchors = load_anchor_recipes()
+    if not anchors:
+        return []
+
+    # Bias toward dinner-capable recipes; lunch-only recipes are less useful as
+    # the bulk of anchors but still add variety, so keep a few in the pool.
+    dinner_pool = [a for a in anchors if a.get("meal_type") in ("dinner", "either")]
+    lunch_only = [a for a in anchors if a.get("meal_type") == "lunch"]
+
+    target = min(max(count, days + 3), len(anchors))
+    # Reserve ~1/4 of slots for lunch-only ideas when available.
+    lunch_slots = min(len(lunch_only), max(1, target // 4))
+    dinner_slots = max(target - lunch_slots, 0)
+
+    sample = random.sample(dinner_pool, min(dinner_slots, len(dinner_pool)))
+    sample += random.sample(lunch_only, min(lunch_slots, len(lunch_only)))
+    random.shuffle(sample)
+    return sample

@@ -286,6 +286,7 @@ def build_system_prompt(
     portion_scale: float = 1.0,
     use_up_ingredients: Optional[str] = None,
     days: int = 5,
+    anchor_recipes: list[dict] | None = None,
 ) -> str:
     """
     Build the full system prompt for weekly meal plan generation.
@@ -404,6 +405,34 @@ def build_system_prompt(
             "## Saved Favorites\n"
             "No favorites yet. Focus on variety and building the family's repertoire."
         )
+
+    # --- Anchor recipes section ---
+    if anchor_recipes:
+        lines = []
+        for r in anchor_recipes:
+            ings = ", ".join(r.get("key_ingredients", []))
+            cuisine = r.get("cuisine", "")
+            mtype = r.get("meal_type", "either")
+            line = f"  - {r['name']} ({cuisine}, {mtype})"
+            if ings:
+                line += f" — key: {ings}"
+            if r.get("summary"):
+                line += f". {r['summary']}"
+            lines.append(line)
+        anchor_block = (
+            "## Anchor Recipes (real-world inspiration)\n"
+            "Below is a rotating selection of established, real-world recipes. Use them as a "
+            "STARTING POINT for this week's meals rather than inventing dishes from scratch. "
+            "You have full latitude to ADAPT FREELY: keep the spirit, flavor profile, and "
+            "recognizable identity of a dish, but rework ingredients and methods as needed to "
+            "satisfy every health constraint, the household, the season, and ingredient efficiency. "
+            "Draw on several of these as bases, vary them so the week isn't a literal copy, and feel "
+            "free to include a dish not listed here when it serves the plan better. The health rules "
+            "below always take precedence over fidelity to the original recipe.\n\n"
+            + "\n".join(lines)
+        )
+    else:
+        anchor_block = ""
 
     # --- Constraints section ---
     all_constraints = DEFAULT_CONSTRAINTS + (constraints or [])
@@ -685,7 +714,7 @@ Confirm explicitly in `ingredient_overlap_notes`.
 {favorites_block}
 
 ---
-
+{(chr(10) + anchor_block + chr(10) + "---" + chr(10)) if anchor_block else ""}
 {budget_block}
 
 ---

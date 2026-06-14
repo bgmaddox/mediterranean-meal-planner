@@ -137,6 +137,22 @@ class RecipeLibraryEntry(TypedDict):
     meal: DinnerMeal                    # Full meal dict (DinnerMeal or LunchMeal)
 
 
+class AnchorRecipe(TypedDict):
+    """A real-world recipe used to anchor Claude's generation (curated seed set).
+
+    These are compact descriptions of existing dishes — not full meal plans. A
+    rotating sample is injected into the system prompt as inspiration; Claude
+    adapts them freely to satisfy the health constraints, household, and season.
+    Stored in data/anchor_recipes.json and hand-editable.
+    """
+    id: str                             # Readable slug, e.g. 'greek-lemon-chicken'
+    name: str                           # Dish name, e.g. 'Greek Lemon Chicken with Roasted Potatoes'
+    cuisine: str                        # e.g. 'Greek', 'Thai', 'Mexican'
+    meal_type: str                      # 'dinner', 'lunch', or 'either'
+    key_ingredients: list[str]          # The defining (mostly non-pantry) ingredients
+    summary: str                        # One-line method, e.g. 'Marinate chicken in lemon-oregano-garlic, roast with potatoes.'
+
+
 class MealHistoryEntry(TypedDict):
     """A single week's worth of meals, recorded after generation."""
     week_start: str                     # ISO date string e.g. '2026-03-24' (Monday of that week)
@@ -166,6 +182,7 @@ class UserPreferences(TypedDict):
     lunch_adult_count: int              # How many adults bring lunch (currently 1; configurable)
     budget: Optional[str]              # e.g. '$150/week' or None
     portion_scale: float               # Default 1.0; 0.9 = ~10% smaller, 1.1 = ~10% larger
+    use_anchor_recipes: bool           # Default True; inject curated real recipes as inspiration
 
     # Email
     recipient_email: Optional[str]     # Where to send the weekly email report
