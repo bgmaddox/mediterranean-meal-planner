@@ -428,19 +428,6 @@ body {
   font-style: italic;
 }
 
-/* Two-up row: nutrition snapshot + weekend prep */
-.pr-twoup { display: flex; gap: 16pt; margin-top: 4pt; }
-.pr-twoup > div { flex: 1; }
-
-/* Nutrition snapshot vs targets */
-.pr-nutri { width: 100%; border-collapse: collapse; font-size: 9pt; }
-.pr-nutri td { padding: 3pt 6pt; border-bottom: .5pt solid #F1EBDC; }
-.pr-nutri tr:last-child td { border-bottom: none; }
-.pr-nutri__metric { color: #5A6472; }
-.pr-nutri__val { color: #233044; font-weight: 700; text-align: right; white-space: nowrap; }
-.pr-nutri__target { color: #9aa1ab; font-size: 8pt; text-align: right; white-space: nowrap; }
-.pr-nutri__note { font-size: 7.5pt; color: #9aa1ab; margin-top: 4pt; }
-
 /* Weekend prep checklist */
 .pr-prep-list { list-style: none; }
 .pr-prep-list li {
@@ -596,59 +583,6 @@ def _menu_table(dinners: list, lunches: list) -> str:
     )
 
 
-def _nutrition_snapshot(dinners: list, lunches: list, prefs: dict) -> str:
-    """Estimated daily lunch+dinner nutrition (avg) vs the user's targets."""
-    def _avg(meals: list, key: str):
-        vals = [
-            m.get("nutrition_estimate", {}).get(key)
-            for m in meals
-        ]
-        vals = [v for v in vals if isinstance(v, (int, float))]
-        return sum(vals) / len(vals) if vals else None
-
-    def _daily(key: str):
-        d = _avg(dinners, key)
-        l = _avg(lunches, key)
-        if d is None and l is None:
-            return None
-        return (d or 0) + (l or 0)
-
-    cal = _daily("calories_per_adult_serving")
-    pro = _daily("protein_g")
-    fib = _daily("fiber_g")
-    if cal is None and pro is None and fib is None:
-        return ""
-
-    t_cal = prefs.get("target_calories_lunch_dinner")
-    t_pro = prefs.get("target_protein_g")
-    t_fib = prefs.get("target_fiber_g")
-
-    def _row(label, val, unit, target):
-        if val is None:
-            return ""
-        target_html = (
-            f'<td class="pr-nutri__target">target {int(round(target))}{unit}</td>'
-            if target else '<td class="pr-nutri__target"></td>'
-        )
-        return (
-            f'<tr><td class="pr-nutri__metric">{label}</td>'
-            f'<td class="pr-nutri__val">{int(round(val))}{unit}</td>'
-            f'{target_html}</tr>'
-        )
-
-    rows = (
-        _row("Calories", cal, "", t_cal)
-        + _row("Protein", pro, "g", t_pro)
-        + _row("Fiber", fib, "g", t_fib)
-    )
-    return (
-        '<div class="pr-extras__heading">Daily Nutrition (Lunch + Dinner)</div>'
-        f'<table class="pr-nutri"><tbody>{rows}</tbody></table>'
-        '<div class="pr-nutri__note">Per adult serving, averaged across the week. '
-        'Estimates ±15–20%.</div>'
-    )
-
-
 def _prep_checklist(prep: list) -> str:
     """Compact weekend-prep preview for the cover."""
     if not prep:
@@ -680,18 +614,11 @@ def _overlap_notes(summary: dict) -> str:
 
 
 def _cover_extras(dinners: list, lunches: list, prep: list,
-                  summary: dict, prefs: dict) -> str:
+                  summary: dict) -> str:
     """Fill the lower portion of page 1 with at-a-glance planning info."""
-    nutri = _nutrition_snapshot(dinners, lunches, prefs)
-    checklist = _prep_checklist(prep)
-    twoup = ""
-    if nutri and checklist:
-        twoup = f'<div class="pr-twoup"><div>{nutri}</div><div>{checklist}</div></div>'
-    else:
-        twoup = nutri + checklist
     return (
         _menu_table(dinners, lunches)
-        + twoup
+        + _prep_checklist(prep)
         + _overlap_notes(summary)
     )
 
@@ -926,15 +853,9 @@ def build_html(
     # Lunches — flow naturally on one section page
     lunches_html = "".join(_lunch(l) for l in lunches)
 
-    try:
-        import data_store
-        prefs = data_store.load_preferences() or {}
-    except Exception:
-        prefs = {}
-
     body = (
         _cover(week_start, summary, dinners)
-        + _cover_extras(dinners, lunches, prep, summary, prefs)
+        + _cover_extras(dinners, lunches, prep, summary)
         # DINNERS: section banner + first dinner share a page; subsequent dinners
         # each get a new page via break-before:page on .pr-meal--dinner.
         + '<div class="pr-section page-break">DINNERS</div>'
