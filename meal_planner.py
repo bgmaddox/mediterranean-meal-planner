@@ -28,7 +28,7 @@ import data_store
 from schemas import DinnerMeal, LunchMeal, WeekPlan
 from system_prompt import build_system_prompt
 
-MODEL = "claude-sonnet-4-5"
+MODEL = "claude-opus-4-8"
 
 
 class MealPlanError(Exception):
