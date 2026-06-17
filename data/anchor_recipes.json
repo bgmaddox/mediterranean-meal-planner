@@ -30,7 +30,7 @@
   {
     "id": "shakshuka",
     "name": "Shakshuka (Eggs Poached in Spiced Tomato Sauce)",
-    "cuisine": "North African / Levantine",
+    "cuisine": "North African",
     "meal_type": "either",
     "key_ingredients": [
       "eggs",
@@ -385,7 +385,7 @@
   {
     "id": "shrimp-avocado-salad",
     "name": "Shrimp and Avocado Salad",
-    "cuisine": "Latin",
+    "cuisine": "Mexican",
     "meal_type": "lunch",
     "key_ingredients": [
       "shrimp",
@@ -958,5 +958,103 @@
     ],
     "summary": "Sear tuna rare; plate with blanched green beans, potatoes, egg, and a dijon vinaigrette.",
     "technique_notes": "Tuna is best rare: sear a good steak about a minute per side over very high heat and slice it against the grain - it turns dry and chalky if cooked through. Blanch and cook the other components separately and compose the plate."
+  },
+  {
+    "id": "spanish-halibut-romesco",
+    "name": "Pan-Seared Halibut with Romesco",
+    "cuisine": "Spanish",
+    "meal_type": "dinner",
+    "key_ingredients": [
+      "halibut fillets",
+      "roasted red peppers",
+      "almonds",
+      "tomatoes"
+    ],
+    "summary": "Sear halibut and serve over a roasted red pepper, tomato, and almond romesco sauce.",
+    "technique_notes": "Halibut is lean and dries out fast: pat it bone-dry, sear in a hot pan undisturbed until it releases on its own, and pull it at just-opaque since it carries over off the heat. Romesco is blended from roasted peppers and tomato with toasted almonds and a little bread for body - make it ahead, it improves as it sits."
+  },
+  {
+    "id": "south-indian-fish-curry",
+    "name": "South Indian Fish Curry (Meen Kuzhambu)",
+    "cuisine": "Indian",
+    "meal_type": "dinner",
+    "key_ingredients": [
+      "white fish fillets",
+      "light coconut milk",
+      "tamarind",
+      "curry leaves"
+    ],
+    "summary": "Simmer white fish in a tangy tomato-tamarind and light-coconut curry with South Indian spices.",
+    "technique_notes": "Build and simmer the curry base fully before the fish goes in, then slip the fillets in and poach gently - boiling toughens fish and breaks it apart. Bloom mustard seeds and curry leaves in hot oil first (they should splutter). Add the tamarind near the end and don't over-reduce once the fish is in."
+  },
+  {
+    "id": "thai-steamed-fish-lime",
+    "name": "Thai Steamed Fish with Lime, Garlic, and Chili",
+    "cuisine": "Thai",
+    "meal_type": "dinner",
+    "key_ingredients": [
+      "white fish fillets",
+      "lime",
+      "garlic",
+      "thai chili"
+    ],
+    "summary": "Steam white fish over aromatics and finish with a punchy raw garlic-lime-chili dressing.",
+    "technique_notes": "Steam just until the fish flakes (about 8-10 min depending on thickness) - steaming is unforgiving of overcooking, so check early. Make the lime-garlic-chili-fish-sauce dressing raw and spoon it over after steaming so it stays bright and sharp; don't cook it."
+  },
+  {
+    "id": "shrimp-saganaki",
+    "name": "Shrimp Saganaki (Greek Shrimp with Tomato and Feta)",
+    "cuisine": "Greek",
+    "meal_type": "dinner",
+    "key_ingredients": [
+      "shrimp",
+      "cherry tomatoes",
+      "feta",
+      "garlic"
+    ],
+    "summary": "Bake shrimp in a garlicky tomato sauce topped with feta until just pink and bubbling.",
+    "technique_notes": "Reduce the tomato sauce until thick before the shrimp go in, then add the raw shrimp and bake only until they turn pink and curl into a C - they keep cooking in the hot sauce, so pull early. Crumble the feta on top near the end so it softens but doesn't dissolve."
+  },
+  {
+    "id": "cajun-blackened-tilapia",
+    "name": "Cajun Blackened Tilapia with Corn and Black Beans",
+    "cuisine": "Cajun",
+    "meal_type": "dinner",
+    "key_ingredients": [
+      "tilapia fillets",
+      "cajun spice",
+      "corn",
+      "black beans"
+    ],
+    "summary": "Coat tilapia in Cajun spice and sear hard for a blackened crust; serve with a corn and black bean salad.",
+    "technique_notes": "Blackening needs a screaming-hot cast-iron pan and a dry, well-spiced fillet: pat it dry, press the spice rub on, and don't move it until the crust sets (2-3 min) or it sticks and tears. Tilapia is thin and cooks through fast, so flip only once. Use good ventilation - blackening smokes."
+  },
+  {
+    "id": "spanish-mussels-tomato",
+    "name": "Spanish Mussels in Smoked-Paprika Tomato Broth",
+    "cuisine": "Spanish",
+    "meal_type": "dinner",
+    "key_ingredients": [
+      "mussels",
+      "cherry tomatoes",
+      "smoked paprika",
+      "white wine"
+    ],
+    "summary": "Steam mussels open in a smoky tomato, garlic, and white-wine broth.",
+    "technique_notes": "Scrub the mussels and discard any that stay open when tapped before cooking, and any that stay shut after. Build the tomato-paprika broth first, then add the mussels, cover, and steam just until they open (4-6 min) - pull them as they open so they don't turn rubbery. Bloom the smoked paprika briefly off high heat so it doesn't scorch."
+  },
+  {
+    "id": "sicilian-swordfish",
+    "name": "Sicilian Swordfish with Tomato, Caper, and Mint",
+    "cuisine": "Italian",
+    "meal_type": "dinner",
+    "key_ingredients": [
+      "swordfish steaks",
+      "cherry tomatoes",
+      "capers",
+      "mint"
+    ],
+    "summary": "Grill or sear swordfish and top with a quick Sicilian tomato, caper, olive, and mint relish.",
+    "technique_notes": "Swordfish is meaty but dries out if overcooked: sear or grill it hot and fast, about 3-4 min per side, and pull at just-opaque (medium). Pat it dry first for a good sear. Make the tomato-caper-mint relish raw or barely warmed and spoon it over at the end so it stays fresh."
   }
 ]
