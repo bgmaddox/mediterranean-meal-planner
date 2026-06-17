@@ -377,6 +377,7 @@ def add_anchor_recipe(
     meal_type: str = "either",
     key_ingredients: list[str] | None = None,
     summary: str = "",
+    technique_notes: str = "",
 ) -> AnchorRecipe:
     """
     Add a user-defined anchor recipe to the gitignored user file.
@@ -404,6 +405,7 @@ def add_anchor_recipe(
         "meal_type": meal_type,
         "key_ingredients": [k.strip() for k in (key_ingredients or []) if k.strip()],
         "summary": summary.strip(),
+        "technique_notes": technique_notes.strip(),
     }
     user = load_anchor_user_recipes()
     user.append(entry)

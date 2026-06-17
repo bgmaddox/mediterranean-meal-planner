@@ -4,559 +4,959 @@
     "name": "Greek Lemon Chicken with Roasted Potatoes",
     "cuisine": "Greek",
     "meal_type": "dinner",
-    "key_ingredients": ["chicken thighs", "yukon gold potatoes", "lemon", "fresh oregano"],
-    "summary": "Marinate chicken in lemon, garlic, and oregano, then roast over potatoes until golden."
+    "key_ingredients": [
+      "chicken thighs",
+      "yukon gold potatoes",
+      "lemon",
+      "fresh oregano"
+    ],
+    "summary": "Marinate chicken in lemon, garlic, and oregano, then roast over potatoes until golden.",
+    "technique_notes": "Toss the potatoes in the same lemon-oil-oregano marinade and arrange in a single layer under the chicken so they roast in the rendered fat; roast at 425°F. Pat chicken dry and start it skin-side up for browning. Hold most of the lemon juice until the last 10 minutes so it doesn't turn bitter."
   },
   {
     "id": "sheet-pan-salmon-asparagus",
     "name": "Sheet-Pan Salmon with Lemon and Asparagus",
     "cuisine": "Mediterranean",
     "meal_type": "dinner",
-    "key_ingredients": ["salmon fillets", "asparagus", "lemon", "dill"],
-    "summary": "Roast salmon and asparagus on one pan with olive oil, lemon, and herbs."
+    "key_ingredients": [
+      "salmon fillets",
+      "asparagus",
+      "lemon",
+      "dill"
+    ],
+    "summary": "Roast salmon and asparagus on one pan with olive oil, lemon, and herbs.",
+    "technique_notes": "Give asparagus a 5-7 minute head start; salmon only needs ~12 min at 400°F. Match spear thickness to salmon timing (thin spears burn). Pat salmon dry and roast skin-side down. Squeeze lemon on after roasting, not before, to avoid bitterness."
   },
   {
     "id": "shakshuka",
     "name": "Shakshuka (Eggs Poached in Spiced Tomato Sauce)",
     "cuisine": "North African / Levantine",
     "meal_type": "either",
-    "key_ingredients": ["eggs", "bell peppers", "feta"],
-    "summary": "Simmer peppers and tomatoes with cumin and paprika, poach eggs in the sauce, finish with feta."
+    "key_ingredients": [
+      "eggs",
+      "bell peppers",
+      "feta"
+    ],
+    "summary": "Simmer peppers and tomatoes with cumin and paprika, poach eggs in the sauce, finish with feta.",
+    "technique_notes": "Cook the peppers and onions until genuinely soft (8-10 min) and reduce the sauce before the eggs go in. Make wells, crack eggs into them, then cover the pan on low until whites set but yolks stay runny (~5-8 min); residual heat finishes them off the burner."
   },
   {
     "id": "greek-salad-chickpeas",
     "name": "Greek Salad with Chickpeas",
     "cuisine": "Greek",
     "meal_type": "lunch",
-    "key_ingredients": ["cucumber", "cherry tomatoes", "feta", "red onion"],
-    "summary": "Toss cucumber, tomato, olives, and chickpeas with feta and a red-wine vinaigrette."
+    "key_ingredients": [
+      "cucumber",
+      "cherry tomatoes",
+      "feta",
+      "red onion"
+    ],
+    "summary": "Toss cucumber, tomato, olives, and chickpeas with feta and a red-wine vinaigrette.",
+    "technique_notes": "Salt the cucumber and tomatoes and let them drain 10 min so the salad doesn't go watery, and dress only just before serving. Add feta in slabs (not pre-crumbled) on top at the end. Authentic versions skip lettuce."
   },
   {
     "id": "lentil-soup",
     "name": "Mediterranean Lentil Soup",
     "cuisine": "Mediterranean",
     "meal_type": "either",
-    "key_ingredients": ["carrots", "celery", "spinach"],
-    "summary": "Simmer green lentils with mirepoix, cumin, and tomato; stir in spinach and lemon at the end."
+    "key_ingredients": [
+      "carrots",
+      "celery",
+      "spinach"
+    ],
+    "summary": "Simmer green lentils with mirepoix, cumin, and tomato; stir in spinach and lemon at the end.",
+    "technique_notes": "Hold the acid (lemon and most of the tomato) until the lentils are fully tender; acid added early keeps lentils hard. Soften the mirepoix first, and stir spinach in at the very end off the heat so it just wilts."
   },
   {
     "id": "mediterranean-quinoa-bowl",
     "name": "Mediterranean Quinoa Bowl with Feta and Cucumber",
     "cuisine": "Mediterranean",
     "meal_type": "lunch",
-    "key_ingredients": ["cucumber", "cherry tomatoes", "feta", "parsley"],
-    "summary": "Layer quinoa with chickpeas, chopped veg, feta, and a lemon-tahini drizzle."
+    "key_ingredients": [
+      "cucumber",
+      "cherry tomatoes",
+      "feta",
+      "parsley"
+    ],
+    "summary": "Layer quinoa with chickpeas, chopped veg, feta, and a lemon-tahini drizzle.",
+    "technique_notes": "Rinse quinoa to wash off bitter saponins, toast it dry for a minute, then cook 1:1.5 with the lid on and rest 5 min off heat before fluffing. Cool it before assembling so the vegetables stay crisp."
   },
   {
     "id": "baked-cod-tomatoes-olives",
     "name": "Baked Cod with Tomatoes, Olives, and Capers",
     "cuisine": "Italian",
     "meal_type": "dinner",
-    "key_ingredients": ["cod fillets", "cherry tomatoes", "kalamata olives", "capers"],
-    "summary": "Bake cod in a puttanesca-style tomato, olive, and caper sauce."
+    "key_ingredients": [
+      "cod fillets",
+      "cherry tomatoes",
+      "kalamata olives",
+      "capers"
+    ],
+    "summary": "Bake cod in a puttanesca-style tomato, olive, and caper sauce.",
+    "technique_notes": "Reduce the tomato-olive-caper sauce on the stovetop first, then nestle the cod in and bake just until it flakes (~12-15 min at 400°F). Pat the cod dry and go easy on salt since the olives and capers are already salty."
   },
   {
     "id": "falafel-bowls",
     "name": "Baked Falafel Bowls with Tahini",
     "cuisine": "Levantine",
     "meal_type": "either",
-    "key_ingredients": ["chickpeas", "parsley", "cucumber", "tahini"],
-    "summary": "Bake spiced chickpea falafel and serve over greens with cucumber, tomato, and tahini sauce."
+    "key_ingredients": [
+      "chickpeas",
+      "parsley",
+      "cucumber",
+      "tahini"
+    ],
+    "summary": "Bake spiced chickpea falafel and serve over greens with cucumber, tomato, and tahini sauce.",
+    "technique_notes": "Use soaked dried chickpeas, never canned or cooked ones (cooked chickpeas make a mushy falafel that won't hold). Pulse the mixture coarse rather than pureeing, and chill it 30 min before forming. Brush with oil and bake hot (425°F), flipping once."
   },
   {
     "id": "white-bean-kale-stew",
     "name": "Tuscan White Bean and Kale Stew",
     "cuisine": "Italian",
     "meal_type": "either",
-    "key_ingredients": ["cannellini beans", "lacinato kale", "carrots"],
-    "summary": "Simmer white beans with kale, garlic, and tomato into a hearty rosemary-scented stew."
+    "key_ingredients": [
+      "cannellini beans",
+      "lacinato kale",
+      "carrots"
+    ],
+    "summary": "Simmer white beans with kale, garlic, and tomato into a hearty rosemary-scented stew.",
+    "technique_notes": "Strip kale leaves from the tough stems and add the kale early enough to soften (10+ min) - unlike spinach it needs real time. Mash some of the beans against the pot to thicken the broth; a parmesan rind simmered in adds depth."
   },
   {
     "id": "chicken-souvlaki-tzatziki",
     "name": "Chicken Souvlaki with Tzatziki",
     "cuisine": "Greek",
     "meal_type": "dinner",
-    "key_ingredients": ["chicken breast", "greek yogurt", "cucumber", "lemon"],
-    "summary": "Grill lemon-oregano chicken skewers; serve with cucumber-yogurt tzatziki and a chopped salad."
+    "key_ingredients": [
+      "chicken breast",
+      "greek yogurt",
+      "cucumber",
+      "lemon"
+    ],
+    "summary": "Grill lemon-oregano chicken skewers; serve with cucumber-yogurt tzatziki and a chopped salad.",
+    "technique_notes": "Grate the cucumber, salt it, then squeeze it dry before mixing into the yogurt or the tzatziki turns watery. Cut chicken into even cubes, don't crowd the skewers, and grill hot to char before resting."
   },
   {
     "id": "stuffed-bell-peppers",
     "name": "Turkey and Brown Rice Stuffed Bell Peppers",
     "cuisine": "Mediterranean",
     "meal_type": "dinner",
-    "key_ingredients": ["bell peppers", "ground turkey", "brown rice"],
-    "summary": "Stuff peppers with spiced turkey, brown rice, and tomato; bake until tender."
+    "key_ingredients": [
+      "bell peppers",
+      "ground turkey",
+      "brown rice"
+    ],
+    "summary": "Stuff peppers with spiced turkey, brown rice, and tomato; bake until tender.",
+    "technique_notes": "Par-cook the rice to only ~70% since it finishes inside the peppers, and pre-soften the peppers (blanch or microwave ~5 min) so they're tender in time. Bake covered with foil first, then uncover to brown the tops."
   },
   {
     "id": "pasta-white-beans-tomatoes",
     "name": "Whole Wheat Pasta with Cherry Tomatoes, White Beans, and Basil",
     "cuisine": "Italian",
     "meal_type": "dinner",
-    "key_ingredients": ["whole wheat pasta", "cherry tomatoes", "white beans", "basil"],
-    "summary": "Burst cherry tomatoes in olive oil and garlic, toss with pasta, white beans, and basil."
+    "key_ingredients": [
+      "whole wheat pasta",
+      "cherry tomatoes",
+      "white beans",
+      "basil"
+    ],
+    "summary": "Burst cherry tomatoes in olive oil and garlic, toss with pasta, white beans, and basil.",
+    "technique_notes": "Blister the cherry tomatoes in hot oil without stirring much so they char and burst. Reserve starchy pasta water and toss everything off the heat to emulsify a light sauce. Fold the beans in gently at the end to keep them whole."
   },
   {
     "id": "mujadara",
     "name": "Mujadara (Lentils and Rice with Crispy Onions)",
     "cuisine": "Levantine",
     "meal_type": "either",
-    "key_ingredients": ["green lentils", "brown rice", "onions"],
-    "summary": "Cook lentils and rice with cumin; top with deeply caramelized onions and a yogurt dollop."
+    "key_ingredients": [
+      "green lentils",
+      "brown rice",
+      "onions"
+    ],
+    "summary": "Cook lentils and rice with cumin; top with deeply caramelized onions and a yogurt dollop.",
+    "technique_notes": "The onions make the dish: cook the sliced onions low and slow 20-30 min until deep mahogany, not just golden, and reserve some for garnish. Cook the lentils to just-tender before combining with the rice so neither turns to mush."
   },
   {
     "id": "grilled-chicken-salad",
     "name": "Grilled Mediterranean Chicken Salad",
     "cuisine": "Mediterranean",
     "meal_type": "lunch",
-    "key_ingredients": ["chicken breast", "mixed greens", "cucumber", "feta"],
-    "summary": "Slice grilled chicken over greens with cucumber, tomato, olives, and a lemon vinaigrette."
+    "key_ingredients": [
+      "chicken breast",
+      "mixed greens",
+      "cucumber",
+      "feta"
+    ],
+    "summary": "Slice grilled chicken over greens with cucumber, tomato, olives, and a lemon vinaigrette.",
+    "technique_notes": "Pound the chicken to an even thickness so it cooks evenly, and rest it after grilling before slicing to keep it juicy. Dress the greens only just before serving."
   },
   {
     "id": "salmon-nicoise",
     "name": "Salmon Niçoise-Style Salad",
     "cuisine": "French",
     "meal_type": "dinner",
-    "key_ingredients": ["salmon fillets", "green beans", "eggs", "baby potatoes"],
-    "summary": "Compose seared salmon with blanched green beans, eggs, potatoes, and a dijon vinaigrette."
+    "key_ingredients": [
+      "salmon fillets",
+      "green beans",
+      "eggs",
+      "baby potatoes"
+    ],
+    "summary": "Compose seared salmon with blanched green beans, eggs, potatoes, and a dijon vinaigrette.",
+    "technique_notes": "Cook each component to its own right doneness: blanch the green beans then shock in ice water to keep them bright and crisp, aim for jammy 7-8 minute eggs, and sear the salmon skin-side down. Compose the plate, don't toss it."
   },
   {
     "id": "tabbouleh-grilled-chicken",
     "name": "Tabbouleh with Grilled Chicken",
     "cuisine": "Levantine",
     "meal_type": "lunch",
-    "key_ingredients": ["parsley", "bulgur", "cherry tomatoes", "chicken breast"],
-    "summary": "Toss a parsley-forward bulgur tabbouleh with lemon and olive oil; top with sliced grilled chicken."
+    "key_ingredients": [
+      "parsley",
+      "bulgur",
+      "cherry tomatoes",
+      "chicken breast"
+    ],
+    "summary": "Toss a parsley-forward bulgur tabbouleh with lemon and olive oil; top with sliced grilled chicken.",
+    "technique_notes": "It's parsley-forward with bulgur as an accent, not the reverse. Use fine bulgur and soak (don't boil) it until just tender, then drain well. Dry the parsley thoroughly before chopping, and let the salad rest 15 min after dressing."
   },
   {
     "id": "eggplant-chickpea-tagine",
     "name": "Eggplant and Chickpea Tagine",
     "cuisine": "Moroccan",
     "meal_type": "dinner",
-    "key_ingredients": ["eggplant", "chickpeas", "apricots"],
-    "summary": "Stew eggplant and chickpeas with warm spices and a touch of dried fruit; serve over couscous or farro."
+    "key_ingredients": [
+      "eggplant",
+      "chickpeas",
+      "apricots"
+    ],
+    "summary": "Stew eggplant and chickpeas with warm spices and a touch of dried fruit; serve over couscous or farro.",
+    "technique_notes": "Salt and brown or roast the eggplant first so it isn't spongy and raw, then build the spiced base and stew gently. Add the dried fruit partway through so it plumps without dissolving."
   },
   {
     "id": "yogurt-marinated-chicken-farro",
     "name": "Yogurt-Marinated Grilled Chicken with Farro",
     "cuisine": "Mediterranean",
     "meal_type": "dinner",
-    "key_ingredients": ["chicken thighs", "greek yogurt", "farro", "lemon"],
-    "summary": "Marinate chicken in spiced yogurt and grill; serve over farro with a herb salad."
+    "key_ingredients": [
+      "chicken thighs",
+      "greek yogurt",
+      "farro",
+      "lemon"
+    ],
+    "summary": "Marinate chicken in spiced yogurt and grill; serve over farro with a herb salad.",
+    "technique_notes": "Let the yogurt marinade work at least 2 hours - it tenderizes the chicken - then scrape off the excess before grilling so it chars instead of steaming. Toast the farro before simmering for a nuttier flavor."
   },
   {
     "id": "teriyaki-salmon-bowl",
     "name": "Teriyaki Salmon Bowl with Brown Rice and Edamame",
     "cuisine": "Japanese",
     "meal_type": "dinner",
-    "key_ingredients": ["salmon fillets", "edamame", "brown rice", "scallions"],
-    "summary": "Glaze salmon with a light teriyaki, serve over brown rice with edamame and cucumber."
+    "key_ingredients": [
+      "salmon fillets",
+      "edamame",
+      "brown rice",
+      "scallions"
+    ],
+    "summary": "Glaze salmon with a light teriyaki, serve over brown rice with edamame and cucumber.",
+    "technique_notes": "Reduce the teriyaki to a glaze separately, brush it on only at the end, and broil 1-2 min so the sugars caramelize without scorching. Pat the salmon dry first so it sears rather than steams."
   },
   {
     "id": "thai-chicken-stir-fry",
     "name": "Thai-Inspired Chicken and Vegetable Stir-Fry",
     "cuisine": "Thai",
     "meal_type": "dinner",
-    "key_ingredients": ["chicken breast", "bell peppers", "snap peas", "basil"],
-    "summary": "Stir-fry chicken and crisp vegetables in a garlic-ginger-fish-sauce glaze; serve over brown rice."
+    "key_ingredients": [
+      "chicken breast",
+      "bell peppers",
+      "snap peas",
+      "basil"
+    ],
+    "summary": "Stir-fry chicken and crisp vegetables in a garlic-ginger-fish-sauce glaze; serve over brown rice.",
+    "technique_notes": "Cook over the highest heat in batches so the chicken sears instead of steaming. Add vegetables by density (peppers before snap peas) and stir in the basil off the heat at the very end so it stays fragrant."
   },
   {
     "id": "korean-beef-bowl",
     "name": "Korean-Style Beef Bowl (Bulgogi)",
     "cuisine": "Korean",
     "meal_type": "dinner",
-    "key_ingredients": ["lean beef sirloin", "brown rice", "scallions", "cucumber"],
-    "summary": "Sear thin-sliced marinated beef; serve over brown rice with quick-pickled cucumber and greens."
+    "key_ingredients": [
+      "lean beef sirloin",
+      "brown rice",
+      "scallions",
+      "cucumber"
+    ],
+    "summary": "Sear thin-sliced marinated beef; serve over brown rice with quick-pickled cucumber and greens.",
+    "technique_notes": "Slice the beef thin against the grain (freeze it 20 min first to make slicing easier), and use grated pear or onion in the marinade to tenderize. Sear hard in a single layer without crowding the pan."
   },
   {
     "id": "viet-chicken-lettuce-wraps",
     "name": "Vietnamese Chicken Lettuce Wraps",
     "cuisine": "Vietnamese",
     "meal_type": "either",
-    "key_ingredients": ["ground chicken", "butter lettuce", "carrots", "lime"],
-    "summary": "Saute ground chicken with ginger and lime; spoon into lettuce cups with shredded carrot and herbs."
+    "key_ingredients": [
+      "ground chicken",
+      "butter lettuce",
+      "carrots",
+      "lime"
+    ],
+    "summary": "Saute ground chicken with ginger and lime; spoon into lettuce cups with shredded carrot and herbs.",
+    "technique_notes": "Cook the ground chicken past gray until the moisture evaporates and it lightly browns, then build the lime-fish-sauce dressing off the heat to keep it bright. Keep filling and herbs separate from the lettuce until eating so the cups stay crisp."
   },
   {
     "id": "miso-cod-bok-choy",
     "name": "Miso-Glazed Cod with Bok Choy",
     "cuisine": "Japanese",
     "meal_type": "dinner",
-    "key_ingredients": ["cod fillets", "baby bok choy", "white miso"],
-    "summary": "Broil miso-glazed cod and serve with quick-seared bok choy and brown rice."
+    "key_ingredients": [
+      "cod fillets",
+      "baby bok choy",
+      "white miso"
+    ],
+    "summary": "Broil miso-glazed cod and serve with quick-seared bok choy and brown rice.",
+    "technique_notes": "Separate the bok choy stems from the leaves: sear the stems first for 2-3 min and add the leaves only in the last minute, so the stems cook through while the leaves stay green. Marinate the cod in the miso, then broil it close to the element and watch closely - the miso sugars scorch fast."
   },
   {
     "id": "ginger-chicken-soba",
     "name": "Ginger Chicken with Soba Noodles",
     "cuisine": "Japanese",
     "meal_type": "dinner",
-    "key_ingredients": ["chicken breast", "soba noodles", "ginger", "snap peas"],
-    "summary": "Toss seared ginger chicken and vegetables with soba in a light soy-sesame sauce."
+    "key_ingredients": [
+      "chicken breast",
+      "soba noodles",
+      "ginger",
+      "snap peas"
+    ],
+    "summary": "Toss seared ginger chicken and vegetables with soba in a light soy-sesame sauce.",
+    "technique_notes": "Rinse the cooked soba under cold water to stop the cooking and wash off surface starch (this prevents gummy clumps), then toss with a little oil. Add the snap peas in only the last minute so they stay crisp."
   },
   {
     "id": "sesame-tofu-broccoli",
     "name": "Sesame Tofu and Broccoli Stir-Fry",
     "cuisine": "Chinese",
     "meal_type": "either",
-    "key_ingredients": ["firm tofu", "broccoli", "sesame seeds"],
-    "summary": "Crisp tofu and stir-fry with broccoli in a garlic-sesame-soy sauce over brown rice."
+    "key_ingredients": [
+      "firm tofu",
+      "broccoli",
+      "sesame seeds"
+    ],
+    "summary": "Crisp tofu and stir-fry with broccoli in a garlic-sesame-soy sauce over brown rice.",
+    "technique_notes": "Press the tofu 15-20 min to remove water, then coat in a little cornstarch and crisp it undisturbed before stir-frying. Blanch or steam the broccoli briefly first so it cooks through in the quick stir-fry. The sauce thickens fast, so finish it off the heat."
   },
   {
     "id": "black-bean-sweet-potato-tacos",
     "name": "Black Bean and Sweet Potato Tacos",
     "cuisine": "Mexican",
     "meal_type": "either",
-    "key_ingredients": ["black beans", "sweet potatoes", "corn tortillas", "lime"],
-    "summary": "Roast cumin-spiced sweet potato, fold into tortillas with black beans, avocado, and lime slaw."
+    "key_ingredients": [
+      "black beans",
+      "sweet potatoes",
+      "corn tortillas",
+      "lime"
+    ],
+    "summary": "Roast cumin-spiced sweet potato, fold into tortillas with black beans, avocado, and lime slaw.",
+    "technique_notes": "Roast the sweet potato in a single uncrowded layer at 425°F so it caramelizes instead of steaming. Char the tortillas directly over a flame. Dress the slaw with its acid only just before serving."
   },
   {
     "id": "chicken-fajita-bowls",
     "name": "Chicken Fajita Bowls",
     "cuisine": "Mexican",
     "meal_type": "dinner",
-    "key_ingredients": ["chicken breast", "bell peppers", "black beans", "brown rice"],
-    "summary": "Sear fajita-spiced chicken and peppers; build bowls with brown rice, beans, and avocado."
+    "key_ingredients": [
+      "chicken breast",
+      "bell peppers",
+      "black beans",
+      "brown rice"
+    ],
+    "summary": "Sear fajita-spiced chicken and peppers; build bowls with brown rice, beans, and avocado.",
+    "technique_notes": "Sear the chicken and peppers in batches over high heat for char, not steam, and don't stir constantly - let contact build color. Rest the chicken, then slice it against the grain."
   },
   {
     "id": "peruvian-chicken-green-sauce",
     "name": "Peruvian-Style Grilled Chicken with Green Sauce",
     "cuisine": "Peruvian",
     "meal_type": "dinner",
-    "key_ingredients": ["chicken thighs", "cilantro", "lime"],
-    "summary": "Grill cumin-lime marinated chicken; serve with a creamy yogurt-cilantro green sauce."
+    "key_ingredients": [
+      "chicken thighs",
+      "cilantro",
+      "lime"
+    ],
+    "summary": "Grill cumin-lime marinated chicken; serve with a creamy yogurt-cilantro green sauce.",
+    "technique_notes": "Marinate the thighs at least an hour and grill them over breast for juiciness. The green sauce is blended raw (cilantro, lime, a little yogurt, jalapeño) - make it fresh and keep it cold."
   },
   {
     "id": "shrimp-avocado-salad",
     "name": "Shrimp and Avocado Salad",
     "cuisine": "Latin",
     "meal_type": "lunch",
-    "key_ingredients": ["shrimp", "avocado", "lime", "cherry tomatoes"],
-    "summary": "Toss poached shrimp with avocado, tomato, and a lime-cilantro dressing over greens."
+    "key_ingredients": [
+      "shrimp",
+      "avocado",
+      "lime",
+      "cherry tomatoes"
+    ],
+    "summary": "Toss poached shrimp with avocado, tomato, and a lime-cilantro dressing over greens.",
+    "technique_notes": "Poach the shrimp gently just until they curl into a C and turn pink (a tight O means overcooked), then shock in ice water. Add the avocado and dress only at the last moment to prevent browning and mush."
   },
   {
     "id": "turkey-black-bean-chili",
     "name": "Turkey and Black Bean Chili",
     "cuisine": "American",
     "meal_type": "either",
-    "key_ingredients": ["ground turkey", "black beans", "bell peppers"],
-    "summary": "Simmer lean turkey with beans, peppers, and tomato in a smoky chili spice blend."
+    "key_ingredients": [
+      "ground turkey",
+      "black beans",
+      "bell peppers"
+    ],
+    "summary": "Simmer lean turkey with beans, peppers, and tomato in a smoky chili spice blend.",
+    "technique_notes": "Brown the turkey hard and bloom the spices in the oil before adding any liquid for depth, then simmer uncovered to thicken. Lean turkey has no fat to render, so start with a little oil and don't overcook it."
   },
   {
     "id": "chana-masala",
     "name": "Chana Masala (Chickpea Curry)",
     "cuisine": "Indian",
     "meal_type": "either",
-    "key_ingredients": ["chickpeas", "ginger", "garam masala"],
-    "summary": "Simmer chickpeas in a tomato-onion masala with ginger and warm spices; serve over brown rice."
+    "key_ingredients": [
+      "chickpeas",
+      "ginger",
+      "garam masala"
+    ],
+    "summary": "Simmer chickpeas in a tomato-onion masala with ginger and warm spices; serve over brown rice.",
+    "technique_notes": "Build a deeply browned onion-tomato-ginger-garlic masala (10+ min) before the chickpeas go in - that base is the flavor - then simmer the chickpeas in it to absorb. Finish with garam masala and lemon off the heat."
   },
   {
     "id": "tandoori-chicken-raita",
     "name": "Tandoori-Style Chicken with Cucumber Raita",
     "cuisine": "Indian",
     "meal_type": "dinner",
-    "key_ingredients": ["chicken thighs", "greek yogurt", "cucumber", "garam masala"],
-    "summary": "Roast yogurt-and-spice marinated chicken; serve with cooling cucumber raita and brown rice."
+    "key_ingredients": [
+      "chicken thighs",
+      "greek yogurt",
+      "cucumber",
+      "garam masala"
+    ],
+    "summary": "Roast yogurt-and-spice marinated chicken; serve with cooling cucumber raita and brown rice.",
+    "technique_notes": "Use a two-stage marinade (lemon and salt first, then yogurt and spices) and slash the thighs so it penetrates; roast hot or broil for char. Grate and drain the cucumber for the raita so it isn't watery."
   },
   {
     "id": "red-lentil-dal-spinach",
     "name": "Red Lentil Dal with Spinach",
     "cuisine": "Indian",
     "meal_type": "either",
-    "key_ingredients": ["red lentils", "spinach", "ginger"],
-    "summary": "Simmer red lentils with turmeric, ginger, and tomato; wilt in spinach and finish with a spice tempering."
+    "key_ingredients": [
+      "red lentils",
+      "spinach",
+      "ginger"
+    ],
+    "summary": "Simmer red lentils with turmeric, ginger, and tomato; wilt in spinach and finish with a spice tempering.",
+    "technique_notes": "Red lentils break down fast - skim the foam and simmer until creamy. Don't skip the tarka: bloom whole spices and garlic in hot oil and pour it over at the end. Stir the spinach in at the very last."
   },
   {
     "id": "turkey-meatballs-marinara",
     "name": "Turkey Meatballs with Marinara over Whole Wheat Pasta",
     "cuisine": "Italian",
     "meal_type": "dinner",
-    "key_ingredients": ["ground turkey", "whole wheat pasta", "marinara"],
-    "summary": "Bake herbed turkey meatballs, simmer in marinara, and serve over whole wheat pasta."
+    "key_ingredients": [
+      "ground turkey",
+      "whole wheat pasta",
+      "marinara"
+    ],
+    "summary": "Bake herbed turkey meatballs, simmer in marinara, and serve over whole wheat pasta.",
+    "technique_notes": "Don't overmix or pack the meatballs or they turn dense; a panade (bread soaked in milk) keeps lean turkey moist. Bake or sear them, then finish cooking gently in the simmering sauce so they stay tender."
   },
   {
     "id": "chicken-sausage-peppers-beans",
     "name": "Sheet-Pan Chicken Sausage with Peppers and White Beans",
     "cuisine": "Mediterranean",
     "meal_type": "dinner",
-    "key_ingredients": ["chicken sausage", "bell peppers", "white beans"],
-    "summary": "Roast chicken sausage with peppers and onions, toss with white beans and a splash of vinegar."
+    "key_ingredients": [
+      "chicken sausage",
+      "bell peppers",
+      "white beans"
+    ],
+    "summary": "Roast chicken sausage with peppers and onions, toss with white beans and a splash of vinegar.",
+    "technique_notes": "Roast the sausage and peppers hot enough to brown (425°F), and add the cooked white beans only at the end just to warm through so they don't fall apart. Deglaze the pan with a splash of vinegar."
   },
   {
     "id": "cobb-style-chicken-salad",
     "name": "Cobb-Style Salad with Grilled Chicken",
     "cuisine": "American",
     "meal_type": "lunch",
-    "key_ingredients": ["chicken breast", "eggs", "avocado", "cherry tomatoes"],
-    "summary": "Arrange grilled chicken, egg, avocado, and tomato over greens with a light vinaigrette."
+    "key_ingredients": [
+      "chicken breast",
+      "eggs",
+      "avocado",
+      "cherry tomatoes"
+    ],
+    "summary": "Arrange grilled chicken, egg, avocado, and tomato over greens with a light vinaigrette.",
+    "technique_notes": "Prep each component separately and arrange them in rows, dressing only at the table. Keep the avocado tossed in a little lemon to hold its color. Everything goes on cold."
   },
   {
     "id": "spinach-feta-frittata",
     "name": "Spinach and Feta Frittata",
     "cuisine": "Mediterranean",
     "meal_type": "either",
-    "key_ingredients": ["eggs", "spinach", "feta"],
-    "summary": "Bake eggs with wilted spinach, scallions, and feta into a sliceable frittata."
+    "key_ingredients": [
+      "eggs",
+      "spinach",
+      "feta"
+    ],
+    "summary": "Bake eggs with wilted spinach, scallions, and feta into a sliceable frittata.",
+    "technique_notes": "Wilt the spinach and squeeze out all the liquid first or the frittata weeps. Start it on the stovetop until the edges set, then finish in the oven, and pull it while the center is just barely set - it carries over."
   },
   {
     "id": "moroccan-salmon-chermoula",
     "name": "Moroccan Salmon with Chermoula",
     "cuisine": "Moroccan",
     "meal_type": "dinner",
-    "key_ingredients": ["salmon fillets", "cilantro", "lemon", "cumin"],
-    "summary": "Coat salmon in a cilantro-cumin chermoula and roast; serve with couscous or farro and greens."
+    "key_ingredients": [
+      "salmon fillets",
+      "cilantro",
+      "lemon",
+      "cumin"
+    ],
+    "summary": "Coat salmon in a cilantro-cumin chermoula and roast; serve with couscous or farro and greens.",
+    "technique_notes": "Chermoula is a raw herb sauce - reserve half to finish and use the rest as a short (20-30 min) marinade, since its acid starts to 'cook' the fish if left longer. Roast the salmon just to medium so it stays moist."
   },
   {
     "id": "spanish-chickpea-spinach-stew",
     "name": "Spanish Chickpea and Spinach Stew (Garbanzos con Espinacas)",
     "cuisine": "Spanish",
     "meal_type": "either",
-    "key_ingredients": ["chickpeas", "spinach", "smoked paprika"],
-    "summary": "Simmer chickpeas and spinach with smoked paprika, cumin, and tomato until thick and silky."
+    "key_ingredients": [
+      "chickpeas",
+      "spinach",
+      "smoked paprika"
+    ],
+    "summary": "Simmer chickpeas and spinach with smoked paprika, cumin, and tomato until thick and silky.",
+    "technique_notes": "Bloom the smoked paprika briefly and off direct high heat - it scorches and turns bitter in seconds. The traditional thickener is a little fried bread blended into the stew. Wilt the spinach in at the end."
   },
   {
     "id": "turkish-white-bean-stew",
     "name": "Turkish White Bean Stew (Fasulye)",
     "cuisine": "Turkish",
     "meal_type": "either",
-    "key_ingredients": ["cannellini beans", "carrots", "tomato paste"],
-    "summary": "Stew white beans with carrot, onion, and tomato paste; brighten with lemon and parsley."
+    "key_ingredients": [
+      "cannellini beans",
+      "carrots",
+      "tomato paste"
+    ],
+    "summary": "Stew white beans with carrot, onion, and tomato paste; brighten with lemon and parsley.",
+    "technique_notes": "Cook the tomato paste until it darkens and loses its raw edge before adding liquid, then simmer gently so the beans stay intact. Brighten with lemon and parsley off the heat."
   },
   {
     "id": "lebanese-chicken-fattoush",
     "name": "Chicken Fattoush Salad",
     "cuisine": "Lebanese",
     "meal_type": "lunch",
-    "key_ingredients": ["chicken breast", "romaine", "cucumber", "sumac"],
-    "summary": "Toss crisp greens, cucumber, tomato, and grilled chicken with a sumac-lemon dressing and toasted pita."
+    "key_ingredients": [
+      "chicken breast",
+      "romaine",
+      "cucumber",
+      "sumac"
+    ],
+    "summary": "Toss crisp greens, cucumber, tomato, and grilled chicken with a sumac-lemon dressing and toasted pita.",
+    "technique_notes": "Toast or bake the pita until crisp and add it only at the very last moment so it stays crunchy. Sumac (and a little pomegranate molasses) define the dressing. Dress just before serving."
   },
   {
     "id": "baked-trout-herbs",
     "name": "Baked Trout with Lemon and Herbs",
     "cuisine": "Mediterranean",
     "meal_type": "dinner",
-    "key_ingredients": ["trout fillets", "lemon", "parsley", "dill"],
-    "summary": "Roast trout with lemon, garlic, and fresh herbs; serve with a grain and greens."
+    "key_ingredients": [
+      "trout fillets",
+      "lemon",
+      "parsley",
+      "dill"
+    ],
+    "summary": "Roast trout with lemon, garlic, and fresh herbs; serve with a grain and greens.",
+    "technique_notes": "Trout is thin and cooks fast - roast it hot and briefly (10-12 min) just until it flakes. Tuck lemon and herbs into the cavity or over the fillets, and keep the skin on to hold it together."
   },
   {
     "id": "shrimp-garlic-zucchini",
     "name": "Garlic Shrimp with Zucchini and Quinoa",
     "cuisine": "Mediterranean",
     "meal_type": "dinner",
-    "key_ingredients": ["shrimp", "zucchini", "lemon", "quinoa"],
-    "summary": "Saute shrimp in garlic and lemon with ribboned zucchini; serve over quinoa."
+    "key_ingredients": [
+      "shrimp",
+      "zucchini",
+      "lemon",
+      "quinoa"
+    ],
+    "summary": "Saute shrimp in garlic and lemon with ribboned zucchini; serve over quinoa.",
+    "technique_notes": "Don't overcook the shrimp (a C shape, not a tight O). Cook the zucchini hot and fast so it doesn't go soggy and watery, and add the garlic late so it doesn't burn. Finish with lemon off the heat."
   },
   {
     "id": "greek-baked-fish-plaki",
     "name": "Greek Baked Fish (Psari Plaki)",
     "cuisine": "Greek",
     "meal_type": "dinner",
-    "key_ingredients": ["white fish fillets", "tomatoes", "red onion", "parsley"],
-    "summary": "Bake white fish over a bed of stewed tomatoes, onions, and herbs in olive oil."
+    "key_ingredients": [
+      "white fish fillets",
+      "tomatoes",
+      "red onion",
+      "parsley"
+    ],
+    "summary": "Bake white fish over a bed of stewed tomatoes, onions, and herbs in olive oil.",
+    "technique_notes": "Soften the onions and partly cook the tomato sauce first, then lay the fish on top and bake just until it flakes. Generous olive oil is part of the dish, not optional."
   },
   {
     "id": "caprese-farro-salad",
     "name": "Caprese Farro Salad",
     "cuisine": "Italian",
     "meal_type": "lunch",
-    "key_ingredients": ["farro", "cherry tomatoes", "fresh mozzarella", "basil"],
-    "summary": "Toss cooked farro with tomatoes, a little fresh mozzarella, and basil in a balsamic dressing."
+    "key_ingredients": [
+      "farro",
+      "cherry tomatoes",
+      "fresh mozzarella",
+      "basil"
+    ],
+    "summary": "Toss cooked farro with tomatoes, a little fresh mozzarella, and basil in a balsamic dressing.",
+    "technique_notes": "Cook the farro just to al dente and let it cool before mixing so it doesn't wilt the basil or melt the mozzarella. Dress it while still slightly warm to absorb flavor, then fold in the cheese and basil once cooled."
   },
   {
     "id": "minestrone-soup",
     "name": "Minestrone Soup",
     "cuisine": "Italian",
     "meal_type": "either",
-    "key_ingredients": ["cannellini beans", "zucchini", "carrots", "whole wheat pasta"],
-    "summary": "Simmer a vegetable, bean, and small-pasta soup in a light tomato base with herbs."
+    "key_ingredients": [
+      "cannellini beans",
+      "zucchini",
+      "carrots",
+      "whole wheat pasta"
+    ],
+    "summary": "Simmer a vegetable, bean, and small-pasta soup in a light tomato base with herbs.",
+    "technique_notes": "Add the vegetables in order of cook time, and cook the pasta separately (or add it only at the very end) so it doesn't bloat and soak up all the broth. A parmesan rind simmered in the pot adds depth."
   },
   {
     "id": "ratatouille-white-beans",
     "name": "Ratatouille with White Beans",
     "cuisine": "French",
     "meal_type": "either",
-    "key_ingredients": ["eggplant", "zucchini", "bell peppers", "white beans"],
-    "summary": "Stew eggplant, zucchini, peppers, and tomato; fold in white beans for a protein-rich main."
+    "key_ingredients": [
+      "eggplant",
+      "zucchini",
+      "bell peppers",
+      "white beans"
+    ],
+    "summary": "Stew eggplant, zucchini, peppers, and tomato; fold in white beans for a protein-rich main.",
+    "technique_notes": "Cook each vegetable separately (or in stages) so each browns properly instead of stewing into mush, then combine at the end. Salt the eggplant first, and fold the beans in last just to warm."
   },
   {
     "id": "salmon-patties-greens",
     "name": "Salmon Patties with Lemon Yogurt over Greens",
     "cuisine": "Mediterranean",
     "meal_type": "dinner",
-    "key_ingredients": ["salmon", "egg", "dill", "greek yogurt"],
-    "summary": "Pan-sear herbed salmon patties; serve over dressed greens with a lemon-yogurt sauce."
+    "key_ingredients": [
+      "salmon",
+      "egg",
+      "dill",
+      "greek yogurt"
+    ],
+    "summary": "Pan-sear herbed salmon patties; serve over dressed greens with a lemon-yogurt sauce.",
+    "technique_notes": "Chill the formed patties before searing so they hold together, and don't overwork the mix. Sear undisturbed to build a crust before flipping once."
   },
   {
     "id": "chicken-shawarma-bowl",
     "name": "Chicken Shawarma Bowl",
     "cuisine": "Levantine",
     "meal_type": "dinner",
-    "key_ingredients": ["chicken thighs", "cucumber", "tomatoes", "tahini"],
-    "summary": "Roast shawarma-spiced chicken; build bowls with brown rice, chopped salad, and tahini sauce."
+    "key_ingredients": [
+      "chicken thighs",
+      "cucumber",
+      "tomatoes",
+      "tahini"
+    ],
+    "summary": "Roast shawarma-spiced chicken; build bowls with brown rice, chopped salad, and tahini sauce.",
+    "technique_notes": "Marinate the thighs at least an hour, then sear or roast them hard for browned edges - spread them out so they brown instead of steaming. Rest, then slice thin."
   },
   {
     "id": "harissa-chicken-couscous",
     "name": "Harissa Chicken with Couscous",
     "cuisine": "North African",
     "meal_type": "dinner",
-    "key_ingredients": ["chicken breast", "harissa", "whole wheat couscous", "bell peppers"],
-    "summary": "Roast harissa-glazed chicken and peppers; serve over whole wheat couscous with herbs."
+    "key_ingredients": [
+      "chicken breast",
+      "harissa",
+      "whole wheat couscous",
+      "bell peppers"
+    ],
+    "summary": "Roast harissa-glazed chicken and peppers; serve over whole wheat couscous with herbs.",
+    "technique_notes": "Couscous is steamed, not boiled: pour an equal volume of boiling liquid over it, cover and rest 5 min, then fluff with a fork and a little oil. Glaze the chicken with the harissa near the end so it doesn't burn."
   },
   {
     "id": "zaatar-chicken-thighs",
     "name": "Za'atar Roasted Chicken Thighs with Vegetables",
     "cuisine": "Levantine",
     "meal_type": "dinner",
-    "key_ingredients": ["chicken thighs", "za'atar", "cherry tomatoes", "red onion"],
-    "summary": "Sheet-pan roast za'atar chicken with tomatoes and onion; finish with lemon."
+    "key_ingredients": [
+      "chicken thighs",
+      "za'atar",
+      "cherry tomatoes",
+      "red onion"
+    ],
+    "summary": "Sheet-pan roast za'atar chicken with tomatoes and onion; finish with lemon.",
+    "technique_notes": "Add the za'atar in the last stretch of roasting or right after - its sesame and herbs scorch under prolonged high heat. Start the thighs skin-side up to brown, and add lemon after roasting."
   },
   {
     "id": "greek-yogurt-chicken-salad-wrap",
     "name": "Greek Yogurt Chicken Salad Wrap",
     "cuisine": "Mediterranean",
     "meal_type": "lunch",
-    "key_ingredients": ["chicken breast", "greek yogurt", "celery", "whole wheat wrap"],
-    "summary": "Bind shredded chicken with yogurt, celery, and herbs; roll into a whole wheat wrap with greens."
+    "key_ingredients": [
+      "chicken breast",
+      "greek yogurt",
+      "celery",
+      "whole wheat wrap"
+    ],
+    "summary": "Bind shredded chicken with yogurt, celery, and herbs; roll into a whole wheat wrap with greens.",
+    "technique_notes": "Use poached or roasted chicken cooled before mixing, and pat the add-ins dry so the wrap doesn't get soggy. Layer greens against the wrap as a moisture barrier, or assemble just before eating."
   },
   {
     "id": "hummus-veggie-power-bowl",
     "name": "Hummus and Roasted Veggie Power Bowl",
     "cuisine": "Mediterranean",
     "meal_type": "lunch",
-    "key_ingredients": ["chickpeas", "roasted vegetables", "quinoa", "tahini"],
-    "summary": "Top quinoa with hummus, roasted vegetables, and chickpeas; drizzle with lemon-tahini."
+    "key_ingredients": [
+      "chickpeas",
+      "roasted vegetables",
+      "quinoa",
+      "tahini"
+    ],
+    "summary": "Top quinoa with hummus, roasted vegetables, and chickpeas; drizzle with lemon-tahini.",
+    "technique_notes": "Roast the vegetables until caramelized for flavor, and cool the components if you're packing it for lunch. Thin the tahini with lemon and water to a pourable drizzle."
   },
   {
     "id": "chicken-tikka-masala-lite",
     "name": "Lightened Chicken Tikka Masala",
     "cuisine": "Indian",
     "meal_type": "dinner",
-    "key_ingredients": ["chicken breast", "greek yogurt", "garam masala", "tomatoes"],
-    "summary": "Simmer yogurt-marinated chicken in a tomato-spice sauce lightened with yogurt; serve over brown rice."
+    "key_ingredients": [
+      "chicken breast",
+      "greek yogurt",
+      "garam masala",
+      "tomatoes"
+    ],
+    "summary": "Simmer yogurt-marinated chicken in a tomato-spice sauce lightened with yogurt; serve over brown rice.",
+    "technique_notes": "Marinate the chicken in spiced yogurt and char or broil it separately first - those charred edges are the point - then add it to the simmered sauce. Temper the yogurt in off the boil so it doesn't curdle."
   },
   {
     "id": "palak-chickpeas",
     "name": "Palak Chana (Spinach and Chickpea Curry)",
     "cuisine": "Indian",
     "meal_type": "either",
-    "key_ingredients": ["spinach", "chickpeas", "ginger", "garam masala"],
-    "summary": "Simmer chickpeas in a pureed spinach-ginger-spice sauce; serve over brown rice."
+    "key_ingredients": [
+      "spinach",
+      "chickpeas",
+      "ginger",
+      "garam masala"
+    ],
+    "summary": "Simmer chickpeas in a pureed spinach-ginger-spice sauce; serve over brown rice.",
+    "technique_notes": "Blanch the spinach and shock it in ice water before blending to keep it vivid green (long simmering turns it army green), and add the puree near the end. Build a properly browned aromatic base first."
   },
   {
     "id": "korean-bibimbap-veg",
     "name": "Vegetable Bibimbap",
     "cuisine": "Korean",
     "meal_type": "either",
-    "key_ingredients": ["brown rice", "spinach", "carrots", "egg"],
-    "summary": "Top brown rice with sauteed and seasoned vegetables and a fried egg; serve with a light gochujang sauce."
+    "key_ingredients": [
+      "brown rice",
+      "spinach",
+      "carrots",
+      "egg"
+    ],
+    "summary": "Top brown rice with sauteed and seasoned vegetables and a fried egg; serve with a light gochujang sauce.",
+    "technique_notes": "Season each vegetable separately - that's the whole point of bibimbap - rather than mixing them together. Crisp the rice on the bottom of a hot pan for texture, and use a runny-yolk fried egg to bind it."
   },
   {
     "id": "thai-red-curry-tofu",
     "name": "Thai Red Curry with Tofu and Vegetables",
     "cuisine": "Thai",
     "meal_type": "either",
-    "key_ingredients": ["firm tofu", "bell peppers", "light coconut milk", "basil"],
-    "summary": "Simmer tofu and vegetables in a red curry with light coconut milk; serve over brown rice."
+    "key_ingredients": [
+      "firm tofu",
+      "bell peppers",
+      "light coconut milk",
+      "basil"
+    ],
+    "summary": "Simmer tofu and vegetables in a red curry with light coconut milk; serve over brown rice.",
+    "technique_notes": "Fry the curry paste in the thick coconut cream first until it's fragrant and the oil splits out - that blooms it - then add the rest of the liquid and the tofu. Press the tofu first, and add basil and lime off the heat."
   },
   {
     "id": "filipino-chicken-adobo",
     "name": "Chicken Adobo",
     "cuisine": "Filipino",
     "meal_type": "dinner",
-    "key_ingredients": ["chicken thighs", "soy sauce", "garlic", "bay leaves"],
-    "summary": "Braise chicken in soy, vinegar, garlic, and bay until tender; serve over brown rice with greens."
+    "key_ingredients": [
+      "chicken thighs",
+      "soy sauce",
+      "garlic",
+      "bay leaves"
+    ],
+    "summary": "Braise chicken in soy, vinegar, garlic, and bay until tender; serve over brown rice with greens.",
+    "technique_notes": "Once the vinegar goes in, don't stir until it has simmered a few minutes, or it tastes raw and harsh. Braise the chicken, then reduce the sauce; optionally crisp the chicken at the end."
   },
   {
     "id": "mexican-shrimp-tacos",
     "name": "Chili-Lime Shrimp Tacos with Slaw",
     "cuisine": "Mexican",
     "meal_type": "dinner",
-    "key_ingredients": ["shrimp", "corn tortillas", "cabbage", "lime"],
-    "summary": "Sear chili-lime shrimp; tuck into tortillas with a crunchy cabbage-lime slaw and avocado."
+    "key_ingredients": [
+      "shrimp",
+      "corn tortillas",
+      "cabbage",
+      "lime"
+    ],
+    "summary": "Sear chili-lime shrimp; tuck into tortillas with a crunchy cabbage-lime slaw and avocado.",
+    "technique_notes": "Sear the shrimp hot and fast just until pink and curled into a C. Char the tortillas over a flame, and dress the slaw with its acid only just before serving so it stays crunchy."
   },
   {
     "id": "cuban-black-beans-rice",
     "name": "Cuban Black Beans and Brown Rice",
     "cuisine": "Cuban",
     "meal_type": "either",
-    "key_ingredients": ["black beans", "bell peppers", "brown rice"],
-    "summary": "Simmer black beans with sofrito and cumin; serve over brown rice with a squeeze of lime."
+    "key_ingredients": [
+      "black beans",
+      "bell peppers",
+      "brown rice"
+    ],
+    "summary": "Simmer black beans with sofrito and cumin; serve over brown rice with a squeeze of lime.",
+    "technique_notes": "Build a proper sofrito (peppers, onion, garlic, cumin) before the beans go in, then simmer with a splash of the bean liquid and a little vinegar at the end for brightness. Mash a few beans to thicken."
   },
   {
     "id": "southwest-quinoa-salad",
     "name": "Southwest Quinoa Salad",
     "cuisine": "American",
     "meal_type": "lunch",
-    "key_ingredients": ["quinoa", "black beans", "corn", "bell peppers"],
-    "summary": "Toss quinoa with black beans, corn, peppers, and avocado in a cumin-lime dressing."
+    "key_ingredients": [
+      "quinoa",
+      "black beans",
+      "corn",
+      "bell peppers"
+    ],
+    "summary": "Toss quinoa with black beans, corn, peppers, and avocado in a cumin-lime dressing.",
+    "technique_notes": "Rinse the quinoa, then cook and spread it out to cool and dry so it isn't mushy and absorbs the dressing without going gummy. Add the avocado last."
   },
   {
     "id": "greek-turkey-burgers-tzatziki",
     "name": "Greek Turkey Burgers with Tzatziki",
     "cuisine": "Greek",
     "meal_type": "dinner",
-    "key_ingredients": ["ground turkey", "feta", "spinach", "greek yogurt"],
-    "summary": "Grill turkey burgers studded with feta and spinach; top with cucumber-yogurt tzatziki."
+    "key_ingredients": [
+      "ground turkey",
+      "feta",
+      "spinach",
+      "greek yogurt"
+    ],
+    "summary": "Grill turkey burgers studded with feta and spinach; top with cucumber-yogurt tzatziki.",
+    "technique_notes": "Squeeze the spinach dry, don't overmix, and give lean turkey a binder (feta, a little oil) for moisture. Press a thumbprint dimple in each patty so they don't dome, and don't press them while cooking."
   },
   {
     "id": "sheet-pan-chicken-veg",
     "name": "Mediterranean Sheet-Pan Chicken and Vegetables",
     "cuisine": "Mediterranean",
     "meal_type": "dinner",
-    "key_ingredients": ["chicken thighs", "zucchini", "cherry tomatoes", "red onion"],
-    "summary": "Roast chicken with seasonal vegetables, olive oil, oregano, and lemon on one pan."
+    "key_ingredients": [
+      "chicken thighs",
+      "zucchini",
+      "cherry tomatoes",
+      "red onion"
+    ],
+    "summary": "Roast chicken with seasonal vegetables, olive oil, oregano, and lemon on one pan.",
+    "technique_notes": "Cut vegetables by density and give the denser ones a head start (or cut quicker ones larger) so everything finishes together. Spread in a single uncrowded layer at 425°F so they roast instead of steam."
   },
   {
     "id": "balela-chickpea-salad",
     "name": "Balela (Mediterranean Chickpea and Bean Salad)",
     "cuisine": "Levantine",
     "meal_type": "lunch",
-    "key_ingredients": ["chickpeas", "black beans", "cherry tomatoes", "parsley"],
-    "summary": "Toss chickpeas and beans with tomato, parsley, and mint in a lemon-olive oil dressing."
+    "key_ingredients": [
+      "chickpeas",
+      "black beans",
+      "cherry tomatoes",
+      "parsley"
+    ],
+    "summary": "Toss chickpeas and beans with tomato, parsley, and mint in a lemon-olive oil dressing.",
+    "technique_notes": "Let it marinate 30+ min so the chickpeas soak up the lemon-garlic dressing, and dry the herbs and beans well first. It tastes best at room temperature rather than cold."
   },
   {
     "id": "sicilian-cauliflower-pasta",
     "name": "Sicilian Cauliflower Pasta",
     "cuisine": "Italian",
     "meal_type": "dinner",
-    "key_ingredients": ["cauliflower", "whole wheat pasta", "raisins", "pine nuts"],
-    "summary": "Roast cauliflower and toss with pasta, a little raisin and pine nut, garlic, and chili."
+    "key_ingredients": [
+      "cauliflower",
+      "whole wheat pasta",
+      "raisins",
+      "pine nuts"
+    ],
+    "summary": "Roast cauliflower and toss with pasta, a little raisin and pine nut, garlic, and chili.",
+    "technique_notes": "Roast or deeply brown the cauliflower for its nutty flavor - don't boil it. Plump the raisins in warm water and toast the pine nuts, and reserve pasta water to bring it all together."
   },
   {
     "id": "ethiopian-misir-wot",
     "name": "Misir Wot (Ethiopian Red Lentil Stew)",
     "cuisine": "Ethiopian",
     "meal_type": "either",
-    "key_ingredients": ["red lentils", "berbere spice", "onions"],
-    "summary": "Simmer red lentils with onion and berbere into a richly spiced stew; serve with greens and brown rice."
+    "key_ingredients": [
+      "red lentils",
+      "berbere spice",
+      "onions"
+    ],
+    "summary": "Simmer red lentils with onion and berbere into a richly spiced stew; serve with greens and brown rice.",
+    "technique_notes": "Cook the onions long and dry (little to no oil at first) until jammy before adding the berbere, then bloom the berbere in oil. Simmer the red lentils until they fully break down and thicken."
   },
   {
     "id": "moroccan-harira",
     "name": "Harira (Moroccan Lentil and Chickpea Soup)",
     "cuisine": "Moroccan",
     "meal_type": "either",
-    "key_ingredients": ["lentils", "chickpeas", "tomatoes", "cilantro"],
-    "summary": "Simmer lentils and chickpeas in a spiced tomato base finished with lemon and cilantro."
+    "key_ingredients": [
+      "lentils",
+      "chickpeas",
+      "tomatoes",
+      "cilantro"
+    ],
+    "summary": "Simmer lentils and chickpeas in a spiced tomato base finished with lemon and cilantro.",
+    "technique_notes": "Build the spiced tomato base, then simmer the lentils and chickpeas until tender. It's traditionally thickened with a flour-water slurry and finished with lemon and lots of cilantro at the end."
   },
   {
     "id": "greek-gigantes-beans",
     "name": "Gigantes Plaki (Greek Baked Giant Beans)",
     "cuisine": "Greek",
     "meal_type": "either",
-    "key_ingredients": ["large white beans", "tomatoes", "dill"],
-    "summary": "Bake large white beans in a tomato-herb sauce until creamy; serve with greens and feta."
+    "key_ingredients": [
+      "large white beans",
+      "tomatoes",
+      "dill"
+    ],
+    "summary": "Bake large white beans in a tomato-herb sauce until creamy; serve with greens and feta.",
+    "technique_notes": "Soak and pre-cook the giant beans until almost tender before baking - they need the head start. Bake low and slow uncovered in plenty of tomato sauce and olive oil so the top caramelizes."
   },
   {
     "id": "chicken-skewers-chimichurri",
     "name": "Grilled Chicken Skewers with Chimichurri",
     "cuisine": "Argentine",
     "meal_type": "dinner",
-    "key_ingredients": ["chicken breast", "parsley", "oregano", "red wine vinegar"],
-    "summary": "Grill chicken skewers and vegetables; spoon over a bright herb chimichurri."
+    "key_ingredients": [
+      "chicken breast",
+      "parsley",
+      "oregano",
+      "red wine vinegar"
+    ],
+    "summary": "Grill chicken skewers and vegetables; spoon over a bright herb chimichurri.",
+    "technique_notes": "Make the chimichurri chunky by hand (not a smooth blender puree) and let it rest 20+ min to meld. Don't crowd the skewers, grill hot for char, and rest the chicken before serving."
   },
   {
     "id": "seared-tuna-salad",
     "name": "Seared Tuna Niçoise-Style Plate",
     "cuisine": "Mediterranean",
     "meal_type": "dinner",
-    "key_ingredients": ["tuna steak", "green beans", "baby potatoes", "egg"],
-    "summary": "Sear tuna rare; plate with blanched green beans, potatoes, egg, and a dijon vinaigrette."
+    "key_ingredients": [
+      "tuna steak",
+      "green beans",
+      "baby potatoes",
+      "egg"
+    ],
+    "summary": "Sear tuna rare; plate with blanched green beans, potatoes, egg, and a dijon vinaigrette.",
+    "technique_notes": "Tuna is best rare: sear a good steak about a minute per side over very high heat and slice it against the grain - it turns dry and chalky if cooked through. Blanch and cook the other components separately and compose the plate."
   }
 ]

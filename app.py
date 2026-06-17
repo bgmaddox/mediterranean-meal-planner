@@ -1120,13 +1120,19 @@ def _settings_fragment():
                 placeholder="Marinate chicken in lemon and herbs, roast over potatoes.",
                 height=70,
             )
+            new_technique = st.text_area(
+                "Technique notes (optional)",
+                placeholder="Tested, non-obvious tips so Claude cooks it the way a refined recipe would — e.g. 'Separate bok choy stems from leaves; sear stems 2 min before adding leaves.'",
+                height=70,
+                help="The proven procedure from a real recipe. Claude follows this instead of improvising. Leave blank if there's nothing special.",
+            )
             if st.form_submit_button("Add recipe", type="primary"):
                 if not new_name.strip():
                     st.error("Recipe name is required.")
                 else:
                     data_store.add_anchor_recipe(
                         new_name, new_cuisine, new_type,
-                        new_ings.split(","), new_summary,
+                        new_ings.split(","), new_summary, new_technique,
                     )
                     st.success(f"Added '{new_name.strip()}' to the library.")
                     st.rerun()
@@ -1136,7 +1142,10 @@ def _settings_fragment():
             for r in _user_recipes:
                 rc1, rc2 = st.columns([5, 1])
                 meta = " · ".join(x for x in [r.get("cuisine", ""), r.get("meal_type", "")] if x)
-                rc1.markdown(f"- **{r['name']}**  \n  <small>{meta}</small>", unsafe_allow_html=True)
+                line = f"- **{r['name']}**  \n  <small>{meta}</small>"
+                if r.get("technique_notes"):
+                    line += f"  \n  <small>🔧 {r['technique_notes']}</small>"
+                rc1.markdown(line, unsafe_allow_html=True)
                 if rc2.button("Delete", key=f"anchor_del_{r['id']}", use_container_width=True):
                     data_store.delete_anchor_recipe(r["id"])
                     st.rerun()

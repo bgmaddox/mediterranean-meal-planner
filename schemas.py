@@ -151,6 +151,7 @@ class AnchorRecipe(TypedDict):
     meal_type: str                      # 'dinner', 'lunch', or 'either'
     key_ingredients: list[str]          # The defining (mostly non-pantry) ingredients
     summary: str                        # One-line method, e.g. 'Marinate chicken in lemon-oregano-garlic, roast with potatoes.'
+    technique_notes: str                # Tested, non-obvious procedural tips Claude should follow (not a full recipe), e.g. 'Separate bok choy stems from leaves; sear stems 2 min before adding leaves.' May be empty.
 
 
 class MealHistoryEntry(TypedDict):

@@ -418,6 +418,8 @@ def build_system_prompt(
                 line += f" — key: {ings}"
             if r.get("summary"):
                 line += f". {r['summary']}"
+            if r.get("technique_notes"):
+                line += f"\n      • Technique: {r['technique_notes']}"
             lines.append(line)
         anchor_block = (
             "## Anchor Recipes (real-world inspiration)\n"
@@ -429,6 +431,11 @@ def build_system_prompt(
             "Draw on several of these as bases, vary them so the week isn't a literal copy, and feel "
             "free to include a dish not listed here when it serves the plan better. The health rules "
             "below always take precedence over fidelity to the original recipe.\n\n"
+            "When a recipe includes a **Technique** note, it captures the tested, non-obvious "
+            "procedure from the real recipe (e.g., how to cut and time an ingredient so it cooks "
+            "evenly). Follow that technique for the relevant ingredients in your `instructions` "
+            "rather than improvising your own method — adapt it only as far as your ingredient "
+            "swaps require. Prefer these proven techniques over plausible-sounding inventions.\n\n"
             + "\n".join(lines)
         )
     else:
