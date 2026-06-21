@@ -1056,5 +1056,243 @@
     ],
     "summary": "Grill or sear swordfish and top with a quick Sicilian tomato, caper, olive, and mint relish.",
     "technique_notes": "Swordfish is meaty but dries out if overcooked: sear or grill it hot and fast, about 3-4 min per side, and pull at just-opaque (medium). Pat it dry first for a good sear. Make the tomato-caper-mint relish raw or barely warmed and spoon it over at the end so it stays fresh."
+  },
+  {
+    "id": "roasted-cauliflower-feta-almonds",
+    "name": "Roasted Cauliflower With Feta, Almonds and Olives",
+    "cuisine": "Mediterranean",
+    "meal_type": "either",
+    "key_ingredients": [
+      "cauliflower",
+      "feta",
+      "almonds",
+      "kalamata olives"
+    ],
+    "summary": "Roast cauliflower until deeply browned; toss with feta, toasted almonds, and olives.",
+    "technique_notes": "Spread cauliflower in a single uncrowded layer and roast at 425°F without stirring too often so the florets actually brown rather than steam. Add feta and olives after roasting so the feta softens but doesn't fully melt, and toast the almonds separately so they stay crunchy."
+  },
+  {
+    "id": "kale-butternut-squash-bowl",
+    "name": "Kale and Butternut Squash Bowl With Jammy Eggs",
+    "cuisine": "Mediterranean",
+    "meal_type": "either",
+    "key_ingredients": [
+      "butternut squash",
+      "lacinato kale",
+      "eggs",
+      "quinoa or farro"
+    ],
+    "summary": "Roast butternut squash, sauté kale, and serve over grains with jammy soft-boiled eggs and a tahini drizzle.",
+    "technique_notes": "Roast squash at 425°F cut-side down first for caramelization, then flip. For jammy eggs, lower into boiling water and cook exactly 7 minutes, then shock in ice water. Massage kale with a little oil and lemon to soften it before sautéing."
+  },
+  {
+    "id": "cherry-tomato-white-bean-salad",
+    "name": "Cherry Tomato and White Bean Salad",
+    "cuisine": "Italian",
+    "meal_type": "lunch",
+    "key_ingredients": [
+      "cherry tomatoes",
+      "cannellini beans",
+      "basil",
+      "red onion"
+    ],
+    "summary": "Marinate cherry tomatoes and white beans in olive oil, red wine vinegar, and basil; serve at room temperature.",
+    "technique_notes": "Let the tomatoes macerate with salt for 10-15 minutes to release their juices, which become the base of the dressing. Let the finished salad sit 15+ min before serving so the beans absorb the vinaigrette. Serve at room temperature, not cold — the flavor is much better."
+  },
+  {
+    "id": "lemony-asparagus-salad",
+    "name": "Lemony Asparagus Salad With Shaved Cheese and Nuts",
+    "cuisine": "Italian",
+    "meal_type": "either",
+    "key_ingredients": [
+      "asparagus",
+      "parmesan or pecorino",
+      "toasted walnuts or almonds",
+      "lemon"
+    ],
+    "summary": "Shave raw or blanched asparagus thin, toss with lemon vinaigrette, and top with shaved hard cheese and toasted nuts.",
+    "technique_notes": "Use a vegetable peeler to shave raw asparagus into ribbons for a delicate texture, or blanch briefly (1-2 min) and shock in ice water for something more tender. Dress with lemon right before serving since the acid wilts the ribbons fast. Toast the nuts dry in a pan."
+  },
+  {
+    "id": "mediterranean-fish-chowder",
+    "name": "Mediterranean Fish Chowder With Potatoes and Kale",
+    "cuisine": "Mediterranean",
+    "meal_type": "dinner",
+    "key_ingredients": [
+      "white fish fillets",
+      "yukon gold potatoes",
+      "lacinato kale",
+      "tomatoes"
+    ],
+    "summary": "Simmer white fish and potatoes in a light tomato-fennel broth with kale.",
+    "technique_notes": "Cook the potatoes fully in the broth before adding fish, since the fish only needs 5-8 min and overcooks quickly. Strip kale from tough stems and add it a few minutes before the fish. A splash of white wine and fennel seed in the broth define the Mediterranean character."
+  },
+  {
+    "id": "mackerel-lemon-tomatoes",
+    "name": "Mackerel With Lemon Olive Oil and Tomatoes",
+    "cuisine": "Mediterranean",
+    "meal_type": "dinner",
+    "key_ingredients": [
+      "mackerel fillets",
+      "cherry tomatoes",
+      "lemon",
+      "parsley"
+    ],
+    "summary": "Roast or pan-sear mackerel and serve over garlicky burst tomatoes with lemon and herbs.",
+    "technique_notes": "Mackerel is oily and robust — it handles high heat well. Score the skin to prevent curling, then sear skin-side down first in a very hot pan. Burst the tomatoes in olive oil and garlic in a separate pan, and finish with lemon and parsley off the heat so the herbs stay bright."
+  },
+  {
+    "id": "citrusy-roast-chicken-pears-figs",
+    "name": "Citrusy Roast Chicken With Pears and Figs",
+    "cuisine": "Mediterranean",
+    "meal_type": "dinner",
+    "key_ingredients": [
+      "chicken thighs",
+      "pears",
+      "dried figs",
+      "lemon"
+    ],
+    "summary": "Roast chicken thighs over sweet pears and figs with lemon and fresh thyme until caramelized.",
+    "technique_notes": "Use ripe but firm pears so they don't turn to mush. Nestle fruit around (not under) the chicken so it can brown properly; the fruit juices mingle with the chicken fat to create a pan sauce. Add dried figs partway through rather than at the start so they don't burn."
+  },
+  {
+    "id": "halloumi-cucumber-tomato-salad",
+    "name": "Cucumber-Tomato Salad With Seared Halloumi and Olive Oil Croutons",
+    "cuisine": "Greek",
+    "meal_type": "either",
+    "key_ingredients": [
+      "halloumi",
+      "cucumber",
+      "cherry tomatoes",
+      "pita or bread"
+    ],
+    "summary": "Sear sliced halloumi golden, toss with cucumber-tomato salad, and top with crunchy olive oil croutons.",
+    "technique_notes": "Sear halloumi in a dry (no oil) very hot pan — it has enough fat — for 1-2 min per side until deeply golden; serve immediately as it toughens as it cools. Salt and drain the cucumber briefly first. Make the croutons last so they stay crunchy."
+  },
+  {
+    "id": "greens-and-beans-toasted-crumbs",
+    "name": "Greens and Beans With Toasted Crumbs",
+    "cuisine": "Italian",
+    "meal_type": "either",
+    "key_ingredients": [
+      "cannellini or white beans",
+      "escarole or kale",
+      "garlic",
+      "crusty bread"
+    ],
+    "summary": "Sauté hearty greens and white beans in garlicky olive oil; top with crispy pan-toasted breadcrumbs.",
+    "technique_notes": "Fry torn bread or coarse crumbs in olive oil until golden and salty, then set them aside — add at the very last second or they go soggy. Mash some of the beans against the pan to create a creamy, thickened sauce, and wilt the greens fully in the bean liquid."
+  },
+  {
+    "id": "farro-blistered-tomatoes-pesto",
+    "name": "Farro With Blistered Tomatoes, Pesto and Spinach",
+    "cuisine": "Italian",
+    "meal_type": "either",
+    "key_ingredients": [
+      "farro",
+      "cherry tomatoes",
+      "pesto",
+      "spinach"
+    ],
+    "summary": "Blister cherry tomatoes in olive oil, toss with cooked farro, pesto, and fresh spinach.",
+    "technique_notes": "Blister the tomatoes in a very hot dry skillet or under a broiler so they char and burst, adding sweetness. Toss everything together off the heat so the pesto stays green and the spinach just wilts from residual warmth. Farro holds up well at room temp, so this works as a warm grain salad."
+  },
+  {
+    "id": "slow-roasted-citrus-salmon",
+    "name": "Slow-Roasted Citrus Salmon With Herb Salad",
+    "cuisine": "Mediterranean",
+    "meal_type": "dinner",
+    "key_ingredients": [
+      "salmon fillet",
+      "lemon",
+      "fresh herbs",
+      "olive oil"
+    ],
+    "summary": "Slow-roast a whole salmon fillet in olive oil with citrus slices; top with a bright herb salad.",
+    "technique_notes": "Low and slow (275°F, 25-30 min) produces silky, barely-set salmon that's completely different in texture from high-heat roasting. The fish is done when it just starts to flake and loses translucency. Build the herb salad (parsley, dill, tarragon, thinly sliced shallot, lemon juice) right before serving."
+  },
+  {
+    "id": "saffron-salmon-kababs",
+    "name": "Saffron Salmon Kababs",
+    "cuisine": "Persian",
+    "meal_type": "dinner",
+    "key_ingredients": [
+      "salmon fillets",
+      "saffron",
+      "lemon",
+      "onion"
+    ],
+    "summary": "Marinate salmon in saffron, lemon, and onion, then grill or broil on skewers.",
+    "technique_notes": "Bloom the saffron in a tablespoon of warm water for 10-15 min to extract its color and flavor before adding to the marinade. Don't marinate more than 1 hour or the lemon will start to denature the fish. Grill or broil hot and fast so the salmon gets color without drying out."
+  },
+  {
+    "id": "roasted-halibut-lemon-olives",
+    "name": "Roasted Halibut With Lemons, Olives and Rosemary",
+    "cuisine": "Mediterranean",
+    "meal_type": "dinner",
+    "key_ingredients": [
+      "halibut fillets",
+      "lemon",
+      "kalamata olives",
+      "fresh rosemary"
+    ],
+    "summary": "Roast halibut over a bed of lemon slices, olives, and rosemary until just cooked through.",
+    "technique_notes": "Halibut is lean and dries out quickly — roast at 400°F and check early (10-12 min for 1-inch fillets). Roasting on sliced lemons keeps the fish elevated and fragrant. Go easy on salt since the olives are already salty. Pull the fish when it's just barely opaque all the way through."
+  },
+  {
+    "id": "salmon-couscous-salad",
+    "name": "Salmon and Couscous Salad With Cucumber-Feta Dressing",
+    "cuisine": "Mediterranean",
+    "meal_type": "dinner",
+    "key_ingredients": [
+      "salmon fillets",
+      "whole wheat couscous",
+      "cucumber",
+      "feta"
+    ],
+    "summary": "Roast salmon and serve over couscous with a creamy blended cucumber-feta dressing and herbs.",
+    "technique_notes": "Couscous is ready in 5 minutes: pour boiling salted liquid over it (1:1 ratio), cover and rest, then fluff. Blend the dressing smooth (cucumber, feta, lemon, a little yogurt or olive oil) and taste for salt before adding — feta varies. Let the couscous cool slightly before assembling so the dressing doesn't break."
+  },
+  {
+    "id": "beet-greens-roasted-beets-yogurt",
+    "name": "Simmered Beet Greens With Roasted Beets, Lemon and Yogurt",
+    "cuisine": "Mediterranean",
+    "meal_type": "either",
+    "key_ingredients": [
+      "whole beets with greens",
+      "greek yogurt",
+      "lemon",
+      "garlic"
+    ],
+    "summary": "Roast beets and simmer their greens separately; serve together over garlicky yogurt with lemon.",
+    "technique_notes": "Roast the beets wrapped in foil until a knife slides in easily (45-60 min at 400°F), then slip the skins off while warm. Simmer the greens (stems first, then leaves) briefly in salted water and drain well — they're more tender than kale but need a few minutes. The yogurt base is the sauce: season it with garlic and lemon."
+  },
+  {
+    "id": "puttanesca-chickpea-salad",
+    "name": "Puttanesca Chickpea-Tomato Salad",
+    "cuisine": "Italian",
+    "meal_type": "either",
+    "key_ingredients": [
+      "chickpeas",
+      "cherry tomatoes",
+      "kalamata olives",
+      "capers"
+    ],
+    "summary": "Toss chickpeas and tomatoes with olives, capers, and anchovies in a bold puttanesca vinaigrette.",
+    "technique_notes": "The anchovies melt into the dressing if you whisk them into the oil — they add savory depth without a fishy flavor, and you can omit them for fully vegetarian. Let the salad sit 10-15 min after dressing so the chickpeas absorb the bold flavors. Good at room temperature or slightly warm."
+  },
+  {
+    "id": "white-bean-cauliflower-salad",
+    "name": "White Bean Salad With Roasted Cauliflower",
+    "cuisine": "Mediterranean",
+    "meal_type": "either",
+    "key_ingredients": [
+      "cauliflower",
+      "cannellini beans",
+      "parsley",
+      "lemon"
+    ],
+    "summary": "Roast cauliflower until caramelized, toss with white beans, herbs, and a bright lemon dressing.",
+    "technique_notes": "Roast cauliflower at high heat (425°F) in a single uncrowded layer until deeply browned — the caramelization is what makes this dish. Toss the warm cauliflower with the beans right away so the beans absorb some warmth and the dressing, then let it cool to room temperature before adding fresh herbs."
   }
 ]
