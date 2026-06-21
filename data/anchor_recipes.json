@@ -1282,6 +1282,62 @@
     "technique_notes": "The anchovies melt into the dressing if you whisk them into the oil — they add savory depth without a fishy flavor, and you can omit them for fully vegetarian. Let the salad sit 10-15 min after dressing so the chickpeas absorb the bold flavors. Good at room temperature or slightly warm."
   },
   {
+    "id": "italian-wedding-soup",
+    "name": "Italian Wedding Soup",
+    "cuisine": "Italian",
+    "meal_type": "either",
+    "key_ingredients": [
+      "ground chicken or turkey",
+      "whole wheat orzo",
+      "baby spinach",
+      "parmesan"
+    ],
+    "summary": "Simmer chicken meatballs with orzo and vegetables in a light broth; finish with baby spinach and parmesan.",
+    "technique_notes": "Build the soup base by cooking onion, carrot, celery, and garlic in olive oil until translucent (4-5 min) before adding broth. Cook the orzo directly in the broth (not separately) and pull it when just tender — about 9 min — before the meatballs go in. Add meatballs and baby spinach together at the very end and cook only 2-4 min; spinach needs no chopping and wilts almost instantly. Make meatballs larger than marble-size (easier to form and more satisfying). Batch-make and freeze meatballs ahead so the soup comes together in 20 min. Finish with a generous drizzle of olive oil and parmesan at the table."
+  },
+  {
+    "id": "caprese-chickpea-salad",
+    "name": "High-Protein Caprese Chickpea Salad",
+    "cuisine": "Italian",
+    "meal_type": "lunch",
+    "key_ingredients": [
+      "chickpeas",
+      "cherry tomatoes",
+      "fresh mozzarella pearls",
+      "fresh basil"
+    ],
+    "summary": "Toss chickpeas, cherry tomatoes, cucumber, and mozzarella in a Dijon-balsamic vinaigrette with fresh basil.",
+    "technique_notes": "The dressing is the key: whisk balsamic vinegar, olive oil, Dijon mustard, and grated (not minced) raw garlic — the Dijon emulsifies and the grated garlic melts in without chunks. For added texture, toast half the chickpeas in a dry pan until crispy and toss them in at the end so they stay crunchy. Use pearl mozzarella whole; it holds its shape and size better than torn fresh mozzarella. The salad holds well for up to 3 days refrigerated, making it ideal for meal prep — add basil just before serving."
+  },
+  {
+    "id": "chickpea-quinoa-red-pepper-bowl",
+    "name": "Chickpea & Quinoa Bowl with Roasted Red Pepper Sauce",
+    "cuisine": "Mediterranean",
+    "meal_type": "either",
+    "key_ingredients": [
+      "quinoa",
+      "chickpeas",
+      "jarred roasted red peppers",
+      "slivered almonds"
+    ],
+    "summary": "Build grain bowls with quinoa and chickpeas topped with a blended roasted red pepper, almond, and spice sauce.",
+    "technique_notes": "The sauce is the dish: blend jarred roasted red peppers with slivered almonds, olive oil, garlic, paprika, and cumin until fairly smooth — it's similar to romesco but lighter (no bread, more cumin). If it feels too thick, add a splash of water. Make the sauce and the seasoned quinoa base separately ahead of time, then assemble just before serving so the components stay distinct. Toss the cooked, cooled quinoa with kalamata olives, red onion, and olive oil to season it before plating."
+  },
+  {
+    "id": "one-skillet-garlicky-salmon-broccoli",
+    "name": "One-Skillet Garlicky Salmon and Broccoli",
+    "cuisine": "Mediterranean",
+    "meal_type": "dinner",
+    "key_ingredients": [
+      "salmon fillet",
+      "broccoli florets",
+      "red bell pepper",
+      "garlic"
+    ],
+    "summary": "Sear salmon pieces with garlic, set aside, then cook broccoli and peppers in the same pan; finish with orange juice and tamari.",
+    "technique_notes": "Use a nonstick skillet so the salmon releases cleanly. Cook salmon pieces in a single layer with half the sliced garlic over medium-high heat 4-5 min, stirring occasionally, then transfer to a plate — don't wipe the pan so the salmon flavor stays. Add broccoli, bell peppers, the remaining garlic, and a tablespoon of water; cover and cook 4-5 min until just tender-crisp. Cut broccoli into bite-sized pieces so it cooks through in time. Stir in orange juice and tamari off the heat, then fold salmon back in gently so it doesn't break apart. Request center-cut salmon at the fish counter for uniform thickness. Salmon is done at 130-135°F (it carries over to 145°F off heat)."
+  },
+  {
     "id": "white-bean-cauliflower-salad",
     "name": "White Bean Salad With Roasted Cauliflower",
     "cuisine": "Mediterranean",
