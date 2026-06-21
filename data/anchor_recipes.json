@@ -25,7 +25,9 @@
       "dill"
     ],
     "summary": "Roast salmon and asparagus on one pan with olive oil, lemon, and herbs.",
-    "technique_notes": "Give asparagus a 5-7 minute head start; salmon only needs ~12 min at 400°F. Match spear thickness to salmon timing (thin spears burn). Pat salmon dry and roast skin-side down. Squeeze lemon on after roasting, not before, to avoid bitterness."
+    "technique_notes": "Roast skin-side down at 400°F, 10-15 min, pulling salmon at 120-130°F internal (instant-read) for medium-rare so it stays moist. Arrange asparagus around the perimeter, salmon in the center; match thin spears to the short cook time. Pat salmon dry and squeeze lemon on after roasting, not before.",
+    "source_url": "https://www.simplyrecipes.com/sheet-pan-salmon-and-asparagus-recipe-8642125",
+    "notes_sourced": true
   },
   {
     "id": "shakshuka",
@@ -38,7 +40,9 @@
       "feta"
     ],
     "summary": "Simmer peppers and tomatoes with cumin and paprika, poach eggs in the sauce, finish with feta.",
-    "technique_notes": "Cook the peppers and onions until genuinely soft (8-10 min) and reduce the sauce before the eggs go in. Make wells, crack eggs into them, then cover the pan on low until whites set but yolks stay runny (~5-8 min); residual heat finishes them off the burner."
+    "technique_notes": "Saute onions and peppers over high heat, mostly undisturbed (~6 min, then ~4 more), so they char and tenderize without turning sweet; add garlic, then bloom paprika and cumin 30 sec. Simmer sauce 10 min. Make wells, spoon sauce over the whites, cover on lowest heat 5-8 min until whites set, yolks runny.",
+    "source_url": "https://www.seriouseats.com/shakshuka-north-african-shirred-eggs-tomato-pepper-recipe",
+    "notes_sourced": true
   },
   {
     "id": "greek-salad-chickpeas",
@@ -52,7 +56,9 @@
       "red onion"
     ],
     "summary": "Toss cucumber, tomato, olives, and chickpeas with feta and a red-wine vinaigrette.",
-    "technique_notes": "Salt the cucumber and tomatoes and let them drain 10 min so the salad doesn't go watery, and dress only just before serving. Add feta in slabs (not pre-crumbled) on top at the end. Authentic versions skip lettuce."
+    "technique_notes": "Rinse canned chickpeas to cut sodium. Use firm English or Persian cucumbers (thin-skinned, few seeds) so the salad holds up. Whisk the EVOO-lemon dressing in the bowl first, then toss everything to coat. Use fresh lemon over bottled for brighter flavor. Authentic Greek versions skip lettuce.",
+    "source_url": "https://www.eatingwell.com/recipe/8053923/cucumber-chickpea-salad-with-feta/",
+    "notes_sourced": true
   },
   {
     "id": "lentil-soup",
@@ -79,7 +85,9 @@
       "parsley"
     ],
     "summary": "Layer quinoa with chickpeas, chopped veg, feta, and a lemon-tahini drizzle.",
-    "technique_notes": "Rinse quinoa to wash off bitter saponins, toast it dry for a minute, then cook 1:1.5 with the lid on and rest 5 min off heat before fluffing. Cool it before assembling so the vegetables stay crisp."
+    "technique_notes": "Rinse quinoa well under cold water to wash off bitter saponins. Add the still-warm cooked quinoa to the lemon vinaigrette so it absorbs the dressing, then let it cool completely before stirring in the cold vegetables so they stay crisp. Top with feta last.",
+    "source_url": "https://www.themediterraneandish.com/quinoa-salad/",
+    "notes_sourced": true
   },
   {
     "id": "baked-cod-tomatoes-olives",
@@ -93,7 +101,9 @@
       "capers"
     ],
     "summary": "Bake cod in a puttanesca-style tomato, olive, and caper sauce.",
-    "technique_notes": "Reduce the tomato-olive-caper sauce on the stovetop first, then nestle the cod in and bake just until it flakes (~12-15 min at 400°F). Pat the cod dry and go easy on salt since the olives and capers are already salty."
+    "technique_notes": "Build the sauce on the stovetop first: saute onion (fennel) 7-9 min until soft, add garlic 1 min, then tomatoes and olives, simmering ~2 min to thicken. Pat cod dry and season, nestle it into the sauce spooning some over the top, then bake at 350°F just 6-8 min until it flakes. Go easy on salt.",
+    "source_url": "https://www.themediterraneandish.com/cod-provencal/",
+    "notes_sourced": true
   },
   {
     "id": "falafel-bowls",
@@ -107,7 +117,9 @@
       "tahini"
     ],
     "summary": "Bake spiced chickpea falafel and serve over greens with cucumber, tomato, and tahini sauce.",
-    "technique_notes": "Use soaked dried chickpeas, never canned or cooked ones (cooked chickpeas make a mushy falafel that won't hold). Pulse the mixture coarse rather than pureeing, and chill it 30 min before forming. Brush with oil and bake hot (425°F), flipping once."
+    "technique_notes": "Soak dried chickpeas (with a little baking soda) overnight, 18+ hrs, until one crushes easily; never use canned. Drain and pat very dry (excess moisture makes them gooey). Pulse coarse, not pureed, and chill 1+ hr so they hold shape without egg or flour. Oil the pan, brush tops, bake 350°F 8 min, flip, 7-12 min more.",
+    "source_url": "https://www.themediterraneandish.com/baked-falafel/",
+    "notes_sourced": true
   },
   {
     "id": "white-bean-kale-stew",
@@ -120,7 +132,9 @@
       "carrots"
     ],
     "summary": "Simmer white beans with kale, garlic, and tomato into a hearty rosemary-scented stew.",
-    "technique_notes": "Strip kale leaves from the tough stems and add the kale early enough to soften (10+ min) - unlike spinach it needs real time. Mash some of the beans against the pot to thicken the broth; a parmesan rind simmered in adds depth."
+    "technique_notes": "Soften onion, carrot, and celery ~8 min, then garlic 1 min. Simmer soaked beans 45-50 min until nearly tender before adding kale and tomatoes; kale needs another 30-45 min to soften. A Parmesan rind simmered in adds savory depth (freeze rinds up to 6 months). Stir in vinegar and salt only at the very end.",
+    "source_url": "https://www.eatingwell.com/recipe/269129/tuscan-white-bean-soup/",
+    "notes_sourced": true
   },
   {
     "id": "chicken-souvlaki-tzatziki",
@@ -134,7 +148,9 @@
       "lemon"
     ],
     "summary": "Grill lemon-oregano chicken skewers; serve with cucumber-yogurt tzatziki and a chopped salad.",
-    "technique_notes": "Grate the cucumber, salt it, then squeeze it dry before mixing into the yogurt or the tzatziki turns watery. Cut chicken into even cubes, don't crowd the skewers, and grill hot to char before resting."
+    "technique_notes": "Marinate even chicken cubes in the lemon-vinegar-garlic-oregano dressing ~2 hrs, reserving some dressing (unmixed) for the salad. Salt the cucumber and drain ~30 min, then pat dry before mixing into Greek yogurt so the tzatziki stays thick. Don't crowd skewers; grill over medium-high to 155°F internal (~5 min), rest 3 min.",
+    "source_url": "https://www.seriouseats.com/chicken-souvlaki-with-tzatziki-sauce-and-greek-salad-recipe",
+    "notes_sourced": true
   },
   {
     "id": "stuffed-bell-peppers",
@@ -174,7 +190,9 @@
       "onions"
     ],
     "summary": "Cook lentils and rice with cumin; top with deeply caramelized onions and a yogurt dollop.",
-    "technique_notes": "The onions make the dish: cook the sliced onions low and slow 20-30 min until deep mahogany, not just golden, and reserve some for garnish. Cook the lentils to just-tender before combining with the rice so neither turns to mush."
+    "technique_notes": "Par-boil lentils ~10-12 min until just tender, then drain. Caramelize the diced onions deeply for about 40 min until darker than normal caramelized (this gives the golden hue), reserve thin onion rings to fry separately in shimmering oil for the crisp garnish. Rinse and soak rice, add with lentils, simmer covered 15-20 min, then rest 10 min.",
+    "source_url": "https://www.themediterraneandish.com/mujadara-lentils-and-rice-with-crispy-onions/",
+    "notes_sourced": true
   },
   {
     "id": "grilled-chicken-salad",
@@ -216,7 +234,9 @@
       "chicken breast"
     ],
     "summary": "Toss a parsley-forward bulgur tabbouleh with lemon and olive oil; top with sliced grilled chicken.",
-    "technique_notes": "It's parsley-forward with bulgur as an accent, not the reverse. Use fine bulgur and soak (don't boil) it until just tender, then drain well. Dry the parsley thoroughly before chopping, and let the salad rest 15 min after dressing."
+    "technique_notes": "It's parsley-forward with bulgur as an accent. Chop herbs by hand with a sharp knife — a food processor bruises them and turns the salad soggy. For fine bulgur, soak (don't boil) in cold water ~20 min until tender, then drain well. Flavor improves as it rests; keeps up to 3 days chilled.",
+    "source_url": "https://www.loveandlemons.com/tabbouleh/",
+    "notes_sourced": true
   },
   {
     "id": "eggplant-chickpea-tagine",
@@ -285,7 +305,9 @@
       "cucumber"
     ],
     "summary": "Sear thin-sliced marinated beef; serve over brown rice with quick-pickled cucumber and greens.",
-    "technique_notes": "Slice the beef thin against the grain (freeze it 20 min first to make slicing easier), and use grated pear or onion in the marinade to tenderize. Sear hard in a single layer without crowding the pan."
+    "technique_notes": "Slice the beef very thin against the grain (freeze 20 min first; kitchen shears help) and use grated pear or onion to tenderize. Marinate 1 hour up to 1 day. Cook in batches over medium-high heat about 5 minutes, adding a little honey at the end to caramelize; sear hard without crowding.",
+    "source_url": "https://www.allrecipes.com/recipe/246172/easy-bulgogi-korean-bbq-beef/",
+    "notes_sourced": true
   },
   {
     "id": "viet-chicken-lettuce-wraps",
@@ -299,7 +321,9 @@
       "lime"
     ],
     "summary": "Saute ground chicken with ginger and lime; spoon into lettuce cups with shredded carrot and herbs.",
-    "technique_notes": "Cook the ground chicken past gray until the moisture evaporates and it lightly browns, then build the lime-fish-sauce dressing off the heat to keep it bright. Keep filling and herbs separate from the lettuce until eating so the cups stay crisp."
+    "technique_notes": "Spread the ground chicken and brown undisturbed about 6 minutes, then break up and cook 6-8 more until browned. Stir in shallots/chilies 30 seconds, then pull off heat and fold in the lime-fish-sauce-sugar mix with herbs to keep it bright. Keep filling and herbs separate from the lettuce until eating.",
+    "source_url": "https://www.simplyrecipes.com/recipes/chicken_larb_lettuce_wraps_larb_gai/",
+    "notes_sourced": true
   },
   {
     "id": "miso-cod-bok-choy",
@@ -312,7 +336,9 @@
       "white miso"
     ],
     "summary": "Broil miso-glazed cod and serve with quick-seared bok choy and brown rice.",
-    "technique_notes": "Separate the bok choy stems from the leaves: sear the stems first for 2-3 min and add the leaves only in the last minute, so the stems cook through while the leaves stay green. Marinate the cod in the miso, then broil it close to the element and watch closely - the miso sugars scorch fast."
+    "technique_notes": "Marinate the cod in the miso 4-8 hours or overnight. Cook bok choy cut-side down in oil plus a splash of water until the water evaporates and it caramelizes, 6-7 min, then add garlic and vinegar 1-2 min. Broil cod about 8 min, rotating halfway; the miso sugars char fast, so watch closely.",
+    "source_url": "https://www.foodnetwork.com/recipes/food-network-kitchen/miso-glazed-cod-with-bok-choy-21801394",
+    "notes_sourced": true
   },
   {
     "id": "ginger-chicken-soba",
@@ -339,7 +365,9 @@
       "sesame seeds"
     ],
     "summary": "Crisp tofu and stir-fry with broccoli in a garlic-sesame-soy sauce over brown rice.",
-    "technique_notes": "Press the tofu 15-20 min to remove water, then coat in a little cornstarch and crisp it undisturbed before stir-frying. Blanch or steam the broccoli briefly first so it cooks through in the quick stir-fry. The sauce thickens fast, so finish it off the heat."
+    "technique_notes": "Press the tofu at least 30 min, cut into 1-inch cubes, salt, then toss with cornstarch (about 2 Tbsp) for crispness. Heat the pan before adding oil so cubes don't stick, and fry golden on each side. The cornstarch sauce thickens fast, so add broccoli, then sauce, and fold the tofu back in off the heat.",
+    "source_url": "https://www.budgetbytes.com/pan-fried-sesame-tofu-with-broccoli/",
+    "notes_sourced": true
   },
   {
     "id": "black-bean-sweet-potato-tacos",
@@ -353,7 +381,9 @@
       "lime"
     ],
     "summary": "Roast cumin-spiced sweet potato, fold into tortillas with black beans, avocado, and lime slaw.",
-    "technique_notes": "Roast the sweet potato in a single uncrowded layer at 425°F so it caramelizes instead of steaming. Char the tortillas directly over a flame. Dress the slaw with its acid only just before serving."
+    "technique_notes": "Cut sweet potato into 1/2-inch cubes, toss with oil/chili/cumin, and roast at 425°F in a single uncrowded layer; flip at 15 min and roast 15 more until edges crisp. Warm tortillas in a dry skillet, covered to stay soft. Dress the slaw with its acid only just before serving.",
+    "source_url": "https://www.simplyrecipes.com/recipes/sweet_potato_and_black_bean_tacos/",
+    "notes_sourced": true
   },
   {
     "id": "chicken-fajita-bowls",
@@ -367,7 +397,9 @@
       "brown rice"
     ],
     "summary": "Sear fajita-spiced chicken and peppers; build bowls with brown rice, beans, and avocado.",
-    "technique_notes": "Sear the chicken and peppers in batches over high heat for char, not steam, and don't stir constantly - let contact build color. Rest the chicken, then slice it against the grain."
+    "technique_notes": "Toss chicken and peppers in spiced oil so the spices bloom in the fat. For char, sear in batches over high heat without stirring constantly; for hands-off cooking, roast on a preheated sheet at 425°F about 15 min, then add beans and finish. Rest the chicken, then slice against the grain.",
+    "source_url": "https://www.eatingwell.com/recipe/274851/sheet-pan-chicken-fajita-bowls/",
+    "notes_sourced": true
   },
   {
     "id": "peruvian-chicken-green-sauce",
@@ -380,7 +412,9 @@
       "lime"
     ],
     "summary": "Grill cumin-lime marinated chicken; serve with a creamy yogurt-cilantro green sauce.",
-    "technique_notes": "Marinate the thighs at least an hour and grill them over breast for juiciness. The green sauce is blended raw (cilantro, lime, a little yogurt, jalapeño) - make it fresh and keep it cold."
+    "technique_notes": "Rub with a vinegar-cumin-paprika-garlic paste and marinate at least an hour. Cook slow over indirect/cooler heat skin-side up to render fat, then finish skin-down over direct heat to crisp and char. The green sauce is blended raw (cilantro, lime, jalapeño, yogurt) - make it fresh and keep it cold.",
+    "source_url": "https://www.seriouseats.com/peruvian-style-grilled-chicken-with-green-sauce-recipe",
+    "notes_sourced": true
   },
   {
     "id": "shrimp-avocado-salad",
@@ -407,7 +441,9 @@
       "bell peppers"
     ],
     "summary": "Simmer lean turkey with beans, peppers, and tomato in a smoky chili spice blend.",
-    "technique_notes": "Brown the turkey hard and bloom the spices in the oil before adding any liquid for depth, then simmer uncovered to thicken. Lean turkey has no fat to render, so start with a little oil and don't overcook it."
+    "technique_notes": "Saute onion, carrot, and pepper 6-8 min, then bloom garlic, chili powder, and cumin in the oil 1 min before liquid for depth. Lean turkey has no fat to render, so start with oil and brown about 5 min. Deglaze the browned bits, then simmer covered 30 min and uncovered 30 min to thicken.",
+    "source_url": "https://www.simplyrecipes.com/recipes/black_bean_turkey_chili/",
+    "notes_sourced": true
   },
   {
     "id": "chana-masala",
@@ -434,7 +470,9 @@
       "garam masala"
     ],
     "summary": "Roast yogurt-and-spice marinated chicken; serve with cooling cucumber raita and brown rice.",
-    "technique_notes": "Use a two-stage marinade (lemon and salt first, then yogurt and spices) and slash the thighs so it penetrates; roast hot or broil for char. Grate and drain the cucumber for the raita so it isn't watery."
+    "technique_notes": "Use a two-stage marinade (lemon and salt first, then yogurt and spices) and slash the thighs so it penetrates; marinate at least 2 hours. Broil in the upper third, flipping every 4 minutes until 165°F; most charring happens in the first 10 minutes. Grate, seed and drain the cucumber for the raita.",
+    "source_url": "https://www.foodnetwork.com/recipes/food-network-kitchen/tandoori-style-chicken-breasts-with-cucumber-raita-23036201",
+    "notes_sourced": true
   },
   {
     "id": "red-lentil-dal-spinach",
@@ -447,7 +485,9 @@
       "ginger"
     ],
     "summary": "Simmer red lentils with turmeric, ginger, and tomato; wilt in spinach and finish with a spice tempering.",
-    "technique_notes": "Red lentils break down fast - skim the foam and simmer until creamy. Don't skip the tarka: bloom whole spices and garlic in hot oil and pour it over at the end. Stir the spinach in at the very last."
+    "technique_notes": "Start lentils in room-temperature water with no salt (prevents graininess); skim foam and simmer uncovered 20-30 min until creamy. Don't skip the tarka: bloom whole spices in hot ghee/oil and pour over at the end, reserving some to spoon on top. Stir spinach in last, 3-5 min.",
+    "source_url": "https://www.simplyrecipes.com/daal-palak-lentil-and-spinach-curry-7112108",
+    "notes_sourced": true
   },
   {
     "id": "turkey-meatballs-marinara",
@@ -460,7 +500,9 @@
       "marinara"
     ],
     "summary": "Bake herbed turkey meatballs, simmer in marinara, and serve over whole wheat pasta.",
-    "technique_notes": "Don't overmix or pack the meatballs or they turn dense; a panade (bread soaked in milk) keeps lean turkey moist. Bake or sear them, then finish cooking gently in the simmering sauce so they stay tender."
+    "technique_notes": "Don't overmix or pack the meatballs; grated onion, egg and bread crumbs keep lean turkey moist. Brown on all sides, about 5 minutes, then pour off excess oil and finish simmering gently in the marinara 15-20 minutes so they stay tender and the flavors blend.",
+    "source_url": "https://www.foodnetwork.com/recipes/giada-de-laurentiis/mini-turkey-meatballs-2095728",
+    "notes_sourced": true
   },
   {
     "id": "chicken-sausage-peppers-beans",
@@ -473,7 +515,9 @@
       "white beans"
     ],
     "summary": "Roast chicken sausage with peppers and onions, toss with white beans and a splash of vinegar.",
-    "technique_notes": "Roast the sausage and peppers hot enough to brown (425°F), and add the cooked white beans only at the end just to warm through so they don't fall apart. Deglaze the pan with a splash of vinegar."
+    "technique_notes": "Brown the sliced sausage hard (only 1-2 min per side, then remove) and sauté aromatics in the residual fat. Drain the white beans but don't rinse them - the starchy liquid makes the sauce. Simmer beans 4-5 min, then wilt greens and return the sausage at the very end so the beans stay intact.",
+    "source_url": "https://www.budgetbytes.com/chicken-sausage-white-bean-skillet/",
+    "notes_sourced": true
   },
   {
     "id": "cobb-style-chicken-salad",
@@ -487,7 +531,9 @@
       "cherry tomatoes"
     ],
     "summary": "Arrange grilled chicken, egg, avocado, and tomato over greens with a light vinaigrette.",
-    "technique_notes": "Prep each component separately and arrange them in rows, dressing only at the table. Keep the avocado tossed in a little lemon to hold its color. Everything goes on cold."
+    "technique_notes": "Prep each component separately and arrange in rows, serving the vinaigrette on the side to dress at the table. Herb-rub the chicken and grill 5-6 min per side to 160°F, then rest 10 minutes before slicing. Keep avocado tossed in lemon to hold its color. Everything goes on cold.",
+    "source_url": "https://www.eatingwell.com/recipe/270517/cobb-salad-with-herb-rubbed-chicken/",
+    "notes_sourced": true
   },
   {
     "id": "spinach-feta-frittata",
@@ -500,7 +546,9 @@
       "feta"
     ],
     "summary": "Bake eggs with wilted spinach, scallions, and feta into a sliceable frittata.",
-    "technique_notes": "Wilt the spinach and squeeze out all the liquid first or the frittata weeps. Start it on the stovetop until the edges set, then finish in the oven, and pull it while the center is just barely set - it carries over."
+    "technique_notes": "Wilt the spinach and wring out all liquid (cheesecloth/towel) or the frittata weeps. Heat oil until shimmering so eggs don't stick, set the bottom on the stovetop about 4 min, then bake at 375°F about 8 min until the top no longer jiggles. Rest a few minutes before slicing.",
+    "source_url": "https://www.themediterraneandish.com/feta-spinach-frittata-recipe/",
+    "notes_sourced": true
   },
   {
     "id": "moroccan-salmon-chermoula",
@@ -514,7 +562,9 @@
       "cumin"
     ],
     "summary": "Coat salmon in a cilantro-cumin chermoula and roast; serve with couscous or farro and greens.",
-    "technique_notes": "Chermoula is a raw herb sauce - reserve half to finish and use the rest as a short (20-30 min) marinade, since its acid starts to 'cook' the fish if left longer. Roast the salmon just to medium so it stays moist."
+    "technique_notes": "Chermoula is a raw blended herb sauce - toast the cumin and coriander seeds first, then blitz with herbs, lemon and garlic, adding water to a drizzling consistency (can be made ahead). Roast salmon skin-side down at 400°F (200C) for 15-20 min just to medium. Drizzle some over and serve the rest on the side.",
+    "source_url": "https://www.bbcgoodfood.com/recipes/roast-side-salmon-chermoula",
+    "notes_sourced": true
   },
   {
     "id": "spanish-chickpea-spinach-stew",
@@ -527,7 +577,9 @@
       "smoked paprika"
     ],
     "summary": "Simmer chickpeas and spinach with smoked paprika, cumin, and tomato until thick and silky.",
-    "technique_notes": "Bloom the smoked paprika briefly and off direct high heat - it scorches and turns bitter in seconds. The traditional thickener is a little fried bread blended into the stew. Wilt the spinach in at the end."
+    "technique_notes": "Cook onion, garlic and smoked paprika in oil until softened and slightly browned before adding tomato. Wilt the spinach in a handful at a time, then simmer the chickpeas with their canned liquid (it gives body) about 30 min until thick. Finish off the heat with EVOO and a few drops of sherry vinegar.",
+    "source_url": "https://www.seriouseats.com/vegan-garbanzos-con-espinacas-jengibre-spinach-chickpea-stew-ginger-spanish",
+    "notes_sourced": true
   },
   {
     "id": "turkish-white-bean-stew",
