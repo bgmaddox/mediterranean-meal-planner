@@ -606,7 +606,9 @@
       "sumac"
     ],
     "summary": "Toss crisp greens, cucumber, tomato, and grilled chicken with a sumac-lemon dressing and toasted pita.",
-    "technique_notes": "Toast or bake the pita until crisp and add it only at the very last moment so it stays crunchy. Sumac (and a little pomegranate molasses) define the dressing. Dress just before serving."
+    "technique_notes": "Bake split pita brushed with oil and sumac at 350F about 15 min until crisp, then break into pieces. Whisk a lemon-sumac vinaigrette, toss in the pita with the vegetables, and let stand 15 min so it soaks up dressing. Grill seasoned chicken 3-4 min per side; slice thin over the salad.",
+    "source_url": "https://www.eatingwell.com/recipe/249705/lebanese-fattoush-salad-with-grilled-chicken/",
+    "notes_sourced": true
   },
   {
     "id": "baked-trout-herbs",
@@ -620,7 +622,9 @@
       "dill"
     ],
     "summary": "Roast trout with lemon, garlic, and fresh herbs; serve with a grain and greens.",
-    "technique_notes": "Trout is thin and cooks fast - roast it hot and briefly (10-12 min) just until it flakes. Tuck lemon and herbs into the cavity or over the fillets, and keep the skin on to hold it together."
+    "technique_notes": "Pat fillets dry and bake skin-side down at 400F for 10-12 min, checking at 10. Pull at about 140F internal (carryover brings it to a safe 145F) just as the flesh turns opaque and flakes. Tuck lemon and herbs over the fillets; keeping skin on holds it together. Finish with more lemon.",
+    "source_url": "https://www.themediterraneandish.com/easy-baked-trout-recipe/",
+    "notes_sourced": true
   },
   {
     "id": "shrimp-garlic-zucchini",
@@ -648,7 +652,9 @@
       "parsley"
     ],
     "summary": "Bake white fish over a bed of stewed tomatoes, onions, and herbs in olive oil.",
-    "technique_notes": "Soften the onions and partly cook the tomato sauce first, then lay the fish on top and bake just until it flakes. Generous olive oil is part of the dish, not optional."
+    "technique_notes": "Soften sliced onions ~7 min, add garlic and canned whole tomatoes, break them up and simmer 10-15 min until thickened. Season the fish and squeeze lemon over it, then nestle into the sauce and spoon sauce on top. Bake at 400F just until it flakes (15-25 min). Finish with parsley and more lemon.",
+    "source_url": "https://www.themediterraneandish.com/baked-greek-fish-psari-plaki/",
+    "notes_sourced": true
   },
   {
     "id": "caprese-farro-salad",
@@ -662,7 +668,9 @@
       "basil"
     ],
     "summary": "Toss cooked farro with tomatoes, a little fresh mozzarella, and basil in a balsamic dressing.",
-    "technique_notes": "Cook the farro just to al dente and let it cool before mixing so it doesn't wilt the basil or melt the mozzarella. Dress it while still slightly warm to absorb flavor, then fold in the cheese and basil once cooled."
+    "technique_notes": "Boil farro in salted water about 20 min, then strain and rinse with cold water so it cools before mixing. Tear the basil by hand and chop the mozzarella; combine with quartered cherry tomatoes and finish with good olive oil, salt, and pepper. Serve right away or refrigerate.",
+    "source_url": "https://www.foodnetwork.com/recipes/caprese-di-farro-2105451",
+    "notes_sourced": true
   },
   {
     "id": "minestrone-soup",
@@ -676,7 +684,9 @@
       "whole wheat pasta"
     ],
     "summary": "Simmer a vegetable, bean, and small-pasta soup in a light tomato base with herbs.",
-    "technique_notes": "Add the vegetables in order of cook time, and cook the pasta separately (or add it only at the very end) so it doesn't bloat and soak up all the broth. A parmesan rind simmered in the pot adds depth."
+    "technique_notes": "Saute the onion-carrot-celery soffritto ~8 min, add garlic, then tomatoes, beans, and broth and simmer covered 20 min. Stir in pasta and cook uncovered ~10 min. If making ahead, cook the pasta separately and add per bowl, since it absorbs the broth as it sits. A parmesan rind adds depth.",
+    "source_url": "https://www.loveandlemons.com/minestrone-soup/",
+    "notes_sourced": true
   },
   {
     "id": "ratatouille-white-beans",
@@ -690,7 +700,9 @@
       "white beans"
     ],
     "summary": "Stew eggplant, zucchini, peppers, and tomato; fold in white beans for a protein-rich main.",
-    "technique_notes": "Cook each vegetable separately (or in stages) so each browns properly instead of stewing into mush, then combine at the end. Salt the eggplant first, and fold the beans in last just to warm."
+    "technique_notes": "Cook each vegetable in stages so each browns instead of stewing: onion+pepper 5-7 min, then eggplant 4-6 min until browned in places, then zucchini 3-5 min, removing each. Return everything with the white beans and tomatoes, cover, and cook 8-10 min just until tender.",
+    "source_url": "https://www.eatingwell.com/recipe/255794/ratatouille-with-white-beans-polenta/",
+    "notes_sourced": true
   },
   {
     "id": "salmon-patties-greens",
@@ -704,7 +716,9 @@
       "greek yogurt"
     ],
     "summary": "Pan-sear herbed salmon patties; serve over dressed greens with a lemon-yogurt sauce.",
-    "technique_notes": "Chill the formed patties before searing so they hold together, and don't overwork the mix. Sear undisturbed to build a crust before flipping once."
+    "technique_notes": "Flake cooled cooked salmon, bind with egg and crushed crackers, and mix gently until just combined so it stays tender. Form patties, coat, and refrigerate about 1 hour so they hold together. Pan-fry in oil and butter over medium, undisturbed, about 7-8 min per side until golden and crisp.",
+    "source_url": "https://www.foodnetwork.com/recipes/giada-de-laurentiis/salmon-cakes-with-lemon-caper-yogurt-sauce-recipe-2124353",
+    "notes_sourced": true
   },
   {
     "id": "chicken-shawarma-bowl",
@@ -718,7 +732,9 @@
       "tahini"
     ],
     "summary": "Roast shawarma-spiced chicken; build bowls with brown rice, chopped salad, and tahini sauce.",
-    "technique_notes": "Marinate the thighs at least an hour, then sear or roast them hard for browned edges - spread them out so they brown instead of steaming. Rest, then slice thin."
+    "technique_notes": "Toss the thighs with the shawarma spices, lemon, and olive oil; refrigerate a couple hours or overnight if you have time. Sear in a cast-iron skillet over medium, spread out, ~5-6 min, then toss and cook another 5-6 min, going longer for browned, crusted edges. Rest before slicing thin.",
+    "source_url": "https://www.themediterraneandish.com/chicken-shawarma-salad-bowls/",
+    "notes_sourced": true
   },
   {
     "id": "harissa-chicken-couscous",
@@ -732,7 +748,9 @@
       "bell peppers"
     ],
     "summary": "Roast harissa-glazed chicken and peppers; serve over whole wheat couscous with herbs.",
-    "technique_notes": "Couscous is steamed, not boiled: pour an equal volume of boiling liquid over it, cover and rest 5 min, then fluff with a fork and a little oil. Glaze the chicken with the harissa near the end so it doesn't burn."
+    "technique_notes": "Couscous is steamed: pour 2 cups boiling stock per 1 cup couscous, cover off the heat, rest 5 min, then fluff and stir in herbs. Sear the spiced chicken hard for char on both sides, then baste with harissa and move to indirect heat to finish to 165F so the glaze doesn't burn. Rest 10 min, slice on the bias.",
+    "source_url": "https://www.foodnetwork.com/fnk/recipes/grilled-harissa-chicken-breasts-with-herbed-couscous-8844007",
+    "notes_sourced": true
   },
   {
     "id": "zaatar-chicken-thighs",
@@ -746,7 +764,9 @@
       "red onion"
     ],
     "summary": "Sheet-pan roast za'atar chicken with tomatoes and onion; finish with lemon.",
-    "technique_notes": "Add the za'atar in the last stretch of roasting or right after - its sesame and herbs scorch under prolonged high heat. Start the thighs skin-side up to brown, and add lemon after roasting."
+    "technique_notes": "Roast at 425F: massage za'atar-garlic-lemon oil into the meat and under the skin, nestle thighs among the vegetables, cover with foil ~25 min, then uncover ~30 min until skin browns and crisps. Rest 5-10 min; finish with parsley and a pinch more za'atar.",
+    "source_url": "https://www.themediterraneandish.com/sheet-pan-zaatar-chicken/",
+    "notes_sourced": true
   },
   {
     "id": "greek-yogurt-chicken-salad-wrap",
@@ -774,7 +794,9 @@
       "tahini"
     ],
     "summary": "Top quinoa with hummus, roasted vegetables, and chickpeas; drizzle with lemon-tahini.",
-    "technique_notes": "Roast the vegetables until caramelized for flavor, and cool the components if you're packing it for lunch. Thin the tahini with lemon and water to a pourable drizzle."
+    "technique_notes": "Roast the vegetables until caramelized; cool components if packing for lunch. Rinse quinoa to wash off bitter saponins, simmer 1 cup quinoa in 1.75 cups water ~15 min, then rest covered 10 min and fluff. Store parts separately and assemble cold. Thin tahini with lemon and water to drizzle.",
+    "source_url": "https://www.themediterraneandish.com/mediterranean-bowl/",
+    "notes_sourced": true
   },
   {
     "id": "chicken-tikka-masala-lite",
@@ -788,7 +810,9 @@
       "tomatoes"
     ],
     "summary": "Simmer yogurt-marinated chicken in a tomato-spice sauce lightened with yogurt; serve over brown rice.",
-    "technique_notes": "Marinate the chicken in spiced yogurt and char or broil it separately first - those charred edges are the point - then add it to the simmered sauce. Temper the yogurt in off the boil so it doesn't curdle."
+    "technique_notes": "Marinate chicken in spiced salted yogurt, but don't over-marinate (4-5 hrs max; the yogurt/lemon acids start cooking the meat). Broil or grill flesh-up ~8 min until charred but still raw inside, rest 10 min, then finish in the simmering sauce ~10 min. Char the aromatics for smoky depth.",
+    "source_url": "https://www.seriouseats.com/chicken-tikka-masala-for-the-grill-recipe",
+    "notes_sourced": true
   },
   {
     "id": "palak-chickpeas",
@@ -802,7 +826,9 @@
       "garam masala"
     ],
     "summary": "Simmer chickpeas in a pureed spinach-ginger-spice sauce; serve over brown rice.",
-    "technique_notes": "Blanch the spinach and shock it in ice water before blending to keep it vivid green (long simmering turns it army green), and add the puree near the end. Build a properly browned aromatic base first."
+    "technique_notes": "Dry-toast cumin seeds ~1 min until popping. Build a browned aromatic base, then add ground spices and cook ~2 min before the tomatoes and chickpeas; simmer ~10 min. Stir spinach in only at the very end and just wilt it off the heat to keep it green. Flavor deepens if made ahead.",
+    "source_url": "https://www.bbcgoodfood.com/recipes/chana-masala-spinach",
+    "notes_sourced": true
   },
   {
     "id": "korean-bibimbap-veg",
@@ -816,7 +842,9 @@
       "egg"
     ],
     "summary": "Top brown rice with sauteed and seasoned vegetables and a fried egg; serve with a light gochujang sauce.",
-    "technique_notes": "Season each vegetable separately - that's the whole point of bibimbap - rather than mixing them together. Crisp the rice on the bottom of a hot pan for texture, and use a runny-yolk fried egg to bind it."
+    "technique_notes": "Season each vegetable separately rather than together. Sauté carrots in sesame oil 1-2 min; wilt spinach ~30 sec, then squeeze out excess water so the bowl isn't watery. Crisp the rice in a hot pan, arrange veg in sections around a runny-yolk egg, then break the yolk and mix to bind.",
+    "source_url": "https://www.loveandlemons.com/bibimbap-recipe/",
+    "notes_sourced": true
   },
   {
     "id": "thai-red-curry-tofu",
@@ -830,7 +858,9 @@
       "basil"
     ],
     "summary": "Simmer tofu and vegetables in a red curry with light coconut milk; serve over brown rice.",
-    "technique_notes": "Fry the curry paste in the thick coconut cream first until it's fragrant and the oil splits out - that blooms it - then add the rest of the liquid and the tofu. Press the tofu first, and add basil and lime off the heat."
+    "technique_notes": "Press the tofu first. Sauté onion and pepper, then cook the curry paste with ginger ~2 min until fragrant before adding coconut milk; simmer ~10 min until vegetables are tender-crisp. Don't skip the sugar - it balances the paste. Add lime, tofu and basil off the heat.",
+    "source_url": "https://www.loveandlemons.com/thai-red-curry-recipe/",
+    "notes_sourced": true
   },
   {
     "id": "filipino-chicken-adobo",
@@ -844,7 +874,9 @@
       "bay leaves"
     ],
     "summary": "Braise chicken in soy, vinegar, garlic, and bay until tender; serve over brown rice with greens.",
-    "technique_notes": "Once the vinegar goes in, don't stir until it has simmered a few minutes, or it tastes raw and harsh. Braise the chicken, then reduce the sauce; optionally crisp the chicken at the end."
+    "technique_notes": "Sear the chicken first, then toast garlic, bay and peppercorns in the rendered fat 30-60 sec before adding the liquids and scraping up the fond. Once the vinegar is in, let it simmer before stirring. Simmer uncovered ~20 min to 165F, then broil ~3 min per side for crisp skin.",
+    "source_url": "https://www.thekitchn.com/filipino-chicken-adobo-recipe-23652486",
+    "notes_sourced": true
   },
   {
     "id": "mexican-shrimp-tacos",
@@ -858,7 +890,9 @@
       "lime"
     ],
     "summary": "Sear chili-lime shrimp; tuck into tortillas with a crunchy cabbage-lime slaw and avocado.",
-    "technique_notes": "Sear the shrimp hot and fast just until pink and curled into a C. Char the tortillas over a flame, and dress the slaw with its acid only just before serving so it stays crunchy."
+    "technique_notes": "Sear the seasoned shrimp hot and fast, just until firm and opaque (~3-5 min), then pull off the heat so they don't overcook. Toast the tortillas in a dry skillet until the edges brown - it deepens flavor and keeps them from tearing. Dress the slaw only just before serving so it stays crunchy.",
+    "source_url": "https://www.budgetbytes.com/blackened-shrimp-tacos/",
+    "notes_sourced": true
   },
   {
     "id": "cuban-black-beans-rice",
@@ -871,7 +905,9 @@
       "brown rice"
     ],
     "summary": "Simmer black beans with sofrito and cumin; serve over brown rice with a squeeze of lime.",
-    "technique_notes": "Build a proper sofrito (peppers, onion, garlic, cumin) before the beans go in, then simmer with a splash of the bean liquid and a little vinegar at the end for brightness. Mash a few beans to thicken."
+    "technique_notes": "Build a sofrito: sauté onion and green pepper ~5 min until wilted, then garlic ~1 min until fragrant. Simmer the beans slowly and uncovered until very tender for a creamy texture, adding the sofrito and vinegar partway through. Mash a few beans to thicken; brighten with vinegar at the end.",
+    "source_url": "https://www.seriouseats.com/cuban-black-beans-and-rice-soup-recipe",
+    "notes_sourced": true
   },
   {
     "id": "southwest-quinoa-salad",
@@ -913,7 +949,9 @@
       "red onion"
     ],
     "summary": "Roast chicken with seasonal vegetables, olive oil, oregano, and lemon on one pan.",
-    "technique_notes": "Cut vegetables by density and give the denser ones a head start (or cut quicker ones larger) so everything finishes together. Spread in a single uncrowded layer at 425°F so they roast instead of steam."
+    "technique_notes": "Cut veg by density and spread in a single uncrowded layer so each piece touches the hot pan and chars instead of steaming. Toss with lemon-oregano-garlic dressing; roast thighs at 425°F about 35 min to 165°F, then broil a couple minutes for color. For chicken breast, cube and roast at 400°F ~20 min.",
+    "source_url": "https://www.themediterraneandish.com/greek-sheet-pan-chicken/",
+    "notes_sourced": true
   },
   {
     "id": "balela-chickpea-salad",
@@ -927,7 +965,9 @@
       "parsley"
     ],
     "summary": "Toss chickpeas and beans with tomato, parsley, and mint in a lemon-olive oil dressing.",
-    "technique_notes": "Let it marinate 30+ min so the chickpeas soak up the lemon-garlic dressing, and dry the herbs and beans well first. It tastes best at room temperature rather than cold."
+    "technique_notes": "Dry the herbs and beans well, then toss with a zesty olive oil, lemon juice, white wine vinegar, garlic and sumac dressing. Leave it aside at least 30 minutes so flavors meld before serving. Best at room temperature, though it can be covered and chilled until ready.",
+    "source_url": "https://www.themediterraneandish.com/balela-salad-recipe/",
+    "notes_sourced": true
   },
   {
     "id": "sicilian-cauliflower-pasta",
@@ -941,7 +981,9 @@
       "pine nuts"
     ],
     "summary": "Roast cauliflower and toss with pasta, a little raisin and pine nut, garlic, and chili.",
-    "technique_notes": "Roast or deeply brown the cauliflower for its nutty flavor - don't boil it. Plump the raisins in warm water and toast the pine nuts, and reserve pasta water to bring it all together."
+    "technique_notes": "Deeply brown the cauliflower for nutty flavor (traditional versions simmer it tender, then break it into a sauce). Plump raisins, bloom saffron and soften toasted pine nuts in the starchy cooking water, finish pasta just shy of al dente in the pan, and top with toasted breadcrumbs for crunch.",
+    "source_url": "https://www.seriouseats.com/pasta-chi-vruoccoli-arriminati-sicilian-pasta-with-cauliflower",
+    "notes_sourced": true
   },
   {
     "id": "ethiopian-misir-wot",
@@ -968,7 +1010,9 @@
       "cilantro"
     ],
     "summary": "Simmer lentils and chickpeas in a spiced tomato base finished with lemon and cilantro.",
-    "technique_notes": "Build the spiced tomato base, then simmer the lentils and chickpeas until tender. It's traditionally thickened with a flour-water slurry and finished with lemon and lots of cilantro at the end."
+    "technique_notes": "Soften onion, celery and carrot in olive oil, then bloom the spices 1-2 min. Add crushed tomatoes, tomato paste, lentils, chickpeas and cilantro; simmer ~45 min until legumes are very tender, adjusting liquid so it stays pourable. Thicken near the end with broken vermicelli or rice; finish with lemon.",
+    "source_url": "https://www.themediterraneandish.com/harira-recipe/",
+    "notes_sourced": true
   },
   {
     "id": "greek-gigantes-beans",
@@ -981,7 +1025,9 @@
       "dill"
     ],
     "summary": "Bake large white beans in a tomato-herb sauce until creamy; serve with greens and feta.",
-    "technique_notes": "Soak and pre-cook the giant beans until almost tender before baking - they need the head start. Bake low and slow uncovered in plenty of tomato sauce and olive oil so the top caramelizes."
+    "technique_notes": "Pre-cook (or use canned) giant/butter beans, then build a chunky tomato sauce by softening onion, carrot, celery and garlic before adding tomatoes and herbs. Simmer the beans in it briefly, then bake uncovered at 375°F for 20-30 min until thickened and the top turns golden.",
+    "source_url": "https://www.themediterraneandish.com/gigantes-plaki-greek-giant-beans/",
+    "notes_sourced": true
   },
   {
     "id": "chicken-skewers-chimichurri",
@@ -1065,7 +1111,9 @@
       "garlic"
     ],
     "summary": "Bake shrimp in a garlicky tomato sauce topped with feta until just pink and bubbling.",
-    "technique_notes": "Reduce the tomato sauce until thick before the shrimp go in, then add the raw shrimp and bake only until they turn pink and curl into a C - they keep cooking in the hot sauce, so pull early. Crumble the feta on top near the end so it softens but doesn't dissolve."
+    "technique_notes": "Reduce the tomato sauce until thick before the shrimp go in, then add the shrimp and cook only until they turn pink and curl into a C - they keep cooking in the hot sauce, so pull early. Marinate the shrimp in oil, oregano, dill, and garlic first; simmer the sauce 15 min; sprinkle feta on at the end off-heat.",
+    "source_url": "https://www.themediterraneandish.com/greek-shrimp-recipe-with-tomato-and-feta/",
+    "notes_sourced": true
   },
   {
     "id": "cajun-blackened-tilapia",
@@ -1079,7 +1127,9 @@
       "black beans"
     ],
     "summary": "Coat tilapia in Cajun spice and sear hard for a blackened crust; serve with a corn and black bean salad.",
-    "technique_notes": "Blackening needs a screaming-hot cast-iron pan and a dry, well-spiced fillet: pat it dry, press the spice rub on, and don't move it until the crust sets (2-3 min) or it sticks and tears. Tilapia is thin and cooks through fast, so flip only once. Use good ventilation - blackening smokes."
+    "technique_notes": "Blackening needs a screaming-hot cast-iron pan and a dry, well-spiced fillet: press the paprika-cayenne-thyme rub on and let it sit (up to 30 min). Heat oil until almost smoking; don't move the fillet until the crust sets (about 3 min per side). Tilapia is thin and cooks fast, so flip only once. Use good ventilation.",
+    "source_url": "https://www.allrecipes.com/recipe/89577/blackened-tilapia/",
+    "notes_sourced": true
   },
   {
     "id": "spanish-mussels-tomato",
@@ -1107,7 +1157,9 @@
       "mint"
     ],
     "summary": "Grill or sear swordfish and top with a quick Sicilian tomato, caper, olive, and mint relish.",
-    "technique_notes": "Swordfish is meaty but dries out if overcooked: sear or grill it hot and fast, about 3-4 min per side, and pull at just-opaque (medium). Pat it dry first for a good sear. Make the tomato-caper-mint relish raw or barely warmed and spoon it over at the end so it stays fresh."
+    "technique_notes": "Swordfish dries out if overcooked, so use thick steaks (1-1.5 in). Dredge in flour for color, then use unilateral cooking: brown hard on the first side ~5 min, flip only ~2 min to 130-135F. Build the tomato-caper-olive sauce in the same pan, then nestle the fish back to warm through. Keep the relish bright, not over-reduced.",
+    "source_url": "https://www.seriouseats.com/agghiotta-di-pesce-spada-sicilian-braised-swordfish-with-tomatoes-and-olives-5212333",
+    "notes_sourced": true
   },
   {
     "id": "roasted-cauliflower-feta-almonds",
@@ -1149,7 +1201,9 @@
       "red onion"
     ],
     "summary": "Marinate cherry tomatoes and white beans in olive oil, red wine vinegar, and basil; serve at room temperature.",
-    "technique_notes": "Let the tomatoes macerate with salt for 10-15 minutes to release their juices, which become the base of the dressing. Let the finished salad sit 15+ min before serving so the beans absorb the vinaigrette. Serve at room temperature, not cold — the flavor is much better."
+    "technique_notes": "Halve the cherry tomatoes and toss raw with rinsed cannellini, chopped basil, and good EVOO - no cooking. Use a robust extra-virgin olive oil; its flavor carries the dish. Drizzle aged balsamic and flaky salt at the very end, just before serving. Serve at room temperature; keeps about 2 days though basil may discolor.",
+    "source_url": "https://www.simplyrecipes.com/white-bean-and-tomato-salad-recipe-11770041",
+    "notes_sourced": true
   },
   {
     "id": "lemony-asparagus-salad",
