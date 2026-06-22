@@ -1173,7 +1173,9 @@
       "kalamata olives"
     ],
     "summary": "Roast cauliflower until deeply browned; toss with feta, toasted almonds, and olives.",
-    "technique_notes": "Spread cauliflower in a single uncrowded layer and roast at 425°F without stirring too often so the florets actually brown rather than steam. Add feta and olives after roasting so the feta softens but doesn't fully melt, and toast the almonds separately so they stay crunchy."
+    "technique_notes": "Roast at 425°F for 25-30 minutes, tossing once halfway for even browning. Toast the almonds separately in a dry skillet over medium-low, stirring often so they don't burn, 4-5 min. Toss the roasted cauliflower with feta and olives while warm; finish with lemon and flaky salt. Just as good at room temperature, so it holds for make-ahead.",
+    "source_url": "https://cooking.nytimes.com/recipes/1019657-roasted-cauliflower-with-feta-almonds-and-olives",
+    "notes_sourced": true
   },
   {
     "id": "kale-butternut-squash-bowl",
@@ -1187,7 +1189,9 @@
       "quinoa or farro"
     ],
     "summary": "Roast butternut squash, sauté kale, and serve over grains with jammy soft-boiled eggs and a tahini drizzle.",
-    "technique_notes": "Roast squash at 425°F cut-side down first for caramelization, then flip. For jammy eggs, lower into boiling water and cook exactly 7 minutes, then shock in ice water. Massage kale with a little oil and lemon to soften it before sautéing."
+    "technique_notes": "It's steamed, not roasted: boil the eggs in 1 inch of water, covered, exactly 6 min, then cool. Pour off to ¼ inch, lay in ½-inch squash slices (5 min), then pile broccoli, then kale on top; cover and steam until squash is tender and broccoli crisp-tender, 2-4 min. The yogurt-lemon-ginger-sesame sauce tastes sharp alone but balances on the vegetables.",
+    "source_url": "https://cooking.nytimes.com/recipes/1023835-kale-and-butternut-squash-bowl-with-jammy-eggs",
+    "notes_sourced": true
   },
   {
     "id": "cherry-tomato-white-bean-salad",
@@ -1217,7 +1221,9 @@
       "lemon"
     ],
     "summary": "Shave raw or blanched asparagus thin, toss with lemon vinaigrette, and top with shaved hard cheese and toasted nuts.",
-    "technique_notes": "Use a vegetable peeler to shave raw asparagus into ribbons for a delicate texture, or blanch briefly (1-2 min) and shock in ice water for something more tender. Dress with lemon right before serving since the acid wilts the ribbons fast. Toast the nuts dry in a pan."
+    "technique_notes": "Toast the nuts at 350°F for 5 min, then chop. Steam whole trimmed spears just tender, ~5 min, and drain (don't shave into raw ribbons). Macerate minced shallot in the lemon juice with salt 2 min before whisking in the oil, then stir in nuts, cheese and herbs. Dress just before serving.",
+    "source_url": "https://cooking.nytimes.com/recipes/1020990-lemony-asparagus-salad-with-shaved-cheese-and-nuts",
+    "notes_sourced": true
   },
   {
     "id": "mediterranean-fish-chowder",
@@ -1231,7 +1237,9 @@
       "tomatoes"
     ],
     "summary": "Simmer white fish and potatoes in a light tomato-fennel broth with kale.",
-    "technique_notes": "Cook the potatoes fully in the broth before adding fish, since the fish only needs 5-8 min and overcooks quickly. Strip kale from tough stems and add it a few minutes before the fish. A splash of white wine and fennel seed in the broth define the Mediterranean character."
+    "technique_notes": "Soften onion, celery and carrot ~5 min, then melt in minced anchovies and garlic 1-2 min before the tomatoes and paste (cook 10-15 min). Simmer potatoes 30 min in the broth with a bouquet garni (bay, thyme, orange zest) and saffron. Cook the kale separately; add it and the fish at the end and simmer just 5 min.",
+    "source_url": "https://cooking.nytimes.com/recipes/12278-mediterranean-fish-chowder-with-potatoes-and-kale",
+    "notes_sourced": true
   },
   {
     "id": "mackerel-lemon-tomatoes",
@@ -1245,7 +1253,9 @@
       "parsley"
     ],
     "summary": "Roast or pan-sear mackerel and serve over garlicky burst tomatoes with lemon and herbs.",
-    "technique_notes": "Mackerel is oily and robust — it handles high heat well. Score the skin to prevent curling, then sear skin-side down first in a very hot pan. Burst the tomatoes in olive oil and garlic in a separate pan, and finish with lemon and parsley off the heat so the herbs stay bright."
+    "technique_notes": "It's roasted, not seared: make lemon oil by warming EVOO with lemon zest just to the first bubble, off heat, 20+ min. Roast fillets at 425°F on a bed of basil, drizzled with the oil and topped with olives, tomatoes scattered around, 5-7 min (thin) up to 12 (thick). Finish with more lemon oil and basil.",
+    "source_url": "https://cooking.nytimes.com/recipes/1019060-mackerel-with-lemon-olive-oil-and-tomatoes",
+    "notes_sourced": true
   },
   {
     "id": "citrusy-roast-chicken-pears-figs",
@@ -1259,7 +1269,9 @@
       "lemon"
     ],
     "summary": "Roast chicken thighs over sweet pears and figs with lemon and fresh thyme until caramelized.",
-    "technique_notes": "Use ripe but firm pears so they don't turn to mush. Nestle fruit around (not under) the chicken so it can brown properly; the fruit juices mingle with the chicken fat to create a pan sauce. Add dried figs partway through rather than at the start so they don't burn."
+    "technique_notes": "Rub a garlic-orange-zest-rosemary paste over and under the skin, then chill uncovered 4 hrs to overnight. Roast the whole chicken at 450°F for 30 min, then add halved fresh pears and figs cut-side down to the hot pan and roast 15-25 min more. Rest the chicken 10 min. Finish with a raw orange-garlic-sherry-vinegar relish and parsley.",
+    "source_url": "https://cooking.nytimes.com/recipes/1020452-citrusy-roast-chicken-with-pears-and-figs",
+    "notes_sourced": true
   },
   {
     "id": "halloumi-cucumber-tomato-salad",
@@ -1273,7 +1285,9 @@
       "pita or bread"
     ],
     "summary": "Sear sliced halloumi golden, toss with cucumber-tomato salad, and top with crunchy olive oil croutons.",
-    "technique_notes": "Sear halloumi in a dry (no oil) very hot pan — it has enough fat — for 1-2 min per side until deeply golden; serve immediately as it toughens as it cools. Salt and drain the cucumber briefly first. Make the croutons last so they stay crunchy."
+    "technique_notes": "Croutons are baked, not fried: toss torn bread in EVOO, bake at 400°F 18-22 min. Salt the cucumbers and weight with ice to firm and drain; salt tomatoes separately and pour off liquid. Steep smashed garlic in the EVOO, then discard before dressing. Sear halloumi in a little oil over medium-high ~1 min per side; add croutons and halloumi last.",
+    "source_url": "https://cooking.nytimes.com/recipes/1020429-cucumber-tomato-salad-with-seared-halloumi-and-olive-oil-croutons",
+    "notes_sourced": true
   },
   {
     "id": "greens-and-beans-toasted-crumbs",
@@ -1287,7 +1301,9 @@
       "crusty bread"
     ],
     "summary": "Sauté hearty greens and white beans in garlicky olive oil; top with crispy pan-toasted breadcrumbs.",
-    "technique_notes": "Fry torn bread or coarse crumbs in olive oil until golden and salty, then set them aside — add at the very last second or they go soggy. Mash some of the beans against the pan to create a creamy, thickened sauce, and wilt the greens fully in the bean liquid."
+    "technique_notes": "Keep it brothy: don't mash the beans. Gently simmer scallions, chard stems, celery, garlic and thyme in the olive oil 12-15 min to infuse without browning. Add green beans, lima beans, chard leaves, a pinch of sugar and water; simmer ~8 min until just tender. Toast crumbs dry ~4 min and scatter on last so they stay crisp.",
+    "source_url": "https://cooking.nytimes.com/recipes/1023397-greens-and-beans-with-toasted-crumbs",
+    "notes_sourced": true
   },
   {
     "id": "farro-blistered-tomatoes-pesto",
@@ -1301,7 +1317,9 @@
       "spinach"
     ],
     "summary": "Blister cherry tomatoes in olive oil, toss with cooked farro, pesto, and fresh spinach.",
-    "technique_notes": "Blister the tomatoes in a very hot dry skillet or under a broiler so they char and burst, adding sweetness. Toss everything together off the heat so the pesto stays green and the spinach just wilts from residual warmth. Farro holds up well at room temp, so this works as a warm grain salad."
+    "technique_notes": "Boil rinsed farro uncovered in well-salted water ~30 min until tender, not mushy. Roast cherry tomatoes and red-onion wedges with oil at 400°F, 25-30 min, until blistered. Toss the hot farro with olive oil, pesto and lemon, then stir in raw spinach to wilt. Fold in the tomatoes and juices; add mozzarella. Great warm or cold.",
+    "source_url": "https://cooking.nytimes.com/recipes/1021817-farro-with-blistered-tomatoes-pesto-and-spinach",
+    "notes_sourced": true
   },
   {
     "id": "slow-roasted-citrus-salmon",
@@ -1315,7 +1333,9 @@
       "olive oil"
     ],
     "summary": "Slow-roast a whole salmon fillet in olive oil with citrus slices; top with a bright herb salad.",
-    "technique_notes": "Low and slow (275°F, 25-30 min) produces silky, barely-set salmon that's completely different in texture from high-heat roasting. The fish is done when it just starts to flake and loses translucency. Build the herb salad (parsley, dill, tarragon, thinly sliced shallot, lemon juice) right before serving."
+    "technique_notes": "Roast skinless salmon low and slow at 300°F on a bed of sliced lemon and orange, drizzled generously with olive oil, 25-35 min, just until opaque at the edges and barely flaking — the fat bath makes it hard to overcook. Toss the herb salad (parsley, dill, tarragon) with lemon juice and flaky salt right before serving.",
+    "source_url": "https://cooking.nytimes.com/recipes/1018972-slow-roasted-citrus-salmon-with-herb-salad",
+    "notes_sourced": true
   },
   {
     "id": "saffron-salmon-kababs",
@@ -1329,7 +1349,9 @@
       "onion"
     ],
     "summary": "Marinate salmon in saffron, lemon, and onion, then grill or broil on skewers.",
-    "technique_notes": "Bloom the saffron in a tablespoon of warm water for 10-15 min to extract its color and flavor before adding to the marinade. Don't marinate more than 1 hour or the lemon will start to denature the fish. Grill or broil hot and fast so the salmon gets color without drying out."
+    "technique_notes": "Grind the saffron with a pinch of sugar, then steep in 2 Tbsp just-boiled water 5 min to draw out color. Marinate 1-inch salmon cubes only 30 min (lime starts to cure the fish) in saffron, lime, garlic and spices. Grill medium-high on flat skewers, turning every couple minutes and brushing with marinade, ~10 min total.",
+    "source_url": "https://cooking.nytimes.com/recipes/1022437-saffron-salmon-kababs",
+    "notes_sourced": true
   },
   {
     "id": "roasted-halibut-lemon-olives",
@@ -1343,7 +1365,9 @@
       "fresh rosemary"
     ],
     "summary": "Roast halibut over a bed of lemon slices, olives, and rosemary until just cooked through.",
-    "technique_notes": "Halibut is lean and dries out quickly — roast at 400°F and check early (10-12 min for 1-inch fillets). Roasting on sliced lemons keeps the fish elevated and fragrant. Go easy on salt since the olives are already salty. Pull the fish when it's just barely opaque all the way through."
+    "technique_notes": "Roast at 450°F just until opaque, about 10 min — halibut is lean and overcooks fast, so pull it early. Top each fillet with a rosemary branch and thin lemon slices, scatter kalamata olives around, and go easy on salt. If the lemons haven't singed, broil 1-2 min. Drizzle with more olive oil.",
+    "source_url": "https://cooking.nytimes.com/recipes/1013079-roasted-halibut-with-lemons-olives-and-rosemary",
+    "notes_sourced": true
   },
   {
     "id": "salmon-couscous-salad",
@@ -1357,7 +1381,9 @@
       "feta"
     ],
     "summary": "Roast salmon and serve over couscous with a creamy blended cucumber-feta dressing and herbs.",
-    "technique_notes": "Couscous is ready in 5 minutes: pour boiling salted liquid over it (1:1 ratio), cover and rest, then fluff. Blend the dressing smooth (cucumber, feta, lemon, a little yogurt or olive oil) and taste for salt before adding — feta varies. Let the couscous cool slightly before assembling so the dressing doesn't break."
+    "technique_notes": "Uses pearl couscous: toast it dry 3-4 min, then simmer in plenty of salted water 8-10 min and drain — not a 1:1 pour-over. Roast salmon at 400°F ~18 min, then flake. The dressing is stirred, not blended: thick yogurt thinned with water, lime, diced Persian cucumber, feta and herbs. Toss warm couscous with arugula to wilt it.",
+    "source_url": "https://cooking.nytimes.com/recipes/1021970-salmon-and-couscous-salad-with-cucumber-feta-dressing",
+    "notes_sourced": true
   },
   {
     "id": "beet-greens-roasted-beets-yogurt",
@@ -1371,7 +1397,9 @@
       "garlic"
     ],
     "summary": "Roast beets and simmer their greens separately; serve together over garlicky yogurt with lemon.",
-    "technique_notes": "Roast the beets wrapped in foil until a knife slides in easily (45-60 min at 400°F), then slip the skins off while warm. Simmer the greens (stems first, then leaves) briefly in salted water and drain well — they're more tender than kale but need a few minutes. The yogurt base is the sauce: season it with garlic and lemon."
+    "technique_notes": "Roast scrubbed beets at 425°F in a covered dish with ¼-inch water until knife-tender (30-60 min by size), then slip off the skins while warm. Wilt the greens in a hot skillet in just the clinging water, add oil, cover and simmer 5 min. Add lemon only just before serving or they dull. Stir mashed garlic into drained yogurt.",
+    "source_url": "https://cooking.nytimes.com/recipes/12305-simmered-beet-greens-with-roasted-beets-lemon-and-yogurt",
+    "notes_sourced": true
   },
   {
     "id": "puttanesca-chickpea-salad",
@@ -1385,7 +1413,9 @@
       "capers"
     ],
     "summary": "Toss chickpeas and tomatoes with olives, capers, and anchovies in a bold puttanesca vinaigrette.",
-    "technique_notes": "The anchovies melt into the dressing if you whisk them into the oil — they add savory depth without a fishy flavor, and you can omit them for fully vegetarian. Let the salad sit 10-15 min after dressing so the chickpeas absorb the bold flavors. Good at room temperature or slightly warm."
+    "technique_notes": "No cooking — just stir tomatoes, chickpeas, kalamata olives, capers, grated garlic, lemon and coarsely chopped Parmesan with olive oil. The briny capers and olives stand in for the usual anchovies (omit Parmesan to make it vegan). Let it sit 10 min up to 2 hours so the beans drink up the juices; adjust salt and lemon. Keeps 2 days.",
+    "source_url": "https://cooking.nytimes.com/recipes/1023396-puttanesca-chickpea-tomato-salad",
+    "notes_sourced": true
   },
   {
     "id": "italian-wedding-soup",
@@ -1463,6 +1493,8 @@
       "lemon"
     ],
     "summary": "Roast cauliflower until caramelized, toss with white beans, herbs, and a bright lemon dressing.",
-    "technique_notes": "Roast cauliflower at high heat (425°F) in a single uncrowded layer until deeply browned — the caramelization is what makes this dish. Toss the warm cauliflower with the beans right away so the beans absorb some warmth and the dressing, then let it cool to room temperature before adding fresh herbs."
+    "technique_notes": "Roast sliced cauliflower at 400°F on the top rack until well browned, 20-25 min; the caramelization carries the dish. Whisk a sharp dressing of shallot, Dijon, lemon, red wine vinegar and ground fennel. Toss with the white beans and celery, careful not to crush them, and rest 30 min to meld. Add parsley and scallions; serve at room temperature.",
+    "source_url": "https://cooking.nytimes.com/recipes/1023217-white-bean-salad-with-roasted-cauliflower",
+    "notes_sourced": true
   }
 ]
