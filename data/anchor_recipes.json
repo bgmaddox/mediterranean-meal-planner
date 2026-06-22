@@ -11,7 +11,9 @@
       "fresh oregano"
     ],
     "summary": "Marinate chicken in lemon, garlic, and oregano, then roast over potatoes until golden.",
-    "technique_notes": "Toss the potatoes in the same lemon-oil-oregano marinade and arrange in a single layer under the chicken so they roast in the rendered fat; roast at 425°F. Pat chicken dry and start it skin-side up for browning. Hold most of the lemon juice until the last 10 minutes so it doesn't turn bitter."
+    "technique_notes": "Marinate chicken in the lemon-oil-oregano blend ~2 hours. Spread potatoes in the dish, lay chicken skin-side up on top, and roast at 425°F for only 10 minutes, then drop to 375°F for 45-55 minutes to 185°F internal (425°F throughout is too hot for the long bake). Rest 10-15 minutes; broil briefly to crisp skin.",
+    "source_url": "https://www.sipandfeast.com/greek-lemon-chicken/",
+    "notes_sourced": true
   },
   {
     "id": "sheet-pan-salmon-asparagus",
@@ -163,7 +165,9 @@
       "brown rice"
     ],
     "summary": "Stuff peppers with spiced turkey, brown rice, and tomato; bake until tender.",
-    "technique_notes": "Par-cook the rice to only ~70% since it finishes inside the peppers, and pre-soften the peppers (blanch or microwave ~5 min) so they're tender in time. Bake covered with foil first, then uncover to brown the tops."
+    "technique_notes": "Brown the turkey with onion and spices, simmer with tomato sauce and broth, then mix with fully cooked rice (not par-cooked). Halve raw peppers lengthwise, fill, set in the dish with broth poured in the bottom, cover tightly with foil, and bake at 400°F about 45 minutes until tender, then uncover to finish.",
+    "source_url": "https://www.skinnytaste.com/turkey-stuffed-peppers-45-pts/",
+    "notes_sourced": true
   },
   {
     "id": "pasta-white-beans-tomatoes",
@@ -177,7 +181,9 @@
       "basil"
     ],
     "summary": "Burst cherry tomatoes in olive oil and garlic, toss with pasta, white beans, and basil.",
-    "technique_notes": "Blister the cherry tomatoes in hot oil without stirring much so they char and burst. Reserve starchy pasta water and toss everything off the heat to emulsify a light sauce. Fold the beans in gently at the end to keep them whole."
+    "technique_notes": "Cook the cherry tomatoes in olive oil in a covered skillet over medium heat 6-12 minutes until most burst and the oil turns red; this becomes the light sauce. Stir in drained al dente whole wheat pasta off the heat, fold beans in gently, then rest ~20 minutes so the pasta absorbs the sauce. Add basil last.",
+    "source_url": "https://cookieandkate.com/caprese-pasta-salad/",
+    "notes_sourced": true
   },
   {
     "id": "mujadara",
@@ -206,7 +212,9 @@
       "feta"
     ],
     "summary": "Slice grilled chicken over greens with cucumber, tomato, olives, and a lemon vinaigrette.",
-    "technique_notes": "Pound the chicken to an even thickness so it cooks evenly, and rest it after grilling before slicing to keep it juicy. Dress the greens only just before serving."
+    "technique_notes": "Marinate chicken in a yogurt-lemon-garlic mix at least 30 minutes (overnight is better). Toss the greens, cucumber and feta with most of the dressing, reserving some. Sear chicken undisturbed ~5 minutes per side to 165°F, shaking off excess marinade first so it browns. Plate salad, top with sliced chicken, drizzle reserved dressing, serve at once.",
+    "source_url": "https://www.themediterraneandish.com/greek-grilled-chicken-salad-recipe/",
+    "notes_sourced": true
   },
   {
     "id": "salmon-nicoise",
@@ -220,7 +228,9 @@
       "baby potatoes"
     ],
     "summary": "Compose seared salmon with blanched green beans, eggs, potatoes, and a dijon vinaigrette.",
-    "technique_notes": "Cook each component to its own right doneness: blanch the green beans then shock in ice water to keep them bright and crisp, aim for jammy 7-8 minute eggs, and sear the salmon skin-side down. Compose the plate, don't toss it."
+    "technique_notes": "Blanch green beans just 1.5 minutes, then ice-bath. Boil potatoes until barely tender, then steam off-heat under a towel 15-20 minutes. Rather than searing, you can marinate salmon in lemon-mustard 15 minutes and roast at 500°F for 12-15 minutes, resting 15 minutes before flaking. Compose the platter, don't toss.",
+    "source_url": "https://www.foodnetwork.com/recipes/ina-garten/roasted-salmon-nicoise-platter-recipe-1908586",
+    "notes_sourced": true
   },
   {
     "id": "tabbouleh-grilled-chicken",
@@ -249,7 +259,9 @@
       "apricots"
     ],
     "summary": "Stew eggplant and chickpeas with warm spices and a touch of dried fruit; serve over couscous or farro.",
-    "technique_notes": "Salt and brown or roast the eggplant first so it isn't spongy and raw, then build the spiced base and stew gently. Add the dried fruit partway through so it plumps without dissolving."
+    "technique_notes": "Brown the eggplant in batches until golden on all sides but not soft inside. Fry onion, ginger and spices until softened, then add tomatoes, stock, honey and the apricots; nestle the eggplant in and simmer covered ~30 minutes until tender. (Source adds apricots at the start, not partway through.)",
+    "source_url": "https://www.bbcgoodfood.com/recipes/smoky-aubergine-tagine-lemon-apricots",
+    "notes_sourced": true
   },
   {
     "id": "yogurt-marinated-chicken-farro",
@@ -263,7 +275,9 @@
       "lemon"
     ],
     "summary": "Marinate chicken in spiced yogurt and grill; serve over farro with a herb salad.",
-    "technique_notes": "Let the yogurt marinade work at least 2 hours - it tenderizes the chicken - then scrape off the excess before grilling so it chars instead of steaming. Toast the farro before simmering for a nuttier flavor."
+    "technique_notes": "Pound breasts to even thickness, then marinate in the yogurt-lemon-garlic mix at least 2 hours and up to 24. Let the chicken sit at room temperature ~20 minutes before cooking, then grill over high heat to 160-165°F, flipping once. Toast the farro before simmering for nuttier flavor.",
+    "source_url": "https://www.wellplated.com/greek-yogurt-chicken-marinade/",
+    "notes_sourced": true
   },
   {
     "id": "teriyaki-salmon-bowl",
@@ -277,7 +291,9 @@
       "scallions"
     ],
     "summary": "Glaze salmon with a light teriyaki, serve over brown rice with edamame and cucumber.",
-    "technique_notes": "Reduce the teriyaki to a glaze separately, brush it on only at the end, and broil 1-2 min so the sugars caramelize without scorching. Pat the salmon dry first so it sears rather than steams."
+    "technique_notes": "Marinate salmon 30-60 minutes, then cook through (broil ~6 inches from heat 3-4 minutes, or air fry 400°F 5-7 minutes) until caramelized at the edges. Simmer the reserved marinade separately into a glaze and drizzle on at the end - this also cooks off any raw-fish bacteria - rather than brushing during a brief broil.",
+    "source_url": "https://www.skinnytaste.com/teriyaki-salmon-bowl-air-fryer-or-oven/",
+    "notes_sourced": true
   },
   {
     "id": "thai-chicken-stir-fry",
@@ -352,7 +368,9 @@
       "snap peas"
     ],
     "summary": "Toss seared ginger chicken and vegetables with soba in a light soy-sesame sauce.",
-    "technique_notes": "Rinse the cooked soba under cold water to stop the cooking and wash off surface starch (this prevents gummy clumps), then toss with a little oil. Add the snap peas in only the last minute so they stay crisp."
+    "technique_notes": "Cook soba just to al dente (~5 minutes), then drain and rinse well under cool water to wash off surface starch and stop the cooking, preventing gummy clumps. Add the snap peas to boiling water for only ~20 seconds so they stay crisp-tender before draining.",
+    "source_url": "https://cookieandkate.com/sugar-snap-pea-and-carrot-soba-noodles/",
+    "notes_sourced": true
   },
   {
     "id": "sesame-tofu-broccoli",
@@ -456,7 +474,9 @@
       "garam masala"
     ],
     "summary": "Simmer chickpeas in a tomato-onion masala with ginger and warm spices; serve over brown rice.",
-    "technique_notes": "Build a deeply browned onion-tomato-ginger-garlic masala (10+ min) before the chickpeas go in - that base is the flavor - then simmer the chickpeas in it to absorb. Finish with garam masala and lemon off the heat."
+    "technique_notes": "Build a deeply browned onion-spice-ginger-garlic-tomato masala before the chickpeas go in - that base is the flavor. Add chickpeas with a little water and simmer uncovered 15-20 min until thick and stew-like. Stir in garam masala and lemon off the heat to finish.",
+    "source_url": "https://minimalistbaker.com/easy-chana-masala/",
+    "notes_sourced": true
   },
   {
     "id": "tandoori-chicken-raita",
@@ -780,7 +800,9 @@
       "whole wheat wrap"
     ],
     "summary": "Bind shredded chicken with yogurt, celery, and herbs; roll into a whole wheat wrap with greens.",
-    "technique_notes": "Use poached or roasted chicken cooled before mixing, and pat the add-ins dry so the wrap doesn't get soggy. Layer greens against the wrap as a moisture barrier, or assemble just before eating."
+    "technique_notes": "Use cooled diced chicken and pat add-ins dry so the wrap doesn't get soggy. Toast the almonds, whisk the yogurt dressing separately, then toss to coat; chilling 2 hours (or overnight) deepens the flavor. Layer greens against the wrap as a moisture barrier, or assemble just before eating.",
+    "source_url": "https://www.wellplated.com/greek-yogurt-chicken-salad/",
+    "notes_sourced": true
   },
   {
     "id": "hummus-veggie-power-bowl",
@@ -921,7 +943,9 @@
       "bell peppers"
     ],
     "summary": "Toss quinoa with black beans, corn, peppers, and avocado in a cumin-lime dressing.",
-    "technique_notes": "Rinse the quinoa, then cook and spread it out to cool and dry so it isn't mushy and absorbs the dressing without going gummy. Add the avocado last."
+    "technique_notes": "Rinse quinoa, then simmer covered 15-20 min until liquid is fully absorbed; spread to cool so it isn't mushy. Whisk the lime-vinegar-cumin-oil dressing in the bowl first, fold in beans, corn and peppers, then stir in the cooled quinoa. Add avocado last.",
+    "source_url": "https://www.allrecipes.com/recipe/257254/black-bean-corn-and-quinoa-salad/",
+    "notes_sourced": true
   },
   {
     "id": "greek-turkey-burgers-tzatziki",
@@ -935,7 +959,9 @@
       "greek yogurt"
     ],
     "summary": "Grill turkey burgers studded with feta and spinach; top with cucumber-yogurt tzatziki.",
-    "technique_notes": "Squeeze the spinach dry, don't overmix, and give lean turkey a binder (feta, a little oil) for moisture. Press a thumbprint dimple in each patty so they don't dome, and don't press them while cooking."
+    "technique_notes": "Squeeze spinach dry and don't overmix; feta keeps lean turkey (93%) moist. Form four patties, oil the grill rack and grill over medium-high about 4-6 min per side to 165F. A thumbprint dimple keeps them from doming; don't press while cooking.",
+    "source_url": "https://www.eatingwell.com/recipe/262569/turkey-burgers-with-spinach-feta-tzatziki/",
+    "notes_sourced": true
   },
   {
     "id": "sheet-pan-chicken-veg",
@@ -996,7 +1022,9 @@
       "onions"
     ],
     "summary": "Simmer red lentils with onion and berbere into a richly spiced stew; serve with greens and brown rice.",
-    "technique_notes": "Cook the onions long and dry (little to no oil at first) until jammy before adding the berbere, then bloom the berbere in oil. Simmer the red lentils until they fully break down and thicken."
+    "technique_notes": "Cook finely diced onions in spiced butter (niter kibbeh) over medium-high 8-10 min until golden - note: real recipes use fat here, not dry. Add garlic, tomato and berbere, cook 5-7 min, then simmer red lentils covered ~40 min until soft. Stir in more niter kibbeh and berbere at the end.",
+    "source_url": "https://www.daringgourmet.com/misir-wat-ethiopian-spiced-red-lentils/",
+    "notes_sourced": true
   },
   {
     "id": "moroccan-harira",
@@ -1041,7 +1069,9 @@
       "red wine vinegar"
     ],
     "summary": "Grill chicken skewers and vegetables; spoon over a bright herb chimichurri.",
-    "technique_notes": "Make the chimichurri chunky by hand (not a smooth blender puree) and let it rest 20+ min to meld. Don't crowd the skewers, grill hot for char, and rest the chicken before serving."
+    "technique_notes": "Keep the acid (red wine vinegar) in the chimichurri, not the marinade - acidic marinades turn grilled chicken chalky. Pulse parsley/herbs, garlic, vinegar and oil coarsely (source uses a processor, not fully smooth). Cut chicken into 2-inch chunks, grill on separate skewers ~10 min turning once, then spoon sauce over.",
+    "source_url": "https://www.seriouseats.com/grilled-lemon-garlic-chicken-tomato-kebab-skewer-basil-chimichurri-recipe",
+    "notes_sourced": true
   },
   {
     "id": "seared-tuna-salad",
@@ -1055,7 +1085,9 @@
       "egg"
     ],
     "summary": "Sear tuna rare; plate with blanched green beans, potatoes, egg, and a dijon vinaigrette.",
-    "technique_notes": "Tuna is best rare: sear a good steak about a minute per side over very high heat and slice it against the grain - it turns dry and chalky if cooked through. Blanch and cook the other components separately and compose the plate."
+    "technique_notes": "Tuna is best rare: pat dry, season, and sear about 2 min per side, rest 5 min, then slice 1/2-inch thick against the grain. Cook the other components separately - steam potatoes ~15 min, green beans ~5 min to tender-crisp - and compose the plate with a lemon-shallot-Dijon dressing.",
+    "source_url": "https://www.eatingwell.com/recipe/8026382/tuna-nicoise-salad/",
+    "notes_sourced": true
   },
   {
     "id": "spanish-halibut-romesco",
