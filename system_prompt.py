@@ -423,19 +423,19 @@ def build_system_prompt(
             lines.append(line)
         anchor_block = (
             "## Anchor Recipes (real-world inspiration)\n"
-            "Below is a rotating selection of established, real-world recipes. Use them as a "
-            "STARTING POINT for this week's meals rather than inventing dishes from scratch. "
-            "You have full latitude to ADAPT FREELY: keep the spirit, flavor profile, and "
-            "recognizable identity of a dish, but rework ingredients and methods as needed to "
-            "satisfy every health constraint, the household, the season, and ingredient efficiency. "
-            "Draw on several of these as bases, vary them so the week isn't a literal copy, and feel "
-            "free to include a dish not listed here when it serves the plan better. The health rules "
-            "below always take precedence over fidelity to the original recipe.\n\n"
-            "When a recipe includes a **Technique** note, it captures the tested, non-obvious "
-            "procedure from the real recipe (e.g., how to cut and time an ingredient so it cooks "
-            "evenly). Follow that technique for the relevant ingredients in your `instructions` "
-            "rather than improvising your own method — adapt it only as far as your ingredient "
-            "swaps require. Prefer these proven techniques over plausible-sounding inventions.\n\n"
+            "A rotating selection of established recipes. Use several as STARTING POINTS rather than "
+            "inventing from scratch. ADAPT FREELY — keep each dish's spirit, flavor profile, and "
+            "recognizable identity, but rework ingredients and methods to satisfy the health "
+            "constraints, household, season, and ingredient efficiency; vary them so the week isn't a "
+            "literal copy, and include unlisted dishes when they serve the plan better. The health "
+            "rules above always override fidelity to the original.\n\n"
+            "**Side/mezze anchors** (salads, dips, braised/roasted vegetables) build the vegetable "
+            "components of vegetable-forward and mezze-style dinners — use them for real, "
+            "technique-driven character instead of generic treatments.\n\n"
+            "A **Technique** note is the tested, non-obvious procedure from the real recipe (how to "
+            "cut/time an ingredient so it cooks evenly). Follow it for the relevant ingredients in "
+            "your `instructions` — adapting only as far as your swaps require — rather than improvising "
+            "or inventing a plausible-sounding method.\n\n"
             + "\n".join(lines)
         )
     else:
@@ -460,14 +460,12 @@ def build_system_prompt(
 
     # --- Cuisine notes section ---
     _default_cuisine = (
-        "The weekly plan should feel like a well-rounded meal rotation, not exclusively Mediterranean. "
-        "Aim for **3–4 Mediterranean-style dinners** and **1–2 dinners from other cuisines** — such as "
-        "Asian (Japanese, Thai, Korean, Vietnamese), Latin American (Mexican, Peruvian), Indian, American, "
-        "or other world cuisines. "
+        "The plan should feel like a well-rounded rotation, not exclusively Mediterranean. "
+        "Aim for **3–4 Mediterranean-style dinners** and **1–2 from other cuisines** — Asian "
+        "(Japanese, Thai, Korean, Vietnamese), Latin American (Mexican, Peruvian), Indian, American, etc. "
         "The health constraints below apply to ALL meals regardless of cuisine — the cooking style changes, "
-        "the nutritional rules do not. "
-        "For example: a teriyaki salmon bowl, a Thai-inspired chicken and vegetable stir-fry with brown rice, "
-        "or a black bean taco night are all fully compatible with the health goals."
+        "the nutritional rules do not (e.g. a teriyaki salmon bowl, a Thai chicken-and-vegetable stir-fry "
+        "with brown rice, or a black bean taco night are all fully compatible)."
     )
     if cuisine_notes and cuisine_notes.strip():
         cuisine_block = (
@@ -604,6 +602,15 @@ curry), and beyond.
 - **Dairy:** Low-fat Greek yogurt and low-fat milk are encouraged.
 - **No organ meats, no processed meats, no deep-fried food.**
 
+## Meal Composition — vary the structure across the week
+Do not default every dinner to the same plate shape. Rotate among three archetypes: (1) **Classic plate** — protein + whole grain/starch + vegetable (valid, but not the only mode). (2) **Vegetable-forward** — a vegetable dish is the centerpiece with protein and/or grain secondary or folded in (e.g. white-bean-and-greens braise, stuffed vegetables, chickpea-and-vegetable tagine over a little couscous), with legumes, eggs, and dairy carrying the protein. (3) **Mezze / small-plate spread** — 3–4 smaller dishes served tapas-style (e.g. a dip + a vegetable dish + a legume dish + a small protein) instead of one plated entrée. At least 2 dinners should be vegetable-forward or mezze-style, not all classic plates (scale gently: ≥1 for a 3-day week, ≥2 for a 5+-day week). On those nights a grain is **optional**.
+
+## Vegetables are dishes, not afterthoughts
+Every vegetable component must be a deliberately seasoned, technique-driven dish — never "plain steamed/grilled/raw with no seasoning." Build in acid, fat (EVOO), aromatics, herbs/spices, and a finishing element (a sauce, a sprinkle of dukkah/za'atar/feta/toasted nuts, a yogurt-tahini drizzle, a quick pickle, charring). **Vary the treatment across the week** — rotate contrasting techniques (charring/blistering, spice-rub roasting, braising, raw salad with a bright dressing, quick-pickling, grill-then-dress, purée); the same vegetable must not get the same treatment twice in one week. Still respect the health rules (EVOO as the fat, no deep-frying).
+
+## Protein floor on every dinner
+Whatever the composition, every dinner must still meet the household's per-adult protein and satiety needs (see the nutrition targets below). On vegetable-forward and mezze nights, hit those targets through legumes, eggs, Greek yogurt/dairy, nuts/seeds, and modest protein portions rather than one large central protein — structure may change, but macros are never sacrificed.
+
 ---
 
 # HEALTH CONSTRAINT: URIC ACID MANAGEMENT
@@ -657,7 +664,7 @@ Include this as a `uric_acid_tip` in relevant recipes.
 - Avoid refined carbs, added sugars, white rice as sole carb
 - Whole grain or legume-based pasta preferred over white
 - Olive oil is the fat — use it, not excessively
-- Meals should be filling at normal portions (roughly: half veg, quarter protein, quarter whole grain)
+- Meals should be filling at normal portions. One example of a filling plate (for classic-plate dinners) is roughly half veg, quarter protein, quarter whole grain — but this is an example, not a rule for every meal. Vegetable-forward and mezze nights distribute their components differently while hitting the same calorie, fiber, and protein targets.
 
 ---
 
@@ -704,13 +711,12 @@ The following equipment is available. Use whatever makes the best recipe — do 
 # INGREDIENT EFFICIENCY
 
 ## Pantry Staples
-Items the family always has on hand. **Include every pantry staple in the `ingredients` array with accurate quantities and units — the cook needs to know how much to use.** Set `pantry_staple: true` so the app can exclude them from the shopping list, but they must appear in the ingredient list.
+Items the family always has on hand. They must still appear in each recipe's `ingredients` array with `pantry_staple: true` (see Output rule 1) so the cook knows how much to use; the app filters them from the shopping list.
 
 {staples_str}
 
 ## Special Ingredient Rule:
-Non-staple perishables or specialty items must appear in ≥2 meals this week. \
-Confirm explicitly in `ingredient_overlap_notes`.
+Non-staple perishables or specialty items must appear in ≥2 meals this week (confirm in `ingredient_overlap_notes`).
 
 ---
 
@@ -764,7 +770,7 @@ The response must begin with `{{` and end with `}}`.
 8. `cook_time_minutes` reflects realistic home-cook active time.
 9. `nutrition_estimate` is required on every dinner and lunch.
 10. `cost_estimate` is required on every dinner and lunch.
-11. `serving_sizes` is required on every dinner and lunch. List every main component (protein, grain/starch, vegetable sides). \
-Base adult portions on a ~500–550 kcal dinner plate for weight loss: typically 4–6 oz protein, 1/2 cup grain, 1–2 cups vegetables. \
+11. `serving_sizes` is required on every dinner and lunch. List whatever components the chosen composition actually has — this may be a protein + grain + vegetable, several vegetable dishes with no grain, or a mezze of small plates. \
+Base adult portions on a ~500–550 kcal dinner for weight loss and give a sensible portion for each component (e.g. 4–6 oz for a main protein, ~1/2 cup cooked grain, 1–2 cups vegetables, smaller portions for mezze plates). \
 {_kid_portion_sentence}
 """
