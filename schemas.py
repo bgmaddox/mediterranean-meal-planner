@@ -149,6 +149,9 @@ class AnchorRecipe(TypedDict):
     name: str                           # Dish name, e.g. 'Greek Lemon Chicken with Roasted Potatoes'
     cuisine: str                        # e.g. 'Greek', 'Thai', 'Mexican'
     meal_type: str                      # 'dinner', 'lunch', or 'either'
+    role: str                           # 'main' (a full entrée) or 'side' (a vegetable/mezze/salad/dip
+                                        # dish meant to accompany or compose a meal, not a full entrée).
+                                        # Defaults to 'main' at load time if absent (backwards-compatible).
     key_ingredients: list[str]          # The defining (mostly non-pantry) ingredients
     summary: str                        # One-line method, e.g. 'Marinate chicken in lemon-oregano-garlic, roast with potatoes.'
     technique_notes: str                # Tested, non-obvious procedural tips Claude should follow (not a full recipe), e.g. 'Separate bok choy stems from leaves; sear stems 2 min before adding leaves.' May be empty.

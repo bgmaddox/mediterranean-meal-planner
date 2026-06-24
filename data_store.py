@@ -364,11 +364,18 @@ def load_anchor_recipes() -> list[AnchorRecipe]:
     User recipes are kept in a separate gitignored file so they survive deploys
     and never conflict with updates to the shipped seed. A user entry whose id
     matches a seed entry overrides it (keeps the seed's position).
+
+    Missing `role` fields are defaulted to 'main' for backwards compatibility
+    with seed entries that predate the role field.
     """
     by_id: dict[str, AnchorRecipe] = {r["id"]: r for r in load_anchor_seed_recipes()}
     for r in load_anchor_user_recipes():
         by_id[r["id"]] = r
-    return list(by_id.values())
+    recipes = list(by_id.values())
+    for r in recipes:
+        if "role" not in r:
+            r["role"] = "main"
+    return recipes
 
 
 def add_anchor_recipe(
@@ -432,31 +439,40 @@ def select_anchor_recipes(count: int = 10, days: int = 5) -> list[AnchorRecipe]:
     Return a rotating random sample of anchor recipes to inject as inspiration.
 
     Excludes lunch-only recipes from crowding out dinner ideas, but keeps
-    'either' recipes in the pool. The sample is randomized each call so weekly
-    plans draw on different anchors over time.
+    'either' recipes in the pool. Reserves a dedicated side/mezze pool so
+    vegetable-forward and mezze compositions have real-recipe grounding.
+    The sample is randomized each call so weekly plans draw on different
+    anchors over time.
 
     Parameters
     ----------
     count : int
         How many anchors to return. Capped at the library size.
     days : int
-        Days being planned; used to scale the sample up a little for longer weeks.
+        Days being planned; used to scale the sample up a little for longer weeks
+        and to set how many side slots to reserve.
     """
     anchors = load_anchor_recipes()
     if not anchors:
         return []
 
-    # Bias toward dinner-capable recipes; lunch-only recipes are less useful as
-    # the bulk of anchors but still add variety, so keep a few in the pool.
-    dinner_pool = [a for a in anchors if a.get("meal_type") in ("dinner", "either")]
-    lunch_only = [a for a in anchors if a.get("meal_type") == "lunch"]
+    # Split into three pools: dinner mains, lunch-only, and side/mezze.
+    sides = [a for a in anchors if a.get("role") == "side"]
+    dinner_pool = [a for a in anchors if a.get("role") != "side" and a.get("meal_type") in ("dinner", "either")]
+    lunch_only = [a for a in anchors if a.get("role") != "side" and a.get("meal_type") == "lunch"]
 
     target = min(max(count, days + 3), len(anchors))
-    # Reserve ~1/4 of slots for lunch-only ideas when available.
-    lunch_slots = min(len(lunch_only), max(1, target // 4))
-    dinner_slots = max(target - lunch_slots, 0)
+
+    # Reserve 2-3 side slots, scaling with days (max(2, days // 2)), capped at pool size.
+    side_slots = min(len(sides), max(2, days // 2))
+    remaining = target - side_slots
+
+    # Reserve ~1/4 of remaining slots for lunch-only ideas when available.
+    lunch_slots = min(len(lunch_only), max(1, remaining // 4))
+    dinner_slots = max(remaining - lunch_slots, 0)
 
     sample = random.sample(dinner_pool, min(dinner_slots, len(dinner_pool)))
     sample += random.sample(lunch_only, min(lunch_slots, len(lunch_only)))
+    sample += random.sample(sides, min(side_slots, len(sides)))
     random.shuffle(sample)
     return sample
