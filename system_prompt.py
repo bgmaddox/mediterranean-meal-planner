@@ -604,6 +604,15 @@ curry), and beyond.
 - **Dairy:** Low-fat Greek yogurt and low-fat milk are encouraged.
 - **No organ meats, no processed meats, no deep-fried food.**
 
+## Meal Composition — vary the structure across the week
+Do not default every dinner to the same plate shape. Rotate among three archetypes: (1) **Classic plate** — a protein, a whole grain/starch, and a vegetable (the current default; still valid, just not the only mode). (2) **Vegetable-forward** — a vegetable dish is the centerpiece while protein and/or grain are secondary or folded in (e.g. a white-bean-and-greens braise, stuffed vegetables, a chickpea-and-vegetable tagine over a little couscous); legumes, eggs, and dairy carry the protein. (3) **Mezze / small-plate spread** — 3–4 smaller dishes served together tapas-style (e.g. a dip + a vegetable dish + a legume dish + a small protein) rather than one plated entrée. At least 2 of the week's dinners should be vegetable-forward or mezze-style, not all classic plates (scale gently: a 3-day week needs at least 1, a 5+-day week at least 2). On vegetable-forward and mezze nights a grain is **optional**, not mandatory.
+
+## Vegetables are dishes, not afterthoughts
+Every vegetable component must be a deliberately seasoned, technique-driven dish — never "plain steamed/grilled/raw with no seasoning." As appropriate, build in acid, fat (EVOO), aromatics, herbs/spices, and a finishing element (a sauce, a sprinkle of dukkah/za'atar/feta/toasted nuts, a yogurt-tahini drizzle, a quick pickle, charring). **Vary the treatment across the week** — rotate among contrasting techniques such as charring/blistering, roasting with a spice rub, braising, raw salad with a bright dressing, quick-pickling, grilling then dressing, and vegetable purée; the same vegetable must not get the same treatment twice in one week. These treatments still respect the health rules (EVOO as the fat, no deep-frying).
+
+## Protein floor on every dinner
+Whatever the composition, every dinner must still meet the household's per-adult protein and satiety needs (see the nutrition targets below). On vegetable-forward and mezze nights, hit those targets through legumes, eggs, Greek yogurt/dairy, nuts/seeds, and modest protein portions rather than one large central protein — structure may change, but macros are never sacrificed.
+
 ---
 
 # HEALTH CONSTRAINT: URIC ACID MANAGEMENT
@@ -657,7 +666,7 @@ Include this as a `uric_acid_tip` in relevant recipes.
 - Avoid refined carbs, added sugars, white rice as sole carb
 - Whole grain or legume-based pasta preferred over white
 - Olive oil is the fat — use it, not excessively
-- Meals should be filling at normal portions (roughly: half veg, quarter protein, quarter whole grain)
+- Meals should be filling at normal portions. One example of a filling plate (for classic-plate dinners) is roughly half veg, quarter protein, quarter whole grain — but this is an example, not a rule for every meal. Vegetable-forward and mezze nights distribute their components differently while hitting the same calorie, fiber, and protein targets.
 
 ---
 
@@ -764,7 +773,7 @@ The response must begin with `{{` and end with `}}`.
 8. `cook_time_minutes` reflects realistic home-cook active time.
 9. `nutrition_estimate` is required on every dinner and lunch.
 10. `cost_estimate` is required on every dinner and lunch.
-11. `serving_sizes` is required on every dinner and lunch. List every main component (protein, grain/starch, vegetable sides). \
-Base adult portions on a ~500–550 kcal dinner plate for weight loss: typically 4–6 oz protein, 1/2 cup grain, 1–2 cups vegetables. \
+11. `serving_sizes` is required on every dinner and lunch. List whatever components the chosen composition actually has — this may be a protein + grain + vegetable, several vegetable dishes with no grain, or a mezze of small plates. \
+Base adult portions on a ~500–550 kcal dinner for weight loss and give a sensible portion for each component (e.g. 4–6 oz for a main protein, ~1/2 cup cooked grain, 1–2 cups vegetables, smaller portions for mezze plates). \
 {_kid_portion_sentence}
 """
