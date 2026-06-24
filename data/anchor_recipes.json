@@ -1530,5 +1530,132 @@
     "technique_notes": "Roast sliced cauliflower at 400°F on the top rack until well browned, 20-25 min; the caramelization carries the dish. Whisk a sharp dressing of shallot, Dijon, lemon, red wine vinegar and ground fennel. Toss with the white beans and celery, careful not to crush them, and rest 30 min to meld. Add parsley and scallions; serve at room temperature.",
     "source_url": "https://cooking.nytimes.com/recipes/1023217-white-bean-salad-with-roasted-cauliflower",
     "notes_sourced": true
+  },
+  {
+    "id": "chicken-kebabs-turmeric-chile",
+    "name": "Chicken Kebabs with Turmeric and Chile",
+    "cuisine": "Persian",
+    "meal_type": "dinner",
+    "key_ingredients": [
+      "boneless chicken thighs",
+      "turmeric",
+      "lemon juice",
+      "saffron"
+    ],
+    "summary": "Marinate chicken thigh chunks in turmeric, chile, lemon and saffron, then grill slowly on skewers.",
+    "technique_notes": "Marinate thigh chunks with sliced onion, red chile powder, turmeric, garlic powder, a pinch of saffron, lemon juice and olive oil 3 hours to overnight. Discard the onion, thread onto skewers, and grill slowly over low, even heat with the grate ~6 inches from the coals, basting with marinade and turning until browned all over, 15-20 min.",
+    "source_url": "https://cooking.nytimes.com/recipes/1014920-chicken-kebabs-with-turmeric-and-chile",
+    "notes_sourced": true
+  },
+  {
+    "id": "baked-chicken-hibiscus-bbq",
+    "name": "Baked Chicken with Hibiscus BBQ Sauce",
+    "cuisine": "American",
+    "meal_type": "dinner",
+    "key_ingredients": [
+      "bone-in chicken leg quarters",
+      "dried hibiscus flowers",
+      "smoked paprika",
+      "apple cider vinegar"
+    ],
+    "summary": "Dry-rub chicken legs and roast, then glaze with a homemade sweet-tart hibiscus barbecue sauce. Occasional treat only — the sugary sauce is off-profile for weight-loss and uric-acid goals, not a weekly staple.",
+    "technique_notes": "Rub legs with seasoned salt, garlic and onion powder, paprika and thyme; roast at 425F about 30 min until golden but shy of done. Brush generously with the sauce, return 5 min to 165F. For the sauce, simmer hibiscus, vinegar, spices, brown sugar and ketchup 20-25 min until it streams off a spoon, then strain, pressing hard on the solids.",
+    "source_url": "https://cooking.nytimes.com/recipes/1024211-baked-chicken-with-hibiscus-bbq-sauce",
+    "notes_sourced": true
+  },
+  {
+    "id": "classic-gazpacho",
+    "name": "Classic Gazpacho (Chilled Tomato Soup)",
+    "cuisine": "Spanish",
+    "meal_type": "either",
+    "key_ingredients": [
+      "ripe tomatoes",
+      "cucumber",
+      "bell pepper",
+      "extra-virgin olive oil"
+    ],
+    "summary": "No-cook blended chilled soup of ripe tomatoes, cucumber, pepper and olive oil for hot days.",
+    "technique_notes": "Layer torn bread in a bowl, then salted tomatoes, cucumber, onion, pepper, garlic and herbs, more salted tomatoes, then oil and sherry vinegar; rest 30 min so salt draws out juices that soak the bread. Blend on high a full 3 minutes for silk, then push through a fine-mesh strainer with a ladle. Chill; serve cold.",
+    "source_url": "https://www.seriouseats.com/easy-gazpacho-recipe",
+    "notes_sourced": true
+  },
+  {
+    "id": "cold-cucumber-yogurt-soup",
+    "name": "Cold Cucumber Yogurt Soup",
+    "cuisine": "Mediterranean",
+    "meal_type": "either",
+    "key_ingredients": [
+      "cucumber",
+      "greek yogurt",
+      "dill",
+      "lemon"
+    ],
+    "summary": "Blender-only chilled soup of cucumber and Greek yogurt with herbs, lemon and a little garlic.",
+    "technique_notes": "Blend cucumbers, Greek yogurt, olive oil, lemon juice, basil, dill, one raw garlic clove, salt and a touch of honey until smooth; the honey offsets the lemon tang and raw-garlic bite. Chill at least 4 hours (or overnight) so it thickens and flavors meld. Go easy on garlic since it stays raw; garnish with reserved cucumber and herbs.",
+    "source_url": "https://www.loveandlemons.com/cold-cucumber-soup/",
+    "notes_sourced": true
+  },
+  {
+    "id": "mahi-mahi-tomato-lemon-skillet",
+    "name": "Mahi-Mahi Skillet with Tomato-Lemon Sauce",
+    "cuisine": "Mediterranean",
+    "meal_type": "dinner",
+    "key_ingredients": [
+      "mahi-mahi fillets",
+      "cherry tomatoes",
+      "lemon",
+      "shallots"
+    ],
+    "summary": "Pan-seared mahi-mahi finished in a quick blistered-tomato, garlic and lemon pan sauce.",
+    "technique_notes": "Pat fillets very dry and salt well so they sear instead of steam. Sear in olive oil and a little butter over medium-high 3-4 min untouched per side until golden, then set aside. Blister cherry tomatoes ~4 min, add shallots and garlic 1 min, then stock, vinegar and lemon; simmer 4 min. Return fish to ~137F internal; finish with zest and basil.",
+    "source_url": "https://www.everylastbite.com/mahi-mahi-with-tomato-lemon-sauce/",
+    "notes_sourced": true
+  },
+  {
+    "id": "acqua-pazza-poached-halibut",
+    "name": "Acqua Pazza (Tomato-Garlic Poached Halibut)",
+    "cuisine": "Italian",
+    "meal_type": "dinner",
+    "key_ingredients": [
+      "halibut fillets",
+      "cherry tomatoes",
+      "garlic",
+      "kalamata olives"
+    ],
+    "summary": "Firm white fish gently poached in a garlicky tomato-and-olive broth with olive oil.",
+    "technique_notes": "Soften shallots in olive oil, add garlic 1 min, deglaze with white wine 2-3 min, then water, salt and chili. Add tomatoes and a basil sprig; simmer 15 min until soft and reduced by half. Slip in seasoned halibut and olives, simmer gently ~5 min, then turn off heat and let residual heat finish it until flaky. Use firm fish (halibut, cod, snapper), not delicate or oily.",
+    "source_url": "https://parsleyandparm.com/tomato-and-garlic-poached-fish/",
+    "notes_sourced": true
+  },
+  {
+    "id": "wild-rice-lentil-salad",
+    "name": "Wild Rice and Lentil Salad",
+    "cuisine": "Mediterranean",
+    "meal_type": "lunch",
+    "key_ingredients": [
+      "wild rice blend",
+      "brown lentils",
+      "arugula",
+      "pomegranate seeds"
+    ],
+    "summary": "Hearty grain-and-legume salad with arugula, caramelized shallots, toasted almonds and pomegranate.",
+    "technique_notes": "Simmer wild-rice blend and brown lentils together in broth until tender and absorbed, ~45 min, then rest. Meanwhile caramelize thinly sliced shallots low and slow in olive oil 30-45 min, and toast almond slivers dry 2-3 min. Toss warm grains with arugula, mint and almonds; dress with olive oil and balsamic and top with pomegranate. Good warm or cold for packed lunches.",
+    "source_url": "https://www.delishknowledge.com/lentil-wild-rice-salad/",
+    "notes_sourced": true
+  },
+  {
+    "id": "greek-yogurt-honey-walnuts",
+    "name": "Greek Yogurt with Honey and Walnuts",
+    "cuisine": "Greek",
+    "meal_type": "either",
+    "key_ingredients": [
+      "greek yogurt",
+      "honey",
+      "walnuts"
+    ],
+    "summary": "Thick strained yogurt drizzled with honey and topped with toasted walnuts — a uric-acid-friendly breakfast or light dessert.",
+    "technique_notes": "Use thick full- or low-fat strained Greek yogurt (low-fat dairy actively lowers uric acid). Toast walnuts dry in a skillet a few minutes until fragrant to deepen flavor, then drizzle a modest amount of honey just before serving so it stays glossy. Keep honey light to stay on-profile; add cinnamon or a few cherries for sweetness without extra sugar.",
+    "source_url": "",
+    "notes_sourced": false
   }
 ]

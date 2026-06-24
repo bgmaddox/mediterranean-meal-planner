@@ -36,3 +36,6 @@ CLAUDE.md
 .antigravitycli/
 .playwright-mcp/
 temp/
+
+# Source recipe PDFs (copyrighted; not for the public repo)
+recipes/
