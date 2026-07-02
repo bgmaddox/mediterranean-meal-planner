@@ -115,6 +115,7 @@ OUTPUT_SCHEMA = {
             {
                 "id": "string — 'd1' through 'd5'",
                 "name": "string — descriptive recipe name",
+                "composition": "string — exactly one of 'classic', 'vegetable_forward', 'mezze'. Which meal-composition archetype this dinner follows (see Meal Composition rules).",
                 "cook_time_minutes": "integer",
                 "primary_equipment": "string — e.g. 'sheet pan / oven', 'Instant Pot', 'Blackstone griddle', 'slow cooker', 'stovetop'",
                 "servings": {
@@ -603,13 +604,21 @@ curry), and beyond.
 - **No organ meats, no processed meats, no deep-fried food.**
 
 ## Meal Composition — vary the structure across the week
-Do not default every dinner to the same plate shape. Rotate among three archetypes: (1) **Classic plate** — protein + whole grain/starch + vegetable (valid, but not the only mode). (2) **Vegetable-forward** — a vegetable dish is the centerpiece with protein and/or grain secondary or folded in (e.g. white-bean-and-greens braise, stuffed vegetables, chickpea-and-vegetable tagine over a little couscous), with legumes, eggs, and dairy carrying the protein. (3) **Mezze / small-plate spread** — 3–4 smaller dishes served tapas-style (e.g. a dip + a vegetable dish + a legume dish + a small protein) instead of one plated entrée. At least 2 dinners should be vegetable-forward or mezze-style, not all classic plates (scale gently: ≥1 for a 3-day week, ≥2 for a 5+-day week). On those nights a grain is **optional**.
+Do not default every dinner to the same plate shape. Rotate among three archetypes: (1) **Classic plate** — protein + vegetables + optional whole grain/starch (valid, but not the only mode). (2) **Vegetable-forward** — a vegetable dish is the centerpiece with protein and/or grain secondary or folded in (e.g. white-bean-and-greens braise, stuffed vegetables, chickpea-and-vegetable tagine over a little couscous), with legumes, eggs, and dairy carrying the protein. (3) **Mezze / small-plate spread** — 3–4 smaller dishes served tapas-style (e.g. a dip + a vegetable dish + a legume dish + a small protein) instead of one plated entrée. At least 2 dinners should be vegetable-forward or mezze-style, not all classic plates (scale gently: ≥1 for a 3-day week, ≥2 for a 5+-day week). On those nights a grain is **optional**.
+
+Label every dinner with its archetype in the `composition` field (`classic`, `vegetable_forward`, or `mezze`) — the app validates that the week meets the mix above.
+
+## Plate geometry — vegetables are half the plate
+This is the core of the Mediterranean diet pattern, not a suggestion: on a **classic plate**, vegetables occupy roughly **half the plate by volume** (1.5–2+ cups per adult, ideally as **two distinct vegetable components** — e.g. a cooked vegetable dish plus a salad), animal protein is a **modest 3–4 oz cooked portion** (fish may run 4–5 oz), and whole grain/starch is a ~1/2-cup side that is **optional on any night** — legumes can serve as the starch instead. Do not drift to a large protein center with a single small vegetable side; when in doubt, add vegetable volume, not protein or grain.
 
 ## Vegetables are dishes, not afterthoughts
 Every vegetable component must be a deliberately seasoned, technique-driven dish — never "plain steamed/grilled/raw with no seasoning." Build in acid, fat (EVOO), aromatics, herbs/spices, and a finishing element (a sauce, a sprinkle of dukkah/za'atar/feta/toasted nuts, a yogurt-tahini drizzle, a quick pickle, charring). **Vary the treatment across the week** — rotate contrasting techniques (charring/blistering, spice-rub roasting, braising, raw salad with a bright dressing, quick-pickling, grill-then-dress, purée); the same vegetable must not get the same treatment twice in one week. Still respect the health rules (EVOO as the fat, no deep-frying).
 
 ## Protein floor on every dinner
-Whatever the composition, every dinner must still meet the household's per-adult protein and satiety needs (see the nutrition targets below). On vegetable-forward and mezze nights, hit those targets through legumes, eggs, Greek yogurt/dairy, nuts/seeds, and modest protein portions rather than one large central protein — structure may change, but macros are never sacrificed.
+Whatever the composition, every dinner must still meet the household's per-adult protein and satiety needs (see the nutrition targets below). On vegetable-forward and mezze nights, hit those targets through legumes, eggs, Greek yogurt/dairy, nuts/seeds, and modest protein portions rather than one large central protein — structure may change, but macros are never sacrificed. Satiety comes from vegetable volume, fiber, and adequate protein together — not from a larger meat portion.
+
+## Fiber floor on every dinner
+Every dinner should deliver **at least 10–12 g of fiber per adult serving**. This is the counterweight to the protein floor: if a draft dinner estimates under 10 g, rework it (add a legume component, a second vegetable dish, or swap a refined side for beans or an extra vegetable) before finalizing.
 
 ---
 
@@ -664,7 +673,7 @@ Include this as a `uric_acid_tip` in relevant recipes.
 - Avoid refined carbs, added sugars, white rice as sole carb
 - Whole grain or legume-based pasta preferred over white
 - Olive oil is the fat — use it, not excessively
-- Meals should be filling at normal portions. One example of a filling plate (for classic-plate dinners) is roughly half veg, quarter protein, quarter whole grain — but this is an example, not a rule for every meal. Vegetable-forward and mezze nights distribute their components differently while hitting the same calorie, fiber, and protein targets.
+- Meals should be filling at normal portions. For classic-plate dinners the DEFAULT is half vegetables, a quarter protein, a quarter whole grain (grain optional) — deviate only with a reason, never toward more protein and less vegetable. Vegetable-forward and mezze nights distribute their components differently while hitting the same calorie, fiber, and protein targets.
 
 ---
 
@@ -770,7 +779,8 @@ The response must begin with `{{` and end with `}}`.
 8. `cook_time_minutes` reflects realistic home-cook active time.
 9. `nutrition_estimate` is required on every dinner and lunch.
 10. `cost_estimate` is required on every dinner and lunch.
-11. `serving_sizes` is required on every dinner and lunch. List whatever components the chosen composition actually has — this may be a protein + grain + vegetable, several vegetable dishes with no grain, or a mezze of small plates. \
-Base adult portions on a ~500–550 kcal dinner for weight loss and give a sensible portion for each component (e.g. 4–6 oz for a main protein, ~1/2 cup cooked grain, 1–2 cups vegetables, smaller portions for mezze plates). \
+11. `serving_sizes` is required on every dinner and lunch. List whatever components the chosen composition actually has — this may be a protein + vegetables + optional grain, several vegetable dishes with no grain, or a mezze of small plates. \
+Base adult portions on a ~500–550 kcal dinner for weight loss. Portion guidance per adult: **3–4 oz cooked for a main animal protein (fish may be 4–5 oz)**, **1.5–2+ cups vegetables total — on classic plates split across two vegetable components**, ~1/2 cup cooked grain when a grain is included at all, smaller portions for mezze plates. Vegetables are the volume of the meal; do not compensate for a smaller protein with more grain. \
 {_kid_portion_sentence}
+12. `composition` is required on every dinner: 'classic', 'vegetable_forward', or 'mezze'. The week must include at least {"1" if days < 5 else "2"} vegetable_forward or mezze dinner{"" if days < 5 else "s"}.
 """

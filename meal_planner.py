@@ -184,6 +184,18 @@ def _validate_plan(plan: WeekPlan, days: int = 5, require_kid_adaptation: bool =
                 raise MealPlanError(
                     f"Dinner '{dinner.get('name')}' is missing kid_adaptation."
                 )
+    # Meal-composition mix: the prompt asks every dinner to be labeled and the
+    # week to include vegetable-forward/mezze nights. Enforce it here so the
+    # rule can't be silently ignored.
+    non_classic_min = 1 if days < 5 else 2
+    labeled = [d.get("composition") for d in plan["dinners"]]
+    if all(labeled):
+        non_classic = sum(1 for c in labeled if c in ("vegetable_forward", "mezze"))
+        if non_classic < non_classic_min:
+            raise MealPlanError(
+                f"Week has only {non_classic} vegetable-forward/mezze dinner(s); "
+                f"at least {non_classic_min} required. Regenerate."
+            )
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -201,6 +213,9 @@ weekly plan. Your job is to generate exactly one replacement meal that:
    encourage dairy, vitamin C foods, cherries), cholesterol improvement \
    (salmon 2–3x/week across the full week, legumes, oats/barley, EVOO), \
    weight loss (high fiber, high protein, low glycemic).
+4b. Follows Mediterranean plate geometry: vegetables are roughly half the plate \
+   (1.5–2+ cups per adult), animal protein is a modest 3–4 oz cooked portion \
+   (fish 4–5 oz), grain is an optional ~1/2-cup side. Aim for ≥10 g fiber.
 5. Respects ingredient efficiency — if the replacement is a dinner, try to reuse \
    any special ingredients already purchased this week rather than introducing new ones.
 6. Follows all food constraints (no mushrooms, no oranges, no fish in lunches).
@@ -275,6 +290,7 @@ def swap_meal(
             "replacement_dinner": {
                 "id": replaced_meal["id"],
                 "name": "string",
+                "composition": "string — 'classic', 'vegetable_forward', or 'mezze'. Match the plate archetype of the replaced dinner unless the swap reason calls for a change, so the week keeps its vegetable-forward/mezze mix.",
                 "cook_time_minutes": "integer",
                 "primary_equipment": "string",
                 "servings": {"adults": 2, "kids": 2},

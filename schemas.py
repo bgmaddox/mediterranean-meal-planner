@@ -58,6 +58,7 @@ class CostEstimate(TypedDict):
 class DinnerMeal(TypedDict):
     id: str                             # 'd1' – 'd5'
     name: str
+    composition: str                    # 'classic', 'vegetable_forward', or 'mezze'
     cook_time_minutes: int
     primary_equipment: str              # e.g. 'sheet pan / oven', 'Instant Pot', 'Blackstone griddle'
     servings: DinnerServings
