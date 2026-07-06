@@ -106,6 +106,27 @@ PANTRY_STAPLES = [
 ]
 
 # ─────────────────────────────────────────────────────────────────────────────
+# SHARED RULE SUMMARIES
+# Single source of truth for the condensed rules injected into the smaller
+# edit prompts in meal_planner.py (swap / substitute). The full generation
+# prompt states these rules at length below; these summaries exist so the
+# edit calls can never drift out of sync when a rule changes.
+# ─────────────────────────────────────────────────────────────────────────────
+HEALTH_RULES_SUMMARY = """\
+- Uric acid management: avoid organ meats, sardines as a staple, fructose/juice, \
+meat stocks; encourage low-fat dairy, vitamin C foods, cherries; legumes and \
+leafy greens are safe and encouraged.
+- Cholesterol improvement: salmon 2–3x/week across the full week, legumes, \
+oats/barley, EVOO, walnuts.
+- Weight loss: high fiber, high protein, low glycemic, olive oil as the primary fat."""
+
+PLATE_GEOMETRY_SUMMARY = """\
+Mediterranean plate geometry: vegetables are roughly half the plate by volume \
+(1.5–2+ cups per adult), animal protein is a modest 3–4 oz cooked portion \
+(fish may be 4–5 oz), whole grain is an optional ~1/2-cup side — legumes can \
+serve as the starch. Aim for ≥10 g fiber per dinner."""
+
+# ─────────────────────────────────────────────────────────────────────────────
 # OUTPUT JSON SCHEMA
 # Defines the exact structure Claude must return.
 # ─────────────────────────────────────────────────────────────────────────────
@@ -513,6 +534,8 @@ def build_system_prompt(
         portion_scale_instruction = ""
 
     protein_targets = _PROTEIN_TARGETS.get(days, _PROTEIN_TARGETS[5])
+    # Mediterranean pattern: legumes near-daily. Scale ~60% of dinners, min 2.
+    legume_target = max(2, round(days * 0.6))
 
     # Pre-computed conditional strings for kid-related prompt sections
     _children_profile_line = (
@@ -701,7 +724,8 @@ The following equipment is available. Use whatever makes the best recipe — do 
 - Family of {family_size} (2 adults + {kids_count} kid{"s" if kids_count != 1 else ""})
 - 30–45 min active cook/prep time. Slow cooker and Instant Pot meals may take longer but are fine.
 {_kid_adaptation_rule}
-- Protein targets: {protein_targets}.{chr(10) + "- " + portion_scale_instruction if portion_scale_instruction else ""}
+- Protein targets: {protein_targets}.
+- **Legume target:** legumes (beans, lentils, chickpeas, edamame) feature in at least {legume_target} of the {days} dinners — as the main protein or a substantial component (≥1/2 cup per adult), not a garnish. This is a positive target, not just what's left after the meat is planned.{chr(10) + "- " + portion_scale_instruction if portion_scale_instruction else ""}
 
 ## Lunches — {days} per week, {lunch_adult_count} adult(s)
 - Office, weekdays. Microwave available; cold lunches are equally welcome.

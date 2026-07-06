@@ -77,7 +77,7 @@ flowchart TB
     P4 --> P5
     P5 --> C1
     C1 --> V1
-    V1 -- "invalid → error, no retry" --> ERR["❌ MealPlanError shown in UI"]
+    V1 -- "invalid → 1 auto-retry with the<br/>failure reason fed back; then error" --> ERR["❌ MealPlanError shown in UI"]
     V1 --> V2
     V1 --> V3
     V1 --> OUT

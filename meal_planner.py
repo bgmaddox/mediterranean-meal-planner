@@ -26,7 +26,12 @@ import anthropic
 
 import data_store
 from schemas import DinnerMeal, LunchMeal, WeekPlan
-from system_prompt import build_system_prompt
+from system_prompt import (
+    DEFAULT_CONSTRAINTS,
+    HEALTH_RULES_SUMMARY,
+    PLATE_GEOMETRY_SUMMARY,
+    build_system_prompt,
+)
 
 MODEL = "claude-opus-4-8"
 
@@ -112,35 +117,54 @@ def generate_week_plan_from_prompts(system_prompt: str, user_message: str, expec
 
     Raises
     ------
-    MealPlanError on API or parse failure.
+    MealPlanError on API failure, or if the response is still invalid after
+    one automatic retry (the retry feeds the failure reason back to Claude).
     """
-    try:
-        response = _client().messages.create(
-            model=MODEL,
-            max_tokens=16000,
-            system=system_prompt,
-            messages=[{"role": "user", "content": user_message}],
-        )
-    except anthropic.APIError as e:
-        raise MealPlanError(f"Claude API error: {e}") from e
+    client = _client()
+    message = user_message
+    last_error: MealPlanError | None = None
 
-    raw = _strip_fences(response.content[0].text)
+    for attempt in range(2):
+        try:
+            response = client.messages.create(
+                model=MODEL,
+                max_tokens=16000,
+                system=system_prompt,
+                messages=[{"role": "user", "content": message}],
+            )
+        except anthropic.APIError as e:
+            # Infrastructure failure — retrying with a modified prompt won't help.
+            raise MealPlanError(f"Claude API error: {e}") from e
 
-    try:
-        data = json.loads(raw)
-    except json.JSONDecodeError as e:
-        raise MealPlanError(
-            f"Claude returned invalid JSON: {e}\n\nFirst 500 chars:\n{raw[:500]}"
-        ) from e
+        raw = _strip_fences(response.content[0].text)
 
-    if "week_plan" not in data:
-        raise MealPlanError(
-            f"Response missing 'week_plan' key. Keys found: {list(data.keys())}"
-        )
+        try:
+            try:
+                data = json.loads(raw)
+            except json.JSONDecodeError as e:
+                raise MealPlanError(
+                    f"Claude returned invalid JSON: {e}\n\nFirst 500 chars:\n{raw[:500]}"
+                ) from e
 
-    plan: WeekPlan = data["week_plan"]
-    _validate_plan(plan, expected_days, require_kid_adaptation=require_kid_adaptation)
-    return plan
+            if "week_plan" not in data:
+                raise MealPlanError(
+                    f"Response missing 'week_plan' key. Keys found: {list(data.keys())}"
+                )
+
+            plan: WeekPlan = data["week_plan"]
+            _validate_plan(plan, expected_days, require_kid_adaptation=require_kid_adaptation)
+            return plan
+        except MealPlanError as e:
+            last_error = e
+            message = (
+                f"{user_message}\n\n"
+                f"IMPORTANT: Your previous attempt was rejected for this reason:\n"
+                f"{e}\n\n"
+                f"Generate the plan again, fixing that problem. "
+                f"Return only the JSON object."
+            )
+
+    raise last_error
 
 
 def generate_week_plan(week_notes: str | None = None, cuisine_notes: str | None = None, use_up_ingredients: str | None = None, days: int = 5) -> WeekPlan:
@@ -202,23 +226,18 @@ def _validate_plan(plan: WeekPlan, days: int = 5, require_kid_adaptation: bool =
 # Swap a meal
 # ─────────────────────────────────────────────────────────────────────────────
 
-_SWAP_SYSTEM = """You are a Mediterranean diet meal planner replacing a single meal in an existing \
+_SWAP_SYSTEM = f"""You are a Mediterranean diet meal planner replacing a single meal in an existing \
 weekly plan. Your job is to generate exactly one replacement meal that:
 
 1. Fits the same slot type (dinner or lunch) as the meal being replaced.
 2. Does not repeat any meal already in the current week (listed below).
 3. Does not repeat meals from recent history (listed below).
-4. Satisfies all health constraints: Mediterranean diet, uric acid management \
-   (avoid organ meats, sardines as staple, fructose/juice, meat stocks; \
-   encourage dairy, vitamin C foods, cherries), cholesterol improvement \
-   (salmon 2–3x/week across the full week, legumes, oats/barley, EVOO), \
-   weight loss (high fiber, high protein, low glycemic).
-4b. Follows Mediterranean plate geometry: vegetables are roughly half the plate \
-   (1.5–2+ cups per adult), animal protein is a modest 3–4 oz cooked portion \
-   (fish 4–5 oz), grain is an optional ~1/2-cup side. Aim for ≥10 g fiber.
-5. Respects ingredient efficiency — if the replacement is a dinner, try to reuse \
-   any special ingredients already purchased this week rather than introducing new ones.
-6. Follows all food constraints (no mushrooms, no oranges, no fish in lunches).
+4. Satisfies all health constraints:
+{HEALTH_RULES_SUMMARY}
+5. Follows {PLATE_GEOMETRY_SUMMARY}
+6. Respects ingredient efficiency — if the replacement is a dinner, try to reuse \
+any special ingredients already purchased this week rather than introducing new ones.
+7. Follows every food constraint listed in the message — these are hard rules.
 
 Return ONLY valid JSON for a single meal object matching the schema provided. \
 No preamble, no markdown fences."""
@@ -343,7 +362,13 @@ def swap_meal(
         f"Always return replacement_lunch when it appears in the schema."
     ) if has_paired_lunch else ""
 
+    swap_constraints = DEFAULT_CONSTRAINTS + data_store.active_constraints_for_prompt()
+    swap_constraints_block = "\n".join(f"- {c}" for c in swap_constraints)
+
     user_message = f"""Replace this {meal_type}: "{replaced_meal['name']}"{reason_note}{_lunch_slot_note}
+
+Food constraints — HARD RULES (never violate):
+{swap_constraints_block}
 
 Other meals already in this week (do not repeat):
 Dinners: {", ".join(other_dinners)}
@@ -418,14 +443,13 @@ Return ONLY this JSON structure:
 # Substitute an ingredient
 # ─────────────────────────────────────────────────────────────────────────────
 
-_SUBSTITUTE_SYSTEM = """You are revising a single recipe to remove one disliked ingredient. \
+_SUBSTITUTE_SYSTEM = f"""You are revising a single recipe to remove one disliked ingredient. \
 Replace the named ingredient with the most appropriate substitute that preserves the dish's \
 character, cuisine, and ALL health constraints — the same rules used for full meal generation:
 
-- Uric acid management: avoid organ meats, sardines as a staple, fructose/juice, meat stocks; \
-  encourage dairy, vitamin C foods, cherries.
-- Cholesterol improvement: salmon 2–3x/week, legumes, oats/barley, EVOO, walnuts.
-- Weight loss: high fiber, high protein, low glycemic, olive oil as the primary fat.
+{HEALTH_RULES_SUMMARY}
+
+{PLATE_GEOMETRY_SUMMARY}
 
 Adjust only what the substitution requires: update the `ingredients` array, any affected \
 `instructions`, `health_highlights`, `nutrition_estimate`, `cost_estimate`, and `serving_sizes`. \
@@ -486,11 +510,7 @@ def substitute_ingredient(
     meal = meals[idx]
 
     # Food constraints: hardcoded defaults + active user constraints
-    all_constraints = [
-        "No mushrooms",
-        "No oranges or orange juice",
-        "No fish in lunches",
-    ] + data_store.active_constraints_for_prompt()
+    all_constraints = DEFAULT_CONSTRAINTS + data_store.active_constraints_for_prompt()
 
     # Lunch coherence: if this dinner yields a paired leftover lunch, update it too.
     paired_lunch_idx = None

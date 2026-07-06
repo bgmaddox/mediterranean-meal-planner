@@ -519,6 +519,20 @@ def _cover(week_start: str, summary: dict, dinners: list) -> str:
     veg   = summary.get("vegetarian_meal_count", 0)
     cost  = summary.get("estimated_weekly_grocery_cost_usd")
 
+    # Computed from the dinners themselves (not Claude's summary): weekly
+    # scorecard for the Mediterranean-pattern goals — fiber and plate mix.
+    fibers = [
+        d.get("nutrition_estimate", {}).get("fiber_g")
+        for d in dinners
+    ]
+    fibers = [f for f in fibers if isinstance(f, (int, float))]
+    avg_fiber = round(sum(fibers) / len(fibers)) if fibers else None
+    veg_fwd = sum(
+        1 for d in dinners
+        if d.get("composition") in ("vegetable_forward", "mezze")
+    )
+    has_composition = any(d.get("composition") for d in dinners)
+
     stats_html = (
         f'<div class="pr-summary__stat">'
         f'<span class="pr-summary__val">{fish}</span>'
@@ -530,6 +544,18 @@ def _cover(week_start: str, summary: dict, dinners: list) -> str:
         f'<span class="pr-summary__val">{veg}</span>'
         f'<span class="pr-summary__label">Vegetarian</span></div>'
     )
+    if has_composition:
+        stats_html += (
+            f'<div class="pr-summary__stat">'
+            f'<span class="pr-summary__val">{veg_fwd}</span>'
+            f'<span class="pr-summary__label">Veg-forward</span></div>'
+        )
+    if avg_fiber is not None:
+        stats_html += (
+            f'<div class="pr-summary__stat">'
+            f'<span class="pr-summary__val">{avg_fiber}g</span>'
+            f'<span class="pr-summary__label">Avg fiber</span></div>'
+        )
     if cost:
         stats_html += (
             f'<div class="pr-summary__stat">'
