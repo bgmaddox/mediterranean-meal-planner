@@ -2362,5 +2362,266 @@
     "technique_notes": "Rinse rice until water runs clear, soak 10 min, drain. Toast orzo with onion and garlic in EVOO until colored, then coat rice. Add lemon juice and 2 cups broth, boil, then low covered 15-20 min. Rest covered 5-10 min off heat — do not disturb. Fold in parsley, dill, lemon zest at the end.",
     "source_url": "https://www.themediterraneandish.com/greek-lemon-rice-recipe/",
     "notes_sourced": true
+  },
+  {
+    "id": "sauteed-spinach-lemon",
+    "name": "Sautéed Spinach with Lemon",
+    "cuisine": "Greek",
+    "meal_type": "either",
+    "role": "side",
+    "key_ingredients": [
+      "spinach (1 lb)",
+      "garlic (thinly sliced)",
+      "lemon juice",
+      "extra virgin olive oil"
+    ],
+    "summary": "Ten-minute wilted spinach side — the fastest way to put a half-plate of leafy greens next to any protein.",
+    "technique_notes": "Heat EVOO over medium, sauté sliced garlic just 30 seconds until fragrant. Add spinach in batches, letting each wilt before adding more, 2-3 min total. Off heat, drizzle lemon juice and season — adding lemon off heat keeps it bright and prevents dull army-green spinach. Serve warm or room temperature with lemon wedges.",
+    "source_url": "https://www.mediterraneanliving.com/sauteed-spinach-with-lemon/",
+    "notes_sourced": true
+  },
+  {
+    "id": "lemon-broccoli-pecorino",
+    "name": "Lemon Broccoli with Pecorino",
+    "cuisine": "Italian",
+    "meal_type": "either",
+    "role": "side",
+    "key_ingredients": [
+      "broccoli (2 lbs, florets and stems)",
+      "pecorino romano",
+      "lemon juice",
+      "extra virgin olive oil"
+    ],
+    "summary": "Sheet-pan roasted broccoli with browned edges, finished with lemon and salty pecorino — 6g fiber per serving.",
+    "technique_notes": "Roast at 400F: cut florets, peel stems and slice into 1/4-inch coins so nothing is wasted. Toss with EVOO, salt, pepper on a sheet pan; roast 25-30 min until edges brown and stems pierce easily. Toss with lemon juice while hot, then shower with grated pecorino and serve warm.",
+    "source_url": "https://www.mediterraneanliving.com/lemon-broccoli-with-pecorino/",
+    "notes_sourced": true
+  },
+  {
+    "id": "batata-harra",
+    "name": "Batata Harra (Lebanese Spicy Potatoes)",
+    "cuisine": "Lebanese",
+    "meal_type": "either",
+    "role": "side",
+    "key_ingredients": [
+      "potatoes (cubed)",
+      "garlic",
+      "paprika",
+      "tomato paste",
+      "chili powder",
+      "cilantro"
+    ],
+    "summary": "Crispy spiced potato cubes tossed with garlic, paprika-tomato coating, and fresh cilantro — a mezze-table standard.",
+    "technique_notes": "Crisp 1/2-inch potato cubes in 350F olive oil 3-5 min until golden (or roast for a lighter version); drain well. Separately cook minced garlic in 2 tbsp olive oil until just golden, then toss in potatoes with paprika, tomato paste, and chili powder to coat. Off heat, stir in chopped cilantro and salt.",
+    "source_url": "https://www.mediterraneanliving.com/lebanese-spicy-potatoes-batata-harra/",
+    "notes_sourced": true
+  },
+  {
+    "id": "greek-fava-split-pea-dip",
+    "name": "Greek Fava (Yellow Split Pea Purée)",
+    "cuisine": "Greek",
+    "meal_type": "either",
+    "role": "side",
+    "key_ingredients": [
+      "yellow split peas",
+      "onion",
+      "garlic",
+      "lemon juice",
+      "olive oil",
+      "paprika"
+    ],
+    "summary": "Ikarian legume purée served as a mezze or side — 15g fiber and 14g protein per serving from a handful of pantry ingredients.",
+    "technique_notes": "Simmer rinsed yellow split peas with chopped onion, water covering by a few inches, 30-45 min until thick and mushy; drain any excess. Beat in crushed garlic, lemon juice, and olive oil while warm until thick and blended. Cool, season, garnish with paprika and an EVOO drizzle.",
+    "source_url": "https://www.mediterraneanliving.com/greek-fava/",
+    "notes_sourced": true
+  },
+  {
+    "id": "barley-salad-feta-roasted-vegetables",
+    "name": "Barley Salad with Feta and Roasted Vegetables",
+    "cuisine": "Mediterranean",
+    "meal_type": "lunch",
+    "role": "main",
+    "key_ingredients": [
+      "pearled barley",
+      "cherry tomatoes",
+      "zucchini",
+      "yellow bell pepper",
+      "feta (roasted)",
+      "basil"
+    ],
+    "summary": "Warm grain salad where the feta roasts alongside the vegetables until caramelized; barley's beta-glucan makes it a cholesterol-lowering lunch that packs well.",
+    "technique_notes": "Roast cherry tomatoes, bell pepper, zucchini, and cubed feta together at 425F with EVOO 30-40 min until juices release and caramelize — roasting the feta alongside is the trick. Meanwhile boil pearled barley about 30 min until tender. Combine warm with lemon juice, fold in basil ribbons. Good warm or chilled.",
+    "source_url": "https://www.mediterraneanliving.com/barley-salad-with-feta-and-roasted-vegetables/",
+    "notes_sourced": true
+  },
+  {
+    "id": "ensalada-de-garbanzos",
+    "name": "Ensalada de Garbanzos (Spanish Chickpea Salad)",
+    "cuisine": "Spanish",
+    "meal_type": "lunch",
+    "role": "main",
+    "key_ingredients": [
+      "chickpeas",
+      "cucumber",
+      "red bell pepper",
+      "cherry tomatoes",
+      "capers",
+      "cumin-lemon dressing"
+    ],
+    "summary": "No-cook chickpea salad with a cumin-scented lemon vinaigrette and briny capers — 10g fiber, holds up well made ahead for office lunches.",
+    "technique_notes": "No-cook: toss rinsed canned chickpeas with diced cucumber, red bell pepper, halved cherry tomatoes, red onion, parsley, mint, and capers. Whisk dressing of EVOO, lemon juice, red wine vinegar, and ground cumin — the cumin makes it Spanish. Chill 15 min to meld, adjust seasoning, garnish with crumbled feta.",
+    "source_url": "https://www.mediterraneanliving.com/ensalada-de-garbanzos-chickpea-salad/",
+    "notes_sourced": true
+  },
+  {
+    "id": "greek-chop-chop-salad",
+    "name": "Greek Chop Chop Salad",
+    "cuisine": "Greek",
+    "meal_type": "either",
+    "role": "side",
+    "key_ingredients": [
+      "cucumber",
+      "cherry tomatoes",
+      "romaine",
+      "kalamata olives",
+      "feta",
+      "creamy feta dressing"
+    ],
+    "summary": "Chunky-cut Greek salad with romaine and a creamy feta-yogurt dressing — one bowl, no cooking, five minutes of knife work.",
+    "technique_notes": "Everything cut chunky: thick-sliced quartered cucumber, halved cherry tomatoes, rough-chopped red onion and romaine, halved kalamatas, 1/2-inch feta cubes. Toss gently with fresh mint leaves, a pinch of dried oregano, and creamy feta dressing (blended feta, yogurt, lemon, EVOO). Assemble just before serving so the romaine stays crisp.",
+    "source_url": "https://www.mediterraneanliving.com/greek-chop-chop-salad/",
+    "notes_sourced": true
+  },
+  {
+    "id": "turkish-bulgur-salad-bowl",
+    "name": "Turkish Bulgur Salad Bowl (Kısır-Style)",
+    "cuisine": "Turkish",
+    "meal_type": "lunch",
+    "role": "main",
+    "key_ingredients": [
+      "fine bulgur",
+      "tomato paste",
+      "pomegranate molasses",
+      "lemon juice",
+      "scallions",
+      "parsley"
+    ],
+    "summary": "No-boil bulgur salad dressed with sautéed tomato-paste onions, pomegranate molasses, and lemon — 9g fiber and sturdy enough to pack.",
+    "technique_notes": "Pour 2/3 cup hot water over 1 cup fine bulgur, cover, rest 15 min to absorb — no boiling. Sauté onion translucent, add tomato paste 3 min, then cumin and pepper flakes off heat. Fold into bulgur with pomegranate molasses and lemon juice, then chopped lettuce, scallion, parsley, tomato.",
+    "source_url": "https://www.mediterraneanliving.com/bulgur-salad-bowl/",
+    "notes_sourced": true
+  },
+  {
+    "id": "ikarian-baked-chickpeas-zucchini",
+    "name": "Baked Chickpeas with Zucchini and Fresh Herbs (Ikaria)",
+    "cuisine": "Greek",
+    "meal_type": "dinner",
+    "role": "main",
+    "key_ingredients": [
+      "chickpeas",
+      "zucchini",
+      "carrots",
+      "fresh mint, dill, and parsley",
+      "tomatoes",
+      "extra virgin olive oil"
+    ],
+    "summary": "Ikarian blue-zone bake layering chickpeas over vegetables and three fresh herbs — a massive 24g fiber and 25g protein per serving, no meat needed.",
+    "technique_notes": "Layer quartered carrots and zucchini in a baking dish under mint, dill, parsley, diced onion, chopped tomato, and cooked or canned chickpeas. Add a cup of reserved chickpea broth, EVOO, and salt; bake at 350F about 15 min until golden, then stir and bake again until the top crisps.",
+    "source_url": "https://www.mediterraneanliving.com/baked-chickpeas-with-zucchini-and-fresh-herbs/",
+    "notes_sourced": true
+  },
+  {
+    "id": "chickpea-stew-spinach-dill-turmeric",
+    "name": "Chickpea Stew with Spinach, Dill, and Turmeric",
+    "cuisine": "Mediterranean",
+    "meal_type": "either",
+    "role": "main",
+    "key_ingredients": [
+      "chickpeas",
+      "spinach",
+      "turmeric",
+      "fresh dill and cilantro",
+      "rice",
+      "Greek yogurt (topping)"
+    ],
+    "summary": "One-pot turmeric-golden chickpea stew thickened with a little rice and finished with wilted greens and a cooling yogurt dollop — 12g fiber.",
+    "technique_notes": "Cook onions in EVOO until golden, 7-8 min; bloom garlic, turmeric, pepper flakes 1 min. Add broth, water, and 1/4 cup rice; simmer 10-12 min. Add tomato sauce, diced tomatoes, chickpeas; simmer 10 more. Wilt in spinach, dill, cilantro 3-5 min. Serve topped with a dollop of Greek yogurt.",
+    "source_url": "https://www.mediterraneanliving.com/mediterranean-chickpea-stew-with-spinach-dill-and-turmeric/",
+    "notes_sourced": true
+  },
+  {
+    "id": "creamy-white-beans-lemon-garlic-parmesan",
+    "name": "Creamy White Beans with Lemon, Garlic, and Parmesan",
+    "cuisine": "Italian",
+    "meal_type": "either",
+    "role": "main",
+    "key_ingredients": [
+      "cannellini beans",
+      "garlic (sliced)",
+      "lemon zest and juice",
+      "parmesan",
+      "red pepper flakes",
+      "parsley"
+    ],
+    "summary": "Ten-minute skillet beans that turn creamy from parmesan and starch alone — the fastest legume main in the library; serve over greens or with crusty bread.",
+    "technique_notes": "Ten-minute skillet: sizzle sliced garlic and pepper flakes in EVOO 1-2 min until lightly golden. Add canned cannellini and 1/4 cup broth; simmer gently 5-7 min until slightly reduced. Finish with lemon zest, juice, and grated parmesan stirred in until creamy. Garnish parsley; serve over greens or bread.",
+    "source_url": "https://www.mediterraneanliving.com/creamy-white-beans-with-garlic-lemon-and-parmesan/",
+    "notes_sourced": true
+  },
+  {
+    "id": "italian-lentil-soup-rosemary-leek",
+    "name": "Italian Lentil Soup with Rosemary Oil and Roasted Leek",
+    "cuisine": "Italian",
+    "meal_type": "dinner",
+    "role": "main",
+    "key_ingredients": [
+      "green lentils",
+      "leeks (roasted)",
+      "rosemary oil",
+      "carrots and celery",
+      "vegetable broth"
+    ],
+    "summary": "Half-blended lentil soup — creamy but textured — crowned with a caramelized roasted leek half and rosemary oil; 17g fiber per bowl.",
+    "technique_notes": "Soften onion, carrot, celery 5 min in EVOO; add garlic, then green lentils, broth, bay leaf. Simmer 30-40 min until tender. Remove half the lentils, blend the rest smooth, stir the whole ones back — creamy but textured. Top with roasted leek halves (400F, 15-20 min) and rosemary-infused oil.",
+    "source_url": "https://www.mediterraneanliving.com/italian-lentil-soup-with-rosemary-oil-and-roasted-leek/",
+    "notes_sourced": true
+  },
+  {
+    "id": "ikarian-soufico",
+    "name": "Soufico (Ikarian Layered Vegetable Casserole)",
+    "cuisine": "Greek",
+    "meal_type": "dinner",
+    "role": "main",
+    "key_ingredients": [
+      "eggplant",
+      "zucchini",
+      "green bell peppers",
+      "potatoes",
+      "grated tomatoes",
+      "oregano"
+    ],
+    "summary": "Ikaria's answer to ratatouille from Diane Kochilas: salted, pre-softened vegetables layered with grated tomato and baked until melting — a vegetable-forward centerpiece.",
+    "technique_notes": "Salt eggplant, peppers, and zucchini in colanders 1 hour; wipe dry without rinsing. Lightly sauté (or oven-soften at 350F) each vegetable separately, plus onion-garlic. Layer in a Dutch oven with grated tomato, oregano, and salt between layers, pressing down each time. Drizzle EVOO on top; bake 350F 45-60 min until caramelized.",
+    "source_url": "https://www.mediterraneanliving.com/eggplant-casserole-ikarian-soufico/",
+    "notes_sourced": true
+  },
+  {
+    "id": "greek-artichokes-peas-potatoes",
+    "name": "Greek Artichokes, Green Peas, and Potatoes (Anginares Lathera)",
+    "cuisine": "Greek",
+    "meal_type": "dinner",
+    "role": "main",
+    "key_ingredients": [
+      "artichoke hearts",
+      "green peas",
+      "potatoes",
+      "fresh dill (1/2 cup)",
+      "lemon juice",
+      "extra virgin olive oil"
+    ],
+    "summary": "Classic Cretan lathera: artichokes, peas, and potatoes braised in a lemony dill-olive oil broth that thickens into the sauce — two legume-vegetables in one pot.",
+    "technique_notes": "Sauté artichoke hearts, green onions, and carrot rounds in EVOO 5 min. Add chopped dill, quartered potatoes, 1/2 cup lemon juice, and 2 cups water; simmer 20 min. Add peas for 10 more. Finish with a cornstarch slurry boiled 2 min to lightly thicken the lemony braising liquid into sauce.",
+    "source_url": "https://www.mediterraneanliving.com/artichokes-green-peas-and-potatoes/",
+    "notes_sourced": true
   }
 ]
