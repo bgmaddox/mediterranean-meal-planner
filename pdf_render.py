@@ -829,6 +829,21 @@ def _prep_section(tasks: list) -> str:
     return cards
 
 
+def _snacks_section(snacks: list) -> str:
+    """Snack suggestions appended below the Sunday Prep cards (same page)."""
+    if not snacks:
+        return ""
+    cards = '<div class="pr-section" style="margin-top:14pt;">SNACKS</div>'
+    for snack in snacks:
+        cards += (
+            '<div class="pr-prep">'
+            f'<div class="pr-prep__task">{_e(snack.get("name", ""))}</div>'
+            f'<div class="pr-prep__storage">{_e(snack.get("description", ""))}</div>'
+            '</div>'
+        )
+    return cards
+
+
 def _shopping(sections: dict[str, list]) -> str:
     if not sections:
         return ""
@@ -869,6 +884,7 @@ def build_html(
     dinners  = week_plan.get("dinners") or []
     lunches  = week_plan.get("lunches") or []
     prep     = week_plan.get("sunday_prep_list") or []
+    snacks   = week_plan.get("snacks") or []
     summary  = week_plan.get("week_summary") or {}
 
     # Dinners — each gets its own page via .pr-meal--dinner CSS; section banner
@@ -890,6 +906,7 @@ def build_html(
         + lunches_html
         + '<div class="pr-section page-break">SUNDAY PREP</div>'
         + _prep_section(prep)
+        + _snacks_section(snacks)
         + '<div class="pr-section page-break">SHOPPING LIST</div>'
         + _shopping(shopping_sections)
     )

@@ -225,6 +225,20 @@ OUTPUT_SCHEMA = {
                 "storage": "string"
             }
         ],
+        "snacks": [
+            {
+                "name": "string — e.g. 'Greek yogurt with cherries and walnuts'",
+                "description": "string — 1-2 sentences: how to assemble it and why it fits the health goals",
+                "ingredients": [
+                    {
+                        "name": "string",
+                        "quantity": "string",
+                        "unit": "string",
+                        "pantry_staple": "boolean"
+                    }
+                ]
+            }
+        ],
         "week_summary": {
             "fish_meal_count": "integer",
             "red_meat_meal_count": "integer",
@@ -309,6 +323,7 @@ def build_system_prompt(
     use_up_ingredients: Optional[str] = None,
     days: int = 5,
     anchor_recipes: list[dict] | None = None,
+    include_snacks: bool = True,
 ) -> str:
     """
     Build the full system prompt for weekly meal plan generation.
@@ -556,8 +571,32 @@ def build_system_prompt(
         "Kid portions should be roughly half of adult portions. For lunches, kid_portion can be an empty string."
     ) if has_kids else "kid_portion should always be an empty string."
 
+    _snacks_rules_block = (
+        """
+## Snacks — 2–3 suggestions for the week
+Weight loss fails between meals, not at them. Suggest 2–3 simple snacks (a `snacks` array in the JSON) \
+that bridge the gap between the planned lunch+dinner calories and the full daily target. These are \
+assemblies, not recipes — no instructions, no nutrition estimate, just a name, a 1–2 sentence description, \
+and an ingredients list (which feeds the shopping list; mark pantry staples).
+- Lean on the snacks that actively serve the health goals: **Greek yogurt** (lowers uric acid) with fruit or \
+walnuts, **cherries** (clinical evidence for uric acid), **hummus or another legume dip with cut vegetables**, \
+a small handful of **walnuts or almonds** with fruit, olives + feta + cucumber.
+- Portion-aware: each snack should be roughly 100–200 kcal as described.
+- No added-sugar snacks, no juice, no processed snack foods. Fresh fruit is fine; fruit juice is not.
+- At least one should be zero-prep (grab-and-eat); Sunday-preppable snacks (cut vegetables, portioned yogurt) are welcome."""
+        if include_snacks else ""
+    )
+
+    _snacks_output_rule = (
+        "13. `snacks` is required: 2–3 snack suggestions following the Snacks rules. "
+        "Ingredients listed with quantities for the week so they can be shopped.\n"
+        if include_snacks else ""
+    )
+
     import copy
     schema_with_kids = copy.deepcopy(OUTPUT_SCHEMA)
+    if not include_snacks:
+        schema_with_kids["week_plan"].pop("snacks", None)
     schema_with_kids["week_plan"]["dinners"][0]["servings"]["kids"] = kids_count
     schema_with_kids["week_plan"]["dinners"][0]["id"] = f"string — 'd1' through 'd{days}'"
     schema_with_kids["week_plan"]["lunches"][0]["id"] = f"string — 'l1' through 'l{days}'"
@@ -627,7 +666,7 @@ curry), and beyond.
 - **No organ meats, no processed meats, no deep-fried food.**
 
 ## Meal Composition — vary the structure across the week
-Do not default every dinner to the same plate shape. Rotate among three archetypes: (1) **Classic plate** — protein + vegetables + optional whole grain/starch (valid, but not the only mode). (2) **Vegetable-forward** — a vegetable dish is the centerpiece with protein and/or grain secondary or folded in (e.g. white-bean-and-greens braise, stuffed vegetables, chickpea-and-vegetable tagine over a little couscous), with legumes, eggs, and dairy carrying the protein. (3) **Mezze / small-plate spread** — 3–4 smaller dishes served tapas-style (e.g. a dip + a vegetable dish + a legume dish + a small protein) instead of one plated entrée. At least 2 dinners should be vegetable-forward or mezze-style, not all classic plates (scale gently: ≥1 for a 3-day week, ≥2 for a 5+-day week). On those nights a grain is **optional**.
+Do not default every dinner to the same plate shape. Rotate among three archetypes: (1) **Classic plate** — protein + vegetables + optional whole grain/starch (valid, but not the only mode). (2) **Vegetable-forward** — a vegetable dish is the centerpiece with protein and/or grain secondary or folded in (e.g. white-bean-and-greens braise, stuffed vegetables, chickpea-and-vegetable tagine over a little couscous), with legumes, eggs, and dairy carrying the protein. This is the Greek **lathera** tradition — vegetables braised in generous olive oil served as the main course — and the named dishes from the longest-lived Mediterranean populations are your models: briam and soufico (layered baked vegetables), fasolakia yiahni (green bean stew), anginares à la polita (artichokes, peas, and potatoes in lemon-dill broth), imam bayildi (braised stuffed eggplant). Feta, Greek yogurt, or crusty bread traditionally completes the protein. (3) **Mezze / small-plate spread** — 3–4 smaller dishes served tapas-style (e.g. a dip + a vegetable dish + a legume dish + a small protein) instead of one plated entrée. At least 2 dinners should be vegetable-forward or mezze-style, not all classic plates (scale gently: ≥1 for a 3-day week, ≥2 for a 5+-day week). On those nights a grain is **optional**.
 
 Label every dinner with its archetype in the `composition` field (`classic`, `vegetable_forward`, or `mezze`) — the app validates that the week meets the mix above.
 
@@ -738,6 +777,7 @@ The following equipment is available. Use whatever makes the best recipe — do 
 - Only items that hold well for 5 days without degrading.
 - Good: cooked grains, marinated raw protein (2–3 days), sauces (tzatziki, hummus), roasted garlic.
 - Avoid: cooked fish, couscous, dressed salads.
+{_snacks_rules_block}
 
 ---
 
@@ -807,4 +847,4 @@ The response must begin with `{{` and end with `}}`.
 Base adult portions on a ~500–550 kcal dinner for weight loss. Portion guidance per adult: **3–4 oz cooked for a main animal protein (fish may be 4–5 oz)**, **1.5–2+ cups vegetables total — on classic plates split across two vegetable components**, ~1/2 cup cooked grain when a grain is included at all, smaller portions for mezze plates. Vegetables are the volume of the meal; do not compensate for a smaller protein with more grain. \
 {_kid_portion_sentence}
 12. `composition` is required on every dinner: 'classic', 'vegetable_forward', or 'mezze'. The week must include at least {"1" if days < 5 else "2"} vegetable_forward or mezze dinner{"" if days < 5 else "s"}.
-"""
+{_snacks_output_rule}"""

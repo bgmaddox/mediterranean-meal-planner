@@ -788,6 +788,15 @@ with tab_generate:
         else:
             st.caption("No Sunday prep suggested for this week.")
 
+        # ── Snacks ────────────────────────────────────────────────────────────
+        snacks = plan.get("snacks") or []
+        if snacks:
+            st.divider()
+            _section_header("This Week's Snacks", "box")
+            st.caption("Simple between-meal options aligned with the health goals. Ingredients are already on the shopping list.")
+            for snack in snacks:
+                st.markdown(f"**{snack.get('name', 'Snack')}**  \n{snack.get('description', '')}")
+
     else:
         st.info("Click **Generate Week** above to create this week's meal plan.")
 
@@ -1081,12 +1090,23 @@ def _settings_fragment():
         ),
     )
 
+    include_snacks = st.checkbox(
+        "Include weekly snack suggestions",
+        value=prefs.get("include_snacks", True),
+        help=(
+            "When on, each plan includes 2–3 simple snack suggestions (Greek yogurt with "
+            "cherries, hummus with vegetables, etc.) aligned with the health goals. Their "
+            "ingredients are added to the shopping list."
+        ),
+    )
+
     if st.button("Save Meal Planning Preferences"):
         data_store.update_preferences(
             lunch_adult_count=int(lunch_count),
             budget=budget_input.strip() if budget_input.strip() else None,
             portion_scale=_portion_options[portion_label],
             use_anchor_recipes=bool(use_anchors),
+            include_snacks=bool(include_snacks),
         )
         st.success("Saved.")
 

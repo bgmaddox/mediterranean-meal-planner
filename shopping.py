@@ -116,13 +116,15 @@ def build_shopping_list(
         and Pantry Staples (check stock)). Values are lists of ShoppingItem, sorted
         alphabetically within each section. Duplicate ingredients are merged.
     """
-    # Collect all ingredients (dinners + lunches)
+    # Collect all ingredients (dinners + lunches + snacks)
     all_ingredients = []
     for dinner in week_plan.get("dinners", []):
         all_ingredients.extend(dinner.get("ingredients", []))
     for lunch in week_plan.get("lunches", []):
         if lunch.get("source") != "leftover":
             all_ingredients.extend(lunch.get("ingredients", []))
+    for snack in week_plan.get("snacks", []) or []:
+        all_ingredients.extend(snack.get("ingredients", []))
 
     # Deduplicate non-pantry and pantry ingredients separately
     seen: dict[str, ShoppingItem] = {}

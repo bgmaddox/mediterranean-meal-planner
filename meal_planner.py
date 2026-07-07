@@ -105,6 +105,7 @@ def build_generation_prompts(
         use_up_ingredients=use_up_ingredients,
         days=days,
         anchor_recipes=anchor_recipes,
+        include_snacks=prefs.get("include_snacks", True),
     )
     require_kid = bool(prefs.get("children"))
     return system_prompt, _DEFAULT_USER_MESSAGE, require_kid
