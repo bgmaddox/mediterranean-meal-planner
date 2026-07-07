@@ -450,7 +450,8 @@ def build_system_prompt(
             ings = ", ".join(r.get("key_ingredients", []))
             cuisine = r.get("cuisine", "")
             mtype = r.get("meal_type", "either")
-            line = f"  - {r['name']} ({cuisine}, {mtype})"
+            star = "⭐ " if r.get("matches_use_up") else ""
+            line = f"  - {star}{r['name']} ({cuisine}, {mtype})"
             if ings:
                 line += f" — key: {ings}"
             if r.get("summary"):
@@ -473,6 +474,13 @@ def build_system_prompt(
             "cut/time an ingredient so it cooks evenly). Follow it for the relevant ingredients in "
             "your `instructions` — adapting only as far as your swaps require — rather than improvising "
             "or inventing a plausible-sounding method.\n\n"
+            + (
+                "Anchors marked ⭐ feature ingredients the user needs to use up this week — "
+                "strongly prefer adapting one of those for the meals that consume them, rather "
+                "than forcing the ingredient into an unrelated recipe.\n\n"
+                if any(r.get("matches_use_up") for r in anchor_recipes)
+                else ""
+            )
             + "\n".join(lines)
         )
     else:

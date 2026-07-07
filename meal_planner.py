@@ -87,7 +87,7 @@ def build_generation_prompts(
     """
     prefs = data_store.load_preferences()
     anchor_recipes = (
-        data_store.select_anchor_recipes(days=days)
+        data_store.select_anchor_recipes(days=days, use_up_ingredients=use_up_ingredients)
         if prefs.get("use_anchor_recipes", True)
         else None
     )

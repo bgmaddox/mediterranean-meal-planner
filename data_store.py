@@ -435,7 +435,48 @@ def delete_anchor_recipe(recipe_id: str) -> bool:
     return True
 
 
-def select_anchor_recipes(count: int = 10, days: int = 5) -> list[AnchorRecipe]:
+def _parse_use_up_terms(use_up_ingredients: str) -> list[str]:
+    """Split the free-text use-up box into lowercase search terms."""
+    raw = re.split(r"[\n,;]+", use_up_ingredients.lower())
+    return [t.strip() for t in raw if t.strip()]
+
+
+def _match_words(text: str) -> set[str]:
+    """Lowercase words for ingredient matching: alpha-only, singularized, len >= 3."""
+    words = re.findall(r"[a-z]+", text.lower())
+    out = set()
+    for w in words:
+        if len(w) < 3:
+            continue
+        out.add(w)
+        if w.endswith("s") and len(w) > 3:
+            out.add(w[:-1])
+    return out
+
+
+def _anchor_matches_terms(anchor: AnchorRecipe, terms: list[str]) -> bool:
+    """
+    True if any use-up term matches the anchor's key ingredients or name.
+
+    Word-level containment in either direction, so "chicken" matches
+    "chicken thighs" and "half bag of spinach" matches "spinach" — but
+    "eggplant" does NOT match "egg" (whole words only, plural-tolerant).
+    """
+    haystacks = [_match_words(i) for i in anchor.get("key_ingredients", [])]
+    haystacks.append(_match_words(anchor.get("name", "")))
+    for term in terms:
+        term_words = _match_words(term)
+        if not term_words:
+            continue
+        for hay in haystacks:
+            if hay and (term_words <= hay or hay <= term_words):
+                return True
+    return False
+
+
+def select_anchor_recipes(
+    count: int = 10, days: int = 5, use_up_ingredients: str | None = None
+) -> list[AnchorRecipe]:
     """
     Return a rotating random sample of anchor recipes to inject as inspiration.
 
@@ -452,17 +493,33 @@ def select_anchor_recipes(count: int = 10, days: int = 5) -> list[AnchorRecipe]:
     days : int
         Days being planned; used to scale the sample up a little for longer weeks
         and to set how many side slots to reserve.
+    use_up_ingredients : str | None
+        Free text from the "ingredients to use up" box. When given, up to 3
+        anchors featuring those ingredients are guaranteed into the sample and
+        flagged with ``matches_use_up: True`` so the prompt can highlight them.
     """
     anchors = load_anchor_recipes()
     if not anchors:
         return []
 
+    target = min(max(count, days + 3), len(anchors))
+
+    # Guarantee anchors that feature use-up ingredients a spot in the sample.
+    matched: list[AnchorRecipe] = []
+    if use_up_ingredients and use_up_ingredients.strip():
+        terms = _parse_use_up_terms(use_up_ingredients)
+        matched_pool = [a for a in anchors if _anchor_matches_terms(a, terms)]
+        matched = random.sample(matched_pool, min(3, len(matched_pool)))
+        for a in matched:
+            a["matches_use_up"] = True
+        matched_ids = {a["id"] for a in matched}
+        anchors = [a for a in anchors if a["id"] not in matched_ids]
+        target = max(target - len(matched), 0)
+
     # Split into three pools: dinner mains, lunch-only, and side/mezze.
     sides = [a for a in anchors if a.get("role") == "side"]
     dinner_pool = [a for a in anchors if a.get("role") != "side" and a.get("meal_type") in ("dinner", "either")]
     lunch_only = [a for a in anchors if a.get("role") != "side" and a.get("meal_type") == "lunch"]
-
-    target = min(max(count, days + 3), len(anchors))
 
     # Reserve 2-3 side slots, scaling with days (max(2, days // 2)), capped at pool size.
     side_slots = min(len(sides), max(2, days // 2))
@@ -472,7 +529,8 @@ def select_anchor_recipes(count: int = 10, days: int = 5) -> list[AnchorRecipe]:
     lunch_slots = min(len(lunch_only), max(1, remaining // 4))
     dinner_slots = max(remaining - lunch_slots, 0)
 
-    sample = random.sample(dinner_pool, min(dinner_slots, len(dinner_pool)))
+    sample = matched.copy()
+    sample += random.sample(dinner_pool, min(dinner_slots, len(dinner_pool)))
     sample += random.sample(lunch_only, min(lunch_slots, len(lunch_only)))
     sample += random.sample(sides, min(side_slots, len(sides)))
     random.shuffle(sample)
