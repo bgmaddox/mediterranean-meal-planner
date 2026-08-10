@@ -2623,5 +2623,897 @@
     "technique_notes": "Sauté artichoke hearts, green onions, and carrot rounds in EVOO 5 min. Add chopped dill, quartered potatoes, 1/2 cup lemon juice, and 2 cups water; simmer 20 min. Add peas for 10 more. Finish with a cornstarch slurry boiled 2 min to lightly thicken the lemony braising liquid into sauce.",
     "source_url": "https://www.mediterraneanliving.com/artichokes-green-peas-and-potatoes/",
     "notes_sourced": true
+  },
+  {
+    "id": "poy-lentil-greek-salad",
+    "name": "Lentil Greek Salad with Dill Yogurt",
+    "cuisine": "Greek",
+    "meal_type": "lunch",
+    "role": "main",
+    "key_ingredients": [
+      "lentils",
+      "cherry tomatoes",
+      "cucumber",
+      "greek yogurt",
+      "dill"
+    ],
+    "summary": "Cooked lentils layered with tomato, cucumber and a garlicky dill-yogurt sauce, assembled cold.",
+    "technique_notes": "Build as separate meal-prep components and dress only at eating time — the salad waters out once tossed. Cook lentils barely tender (Instant Pot: 1 cup lentils to 3 cups water, 3 min high pressure, quick release, drain) so they hold shape cold. Dress with olive oil, lemon and a pinch of salt just before eating.",
+    "source_url": "https://pinchofyum.com/lentil-greek-salads-with-dill-sauce",
+    "notes_sourced": true,
+    "nutrition": {
+      "calories": 278,
+      "protein_g": 27.3,
+      "fiber_g": 10.9,
+      "fat_g": 6.9,
+      "saturated_fat_g": 2.0,
+      "sodium_mg": 436,
+      "servings": 4
+    }
+  },
+  {
+    "id": "poy-baked-salmon-lentils",
+    "name": "Baked Salmon over Lentils with Lemon Herb Sauce",
+    "cuisine": "Mediterranean",
+    "meal_type": "dinner",
+    "role": "main",
+    "key_ingredients": [
+      "salmon",
+      "black lentils",
+      "quinoa",
+      "green beans",
+      "lemon",
+      "parsley"
+    ],
+    "summary": "Lentils and quinoa oven-baked in broth, then salmon and vegetables roasted directly on top.",
+    "technique_notes": "Bake rinsed lentils and quinoa in broth at 450°F for 45-50 minutes until almost cooked, then fluff. Lay salmon skin-side down on top with quick-cooking vegetables and return for ~10 minutes. Dense vegetables like sweet potato must be par-boiled first — 10 minutes will not cook them. Reserve half the lemon dressing to finish raw.",
+    "source_url": "https://pinchofyum.com/perfect-baked-salmon-lentils",
+    "notes_sourced": true,
+    "nutrition": {
+      "calories": 501,
+      "protein_g": 29.2,
+      "fiber_g": 12.9,
+      "fat_g": 24.4,
+      "saturated_fat_g": 3.6,
+      "sodium_mg": 192,
+      "servings": 6
+    }
+  },
+  {
+    "id": "poy-cauliflower-chickpea-salad",
+    "name": "Cauliflower Rice Salad with Crispy Chickpeas",
+    "cuisine": "Mediterranean",
+    "meal_type": "either",
+    "role": "side",
+    "key_ingredients": [
+      "cauliflower",
+      "chickpeas",
+      "parsley",
+      "dijon mustard",
+      "lemon"
+    ],
+    "summary": "Raw cauliflower pulsed into rice, tossed with roasted crispy chickpeas and a mustard-lemon dressing.",
+    "technique_notes": "Roast oiled, spiced chickpeas at 400°F for 20-30 minutes until genuinely crisp and browned. Pulse cauliflower florets in a food processor about 20-30 pulses to a rice texture — work in batches or it turns to paste. Keep components separate until serving; once dressed it softens fast. Reserve some chickpeas to scatter on top.",
+    "source_url": "https://pinchofyum.com/spring-detox-cauliflower-salad",
+    "notes_sourced": true,
+    "nutrition": {
+      "calories": 484,
+      "protein_g": 10.8,
+      "fiber_g": 16.7,
+      "fat_g": 31.7,
+      "saturated_fat_g": 5.3,
+      "sodium_mg": 259,
+      "servings": 4
+    }
+  },
+  {
+    "id": "poy-lentil-vegetable-soup",
+    "name": "Slow Cooker Lentil and Butternut Soup",
+    "cuisine": "Mediterranean",
+    "meal_type": "either",
+    "role": "main",
+    "key_ingredients": [
+      "green lentils",
+      "yellow split peas",
+      "butternut squash",
+      "kale",
+      "carrots",
+      "celery"
+    ],
+    "summary": "Lentils, split peas and squash slow-cooked, then partly blended with olive oil for a creamy body.",
+    "technique_notes": "Cook everything except greens 5-6 hours on high or 7-8 on low. Blend ~4 cups of the soup with the olive oil and return it — the oil emulsifies into the starch and creates creaminess without dairy. Stir kale and parsley in off-heat. Finish with vinegar or lemon; flavor and texture improve on resting. Instant Pot: 6-7 cups broth, soup setting, 30 min.",
+    "source_url": "https://pinchofyum.com/the-best-detox-crockpot-lentil-soup",
+    "notes_sourced": true,
+    "nutrition": {
+      "calories": 319,
+      "protein_g": 10.8,
+      "fiber_g": 13.2,
+      "fat_g": 14.8,
+      "saturated_fat_g": 2.1,
+      "sodium_mg": 768,
+      "servings": 8
+    }
+  },
+  {
+    "id": "poy-sheet-pan-chicken-pitas",
+    "name": "Sheet Pan Spiced Chicken with Tzatziki and Peppers",
+    "cuisine": "Greek",
+    "meal_type": "dinner",
+    "role": "main",
+    "key_ingredients": [
+      "chicken breast",
+      "bell peppers",
+      "greek yogurt",
+      "cucumber",
+      "lemon",
+      "feta"
+    ],
+    "summary": "Cumin-paprika chicken and peppers roasted on one sheet pan, served family-style for building pitas or bowls.",
+    "technique_notes": "Peppers need a head start: roast at 425°F for 20 minutes, stir and push to one side, then add marinated chicken to the empty side and roast 10 minutes more. Marinate the chicken at least 30 minutes (up to 24 hours). Squeeze grated cucumber dry before it goes into the tzatziki or the sauce turns watery.",
+    "source_url": "https://pinchofyum.com/sheet-pan-chicken-pitas",
+    "notes_sourced": true,
+    "nutrition": {
+      "calories": 529,
+      "protein_g": 32.1,
+      "fiber_g": 4.1,
+      "fat_g": 20.1,
+      "saturated_fat_g": 5.6,
+      "sodium_mg": 1183,
+      "servings": 4
+    }
+  },
+  {
+    "id": "poy-cauliflower-hummus-bowls",
+    "name": "Roasted Cauliflower over Whipped Hummus",
+    "cuisine": "Levantine",
+    "meal_type": "either",
+    "role": "main",
+    "key_ingredients": [
+      "cauliflower",
+      "chickpeas",
+      "lemon",
+      "garlic",
+      "parsley",
+      "tomato"
+    ],
+    "summary": "Spiced roasted cauliflower spooned over a thick swoop of homemade lemon-garlic hummus.",
+    "technique_notes": "Roast spiced cauliflower at 425°F for 25-30 minutes. For genuinely smooth hummus, peel the skins off the chickpeas before blending (~20 minutes, but it is the whole difference) and blend far longer than feels necessary. Tahini is optional — oil, garlic, salt and plenty of lemon carry it. Serve hot or cold.",
+    "source_url": "https://pinchofyum.com/roasted-cauliflower-hummus-bowls",
+    "notes_sourced": true,
+    "nutrition": {
+      "calories": 319,
+      "protein_g": 11.0,
+      "fiber_g": 10.5,
+      "fat_g": 17.3,
+      "saturated_fat_g": 2.5,
+      "sodium_mg": 1014,
+      "servings": 4
+    }
+  },
+  {
+    "id": "poy-pearl-couscous-skillet",
+    "name": "Pearl Couscous Skillet with Tomatoes and Chickpeas",
+    "cuisine": "Mediterranean",
+    "meal_type": "dinner",
+    "role": "main",
+    "key_ingredients": [
+      "pearl couscous",
+      "chickpeas",
+      "canned tomatoes",
+      "kale",
+      "feta",
+      "mint"
+    ],
+    "summary": "One-skillet braise of chickpeas and tomatoes with pearl couscous cooked directly in the sauce.",
+    "technique_notes": "Soften shallot with cumin ~5 minutes, then mash some of the chickpeas against the pan — this is what makes the dish creamy rather than brothy. Add couscous with the liquid, cover and hold on low 6-8 minutes to al dente. It keeps absorbing liquid as it sits, so serve promptly or loosen with water when reheating.",
+    "source_url": "https://pinchofyum.com/couscous-skillet-with-tomatoes-chickpeas-and-feta",
+    "notes_sourced": true,
+    "nutrition": {
+      "calories": 497,
+      "protein_g": 12.9,
+      "fiber_g": 9.9,
+      "fat_g": 26.7,
+      "saturated_fat_g": 3.7,
+      "sodium_mg": 1840,
+      "servings": 2
+    }
+  },
+  {
+    "id": "poy-greek-baked-orzo",
+    "name": "Greek Baked Orzo with Kale and Feta",
+    "cuisine": "Greek",
+    "meal_type": "dinner",
+    "role": "main",
+    "key_ingredients": [
+      "orzo",
+      "kale",
+      "fire-roasted tomatoes",
+      "chickpeas",
+      "feta",
+      "oregano",
+      "dill"
+    ],
+    "summary": "Orzo simmered with kale and tomato in an oven-safe skillet, finished under feta in the oven.",
+    "technique_notes": "Build in layers on the stove: onion 5 minutes, then garlic/pepper/kale/oregano 5 minutes until wilted, then tomato paste 1-2 minutes to caramelize before any liquid. Add orzo, tomatoes, protein and broth, bring to a simmer, then bake at 400°F only 10-15 minutes. Orzo sticks to enameled cast iron — release it with gentle spatula pressure. Finish with lemon and dill off-heat.",
+    "source_url": "https://pinchofyum.com/greek-baked-orzo",
+    "notes_sourced": true,
+    "nutrition": {
+      "calories": 276,
+      "protein_g": 14.4,
+      "fiber_g": 3.2,
+      "fat_g": 7.7,
+      "saturated_fat_g": 1.4,
+      "sodium_mg": 500,
+      "servings": 4
+    }
+  },
+  {
+    "id": "poy-couscous-summer-salad",
+    "name": "Couscous Salad with Stone Fruit and Chickpeas",
+    "cuisine": "Mediterranean",
+    "meal_type": "lunch",
+    "role": "main",
+    "key_ingredients": [
+      "couscous",
+      "chickpeas",
+      "nectarines",
+      "cucumber",
+      "dried cherries",
+      "pepitas"
+    ],
+    "summary": "Couscous steeped in warm spiced broth, tossed cold with chickpeas, stone fruit and crunchy seeds.",
+    "technique_notes": "Combine dry couscous with the cherries, cumin and coriander first, then pour warm broth over and let stand ~5 minutes off-heat — steeping in seasoned liquid flavors the grain from the inside. Cool fully before adding the fresh produce or it wilts. Keeps about a day dressed; for longer prep hold components separate.",
+    "source_url": "https://pinchofyum.com/couscous-summer-salad",
+    "notes_sourced": true,
+    "nutrition": {
+      "calories": 466,
+      "protein_g": 13.1,
+      "fiber_g": 8.9,
+      "fat_g": 20.3,
+      "saturated_fat_g": 3.1,
+      "sodium_mg": 230,
+      "servings": 6
+    }
+  },
+  {
+    "id": "poy-squash-kale-salad",
+    "name": "Butternut and Kale Salad with Roasted Garlic Dressing",
+    "cuisine": "Mediterranean",
+    "meal_type": "either",
+    "role": "side",
+    "key_ingredients": [
+      "butternut squash",
+      "kale",
+      "chickpeas",
+      "apple",
+      "pepitas",
+      "garlic"
+    ],
+    "summary": "Squash and chickpeas roasted with a foil packet of garlic that becomes the dressing base.",
+    "technique_notes": "Roast squash and chickpeas at 425°F for 30-40 minutes with garlic cloves sealed in an oiled foil packet on the same pan; mash the softened garlic into the lemon-oil dressing. Massage the kale with a little dressing until it darkens and relaxes before adding anything else. Serve warm or cold.",
+    "source_url": "https://pinchofyum.com/squash-salad-with-kale",
+    "notes_sourced": true,
+    "nutrition": {
+      "calories": 412,
+      "protein_g": 8.3,
+      "fiber_g": 6.7,
+      "fat_g": 28.0,
+      "saturated_fat_g": 4.1,
+      "sodium_mg": 593,
+      "servings": 6
+    }
+  },
+  {
+    "id": "poy-maple-dijon-brussels",
+    "name": "Roasted Brussels Sprouts with Walnuts and Dijon",
+    "cuisine": "Mediterranean",
+    "meal_type": "either",
+    "role": "side",
+    "key_ingredients": [
+      "brussels sprouts",
+      "walnuts",
+      "dried cranberries",
+      "dijon mustard"
+    ],
+    "summary": "Brussels roasted cut-side down until deeply browned, then glazed with mustard and toasted walnuts.",
+    "technique_notes": "Place halved sprouts cut-side down directly on the sheet pan — contact with hot metal is what browns them — and roast at 425°F for 15-20 minutes until the cut faces are very dark and loose leaves crisp. Add walnuts and the mustard glaze for the last 5-10 minutes. Toss cranberries in off-heat so they don't scorch.",
+    "source_url": "https://pinchofyum.com/house-favorite-brussels-sprouts",
+    "notes_sourced": true,
+    "nutrition": {
+      "calories": 216,
+      "protein_g": 5.0,
+      "fiber_g": 5.4,
+      "fat_g": 12.2,
+      "saturated_fat_g": 1.5,
+      "sodium_mg": 369,
+      "servings": 3
+    }
+  },
+  {
+    "id": "poy-baked-lentil-falafel",
+    "name": "Baked Lentil Falafel",
+    "cuisine": "Levantine",
+    "meal_type": "either",
+    "role": "side",
+    "key_ingredients": [
+      "lentils",
+      "cilantro",
+      "parsley",
+      "jalapeño",
+      "garlic",
+      "lemon"
+    ],
+    "summary": "Herb-heavy lentil patties pulsed in a food processor and baked rather than fried.",
+    "technique_notes": "Use lentils cooked barely tender — overcooked ones make a wet, heavy patty. Pulse everything but the flour to semi-dry crumbles that just hold when pressed, then add flour one tablespoon at a time only until handleable. Form 9 patties and bake at 350°F for 18 minutes. Freezes well.",
+    "source_url": "https://pinchofyum.com/simple-6-ingredient-baked-falafel",
+    "notes_sourced": true,
+    "nutrition": {
+      "calories": 140,
+      "protein_g": 8.3,
+      "fiber_g": 3.8,
+      "fat_g": 2.6,
+      "saturated_fat_g": 0.4,
+      "sodium_mg": 201,
+      "servings": 9
+    }
+  },
+  {
+    "id": "poy-harissa-chickpeas",
+    "name": "Harissa Chickpeas with Whipped Feta",
+    "cuisine": "North African",
+    "meal_type": "either",
+    "role": "main",
+    "key_ingredients": [
+      "chickpeas",
+      "harissa",
+      "fire-roasted tomatoes",
+      "feta",
+      "golden raisins",
+      "parsley"
+    ],
+    "summary": "Chickpeas simmered in harissa and tomato, partly mashed, served under whipped feta.",
+    "technique_notes": "Bloom harissa and garlic in oil 1-2 minutes before the tomatoes go in — raw harissa tastes flat. Simmer with chickpeas 4-5 minutes, then mash some against the pan for creaminess. Whip feta with yogurt and a little water until spreadable. Very high sodium as written: rinse the chickpeas well, skip added salt, and cut the feta back.",
+    "source_url": "https://pinchofyum.com/harissa-chickpeas-with-whipped-feta",
+    "notes_sourced": true,
+    "nutrition": {
+      "calories": 559,
+      "protein_g": 22.1,
+      "fiber_g": 15.6,
+      "fat_g": 20.0,
+      "saturated_fat_g": 6.6,
+      "sodium_mg": 2074,
+      "servings": 4
+    }
+  },
+  {
+    "id": "poy-sunshine-lentil-bowls",
+    "name": "Lentil Bowls with Garlic Olive Oil Dressing",
+    "cuisine": "Mediterranean",
+    "meal_type": "either",
+    "role": "main",
+    "key_ingredients": [
+      "lentils",
+      "potatoes",
+      "green beans",
+      "eggs",
+      "goat cheese",
+      "dill"
+    ],
+    "summary": "Meal-prep bowls of lentils, roasted potato and green beans finished with soft herbed eggs.",
+    "technique_notes": "Prep lentils, potatoes and beans in batches and hold them separate — everything is good hot or cold except the eggs. Plate the bowls before cooking the eggs. For the eggs, whisk well, cook low with a rubber spatula, pausing between passes to build large curds, then add goat cheese and pull off-heat to finish in residual heat.",
+    "source_url": "https://pinchofyum.com/lentil-bowls",
+    "notes_sourced": true,
+    "nutrition": {
+      "calories": 500,
+      "protein_g": 18.6,
+      "fiber_g": 11.3,
+      "fat_g": 36.2,
+      "saturated_fat_g": 7.7,
+      "sodium_mg": 922,
+      "servings": 6
+    }
+  },
+  {
+    "id": "poy-instant-pot-minestrone",
+    "name": "Instant Pot Minestrone with Cabbage and Bulgur",
+    "cuisine": "Italian",
+    "meal_type": "either",
+    "role": "main",
+    "key_ingredients": [
+      "cannellini beans",
+      "cabbage",
+      "carrots",
+      "celery",
+      "bulgur",
+      "pesto"
+    ],
+    "summary": "Pressure-cooked vegetable and white bean soup with bulgur added afterward for chew.",
+    "technique_notes": "Everything but the grain goes in for 30 minutes on the soup setting, quick release. Add bulgur only after cooking and let it sit ~20 minutes off-heat — pressure-cooking it turns it to mush. Same principle on the stovetop or slow cooker: grain last. Use unsalted broth and a low-sodium marinara; jarred sauce and pesto carry most of the salt here.",
+    "source_url": "https://pinchofyum.com/instant-pot-minestrone-soup",
+    "notes_sourced": true,
+    "nutrition": {
+      "calories": 211,
+      "protein_g": 7.6,
+      "fiber_g": 8.7,
+      "fat_g": 5.5,
+      "saturated_fat_g": 0.8,
+      "sodium_mg": 790,
+      "servings": 8
+    }
+  },
+  {
+    "id": "poy-lemon-herb-chickpea-pasta-salad",
+    "name": "Lemon Herb Pasta Salad with Marinated Chickpeas",
+    "cuisine": "Italian",
+    "meal_type": "lunch",
+    "role": "main",
+    "key_ingredients": [
+      "chickpeas",
+      "farfalle",
+      "lemon",
+      "basil",
+      "parsley",
+      "parmesan"
+    ],
+    "summary": "Chickpeas marinated in garlic-lemon oil, tossed through pasta while still warm.",
+    "technique_notes": "Marinate the chickpeas in oil, garlic paste, lemon and salt for 8 hours or overnight if you can. Toss them with the pasta while the pasta is hot — warm pasta absorbs the marinade instead of just being coated. Add Parmesan last, off the heat, so it stays in shreds rather than melting into paste.",
+    "source_url": "https://pinchofyum.com/lemon-herb-pasta-salad",
+    "notes_sourced": true,
+    "nutrition": {
+      "calories": 599,
+      "protein_g": 17.1,
+      "fiber_g": 7.1,
+      "fat_g": 33.9,
+      "saturated_fat_g": 6.1,
+      "sodium_mg": 1070,
+      "servings": 4
+    }
+  },
+  {
+    "id": "poy-quinoa-sweet-potato-salad",
+    "name": "Roasted Sweet Potato and Chickpea Quinoa Salad",
+    "cuisine": "Mediterranean",
+    "meal_type": "lunch",
+    "role": "main",
+    "key_ingredients": [
+      "sweet potatoes",
+      "chickpeas",
+      "walnuts",
+      "quinoa",
+      "baby kale",
+      "shallots"
+    ],
+    "summary": "Staggered sheet-pan roast of sweet potato, chickpeas and maple walnuts served over quinoa.",
+    "technique_notes": "Stagger by cooking time on one pan at 425°F: sweet potatoes and shallots 20 minutes, add chickpeas for 20 more, then maple-tossed walnuts for only the last 5 — added earlier the nuts and syrup burn. Pull the herb stems before serving. Dress simply with lemon, olive oil and salt.",
+    "source_url": "https://pinchofyum.com/quinoa-sweet-potato-salad",
+    "notes_sourced": true,
+    "nutrition": {
+      "calories": 424,
+      "protein_g": 10.6,
+      "fiber_g": 8.7,
+      "fat_g": 27.6,
+      "saturated_fat_g": 3.0,
+      "sodium_mg": 475,
+      "servings": 4
+    }
+  },
+  {
+    "id": "poy-marinated-kale-chicken-bowls",
+    "name": "Marinated Kale and Chicken Bowls with Sun-Dried Tomato Sauce",
+    "cuisine": "Mediterranean",
+    "meal_type": "either",
+    "role": "main",
+    "key_ingredients": [
+      "kale",
+      "chicken breast",
+      "quinoa",
+      "sun-dried tomatoes",
+      "almonds",
+      "lemon"
+    ],
+    "summary": "Kale and chicken marinated separately in lemon-oil, served over quinoa with a sun-dried tomato sauce.",
+    "technique_notes": "Marinate kale and chicken in separate bags: kale benefits from overnight, but chicken should get only 30 minutes to 2 hours — the lemon juice starts breaking down the texture past that. Use mature kale, not baby kale, which goes soggy in the marinade. Stir some sauce through the hot quinoa; add almonds to the sauce last to keep crunch.",
+    "source_url": "https://pinchofyum.com/marinated-kale-and-chicken-bowls-with-sun-dried-tomato-sauce",
+    "notes_sourced": true,
+    "nutrition": {
+      "calories": 673,
+      "protein_g": 38.5,
+      "fiber_g": 8.6,
+      "fat_g": 32.3,
+      "saturated_fat_g": 4.7,
+      "sodium_mg": 350,
+      "servings": 4
+    }
+  },
+  {
+    "id": "poy-chicken-quinoa-artichoke-salad",
+    "name": "Chicken Quinoa Salad with Artichokes and Tomato",
+    "cuisine": "Mediterranean",
+    "meal_type": "lunch",
+    "role": "main",
+    "key_ingredients": [
+      "cooked chicken",
+      "quinoa",
+      "cherry tomatoes",
+      "artichoke hearts",
+      "spinach"
+    ],
+    "summary": "Assembly-only lunch of cooked chicken, quinoa, artichokes and tomato in a vinaigrette.",
+    "technique_notes": "A no-cook template built on pre-cooked components — rotisserie chicken and pre-cooked quinoa — for weeks with no prep time. Rinse and drain canned artichokes well to cut their brine. Dress lightly and keep tomatoes separate until serving if packing ahead.",
+    "source_url": "https://pinchofyum.com/basic-awesome-chicken-quinoa-salad",
+    "notes_sourced": true,
+    "nutrition": {
+      "calories": 298,
+      "protein_g": 22.8,
+      "fiber_g": 6.6,
+      "fat_g": 12.2,
+      "saturated_fat_g": 2.3,
+      "sodium_mg": 405,
+      "servings": 4
+    }
+  },
+  {
+    "id": "poy-air-fryer-salmon-bites",
+    "name": "Air Fryer Spiced Salmon Bites",
+    "cuisine": "Mediterranean",
+    "meal_type": "dinner",
+    "role": "main",
+    "key_ingredients": [
+      "salmon",
+      "paprika",
+      "smoked paprika",
+      "garlic powder"
+    ],
+    "summary": "Skinless salmon cubed, tossed in a spice rub with cornstarch, and air-fried hot and fast.",
+    "technique_notes": "Pat the salmon dry and cut into 1-2 inch cubes; the cornstarch in the rub is what gives a crust rather than a steamed surface. Air fry at 400°F for 8 minutes, or 6-7 for medium. Done when the cubes flake apart under gentle fork pressure. Spread them out so they aren't overlapping.",
+    "source_url": "https://pinchofyum.com/air-fryer-salmon",
+    "notes_sourced": true,
+    "nutrition": {
+      "calories": 188,
+      "protein_g": 25.6,
+      "fiber_g": 0.7,
+      "fat_g": 7.9,
+      "saturated_fat_g": 1.3,
+      "sodium_mg": 332,
+      "servings": 4
+    }
+  },
+  {
+    "id": "poy-caprese-chicken-smashed-potatoes",
+    "name": "Caprese Chicken with Smashed Potatoes",
+    "cuisine": "Italian",
+    "meal_type": "dinner",
+    "role": "main",
+    "key_ingredients": [
+      "chicken breast",
+      "baby potatoes",
+      "sun-dried tomatoes",
+      "basil",
+      "balsamic"
+    ],
+    "summary": "Par-boiled potatoes smashed and crisped in the oven alongside pan-seared chicken finished with tomato and cheese.",
+    "technique_notes": "Boil potatoes 10 minutes, drain and cool slightly, then smash each under a dish towel with your palm — holding it together so it stays in one piece — before oiling and baking at 425°F for 10-15 minutes. Sear the chicken only until browned, not cooked through; it finishes in the oven 8-10 minutes under the tomatoes and cheese.",
+    "source_url": "https://pinchofyum.com/caprese-chicken-with-smashed-potatoes",
+    "notes_sourced": true,
+    "nutrition": {
+      "calories": 553,
+      "protein_g": 37.7,
+      "fiber_g": 7.8,
+      "fat_g": 14.5,
+      "saturated_fat_g": 4.2,
+      "sodium_mg": 836,
+      "servings": 2
+    }
+  },
+  {
+    "id": "poy-socca-whipped-feta",
+    "name": "Socca with Whipped Feta and Tomato Salad",
+    "cuisine": "Mediterranean",
+    "meal_type": "either",
+    "role": "side",
+    "key_ingredients": [
+      "chickpea flour",
+      "feta",
+      "cherry tomatoes",
+      "cucumber",
+      "olive oil"
+    ],
+    "summary": "Naturally gluten-free chickpea-flour flatbread baked in a screaming-hot skillet, torn and dipped.",
+    "technique_notes": "Preheat an oiled 10-inch cast iron skillet in a 450°F oven for 5 minutes before the batter goes in — the hot oiled pan is what crisps the edges. Bake half the batter at a time, 15-18 minutes, until golden at the rim. Mix the tomato salad first so it macerates while the socca bakes. Serve torn, hot.",
+    "source_url": "https://pinchofyum.com/socca-with-whipped-feta",
+    "notes_sourced": true,
+    "nutrition": {
+      "calories": 411,
+      "protein_g": 10.8,
+      "fiber_g": 3.5,
+      "fat_g": 33.6,
+      "saturated_fat_g": 10.3,
+      "sodium_mg": 907,
+      "servings": 2
+    }
+  },
+  {
+    "id": "poy-spiced-chickpea-couscous-bowls",
+    "name": "Spiced Chickpea and Couscous Bowls",
+    "cuisine": "Moroccan",
+    "meal_type": "either",
+    "role": "main",
+    "key_ingredients": [
+      "chickpeas",
+      "fire-roasted tomatoes",
+      "couscous",
+      "cucumber",
+      "mint",
+      "cilantro"
+    ],
+    "summary": "Chickpeas simmered in a warm spice base with tomatoes, served over couscous with herbs and yogurt.",
+    "technique_notes": "Toast the spices with the chickpeas in oil before the tomatoes go in — stir until very fragrant, which is what separates this from a bland tomato stew. Add undrained tomatoes and simmer a full 20 minutes to concentrate while you prep everything else. Uses the whole spice cabinet: chili, cumin, turmeric, garam masala, cinnamon, cayenne.",
+    "source_url": "https://pinchofyum.com/morrocan-spiced-chickpea-glow-bowl",
+    "notes_sourced": true,
+    "nutrition": {
+      "calories": 181,
+      "protein_g": 6.5,
+      "fiber_g": 8.1,
+      "fat_g": 4.9,
+      "saturated_fat_g": 0.6,
+      "sodium_mg": 887,
+      "servings": 6
+    }
+  },
+  {
+    "id": "poy-roasted-veg-green-tahini-bowls",
+    "name": "Roasted Vegetable Bowls with Green Tahini",
+    "cuisine": "Levantine",
+    "meal_type": "either",
+    "role": "main",
+    "key_ingredients": [
+      "carrots",
+      "broccoli",
+      "cauliflower",
+      "potatoes",
+      "tahini",
+      "cilantro",
+      "eggs"
+    ],
+    "summary": "Sheet-pan roasted vegetables portioned for the week with a herb-tahini sauce.",
+    "technique_notes": "Group vegetables by cooking time, not by pan convenience: broccoli with cauliflower on one sheet, carrots with potatoes on another, so the quick ones can come out early. Roast at 425°F for 25-40 minutes — the longer end browns them properly. Blitz the tahini sauce while they roast. Portion with hard-boiled eggs or avocado.",
+    "source_url": "https://pinchofyum.com/30-minute-meal-prep-roasted-vegetable-bowls-with-green-tahini",
+    "notes_sourced": true,
+    "nutrition": {
+      "calories": 322,
+      "protein_g": 6.1,
+      "fiber_g": 6.7,
+      "fat_g": 24.6,
+      "saturated_fat_g": 3.6,
+      "sodium_mg": 302,
+      "servings": 6
+    }
+  },
+  {
+    "id": "poy-avgolemono-orzo-soup",
+    "name": "Lemon Chicken Soup with Orzo",
+    "cuisine": "Greek",
+    "meal_type": "either",
+    "role": "main",
+    "key_ingredients": [
+      "chicken",
+      "orzo",
+      "lemon",
+      "eggs",
+      "spinach",
+      "dill",
+      "carrots"
+    ],
+    "summary": "Avgolemono-style soup thickened with a tempered egg-lemon emulsion rather than cream.",
+    "technique_notes": "The whole dish turns on tempering: whisk eggs with lemon juice, ladle hot soup into that mixture slowly, then return it to the pot off the boil, stirring constantly. Too hot and it scrambles — drop a few ice cubes in first if needed. Very high sodium as written; use unsalted broth and salt only at the end. Orzo keeps absorbing liquid in leftovers.",
+    "source_url": "https://pinchofyum.com/lemon-chicken-soup-with-orzo",
+    "notes_sourced": true,
+    "nutrition": {
+      "calories": 337,
+      "protein_g": 30.1,
+      "fiber_g": 3.1,
+      "fat_g": 14.5,
+      "saturated_fat_g": 3.4,
+      "sodium_mg": 1930,
+      "servings": 6
+    }
+  },
+  {
+    "id": "poy-roasted-veg-grain-bowl",
+    "name": "Roasted Beet and Sweet Potato Grain Bowl",
+    "cuisine": "Mediterranean",
+    "meal_type": "either",
+    "role": "main",
+    "key_ingredients": [
+      "beets",
+      "sweet potatoes",
+      "wild rice",
+      "kale",
+      "pistachios",
+      "balsamic"
+    ],
+    "summary": "Roasted roots and wild rice tossed with dried cherries, piled on kale with balsamic dressing.",
+    "technique_notes": "Roast cubed beets and sweet potatoes at 425°F for 30 minutes while the wild rice cooks. Toss the roots, rice and cherries with a little dressing while warm — they take up flavor as they cool, and this base holds several days refrigerated. Add kale, cheese, nuts and the remaining dressing only at serving.",
+    "source_url": "https://pinchofyum.com/winter-grain-bowl-with-balsamic-dressing",
+    "notes_sourced": true,
+    "nutrition": {
+      "calories": 529,
+      "protein_g": 9.2,
+      "fiber_g": 6.2,
+      "fat_g": 37.4,
+      "saturated_fat_g": 6.6,
+      "sodium_mg": 499,
+      "servings": 6
+    }
+  },
+  {
+    "id": "poy-baked-chicken-meatballs",
+    "name": "Baked Chicken Meatballs",
+    "cuisine": "Mediterranean",
+    "meal_type": "either",
+    "role": "main",
+    "key_ingredients": [
+      "ground chicken",
+      "panko",
+      "parmesan",
+      "garlic powder",
+      "egg"
+    ],
+    "summary": "A plain, endlessly adaptable baked meatball base — mix, roll, bake, no searing.",
+    "technique_notes": "A neutral base recipe rather than a finished dish: mix by hand, roll about 30 small balls, bake at 400°F for 25-30 minutes. Olive oil in the mix keeps lean poultry from drying out. Take it Mediterranean with oregano, dill, lemon zest and feta, or Levantine with cumin, coriander and mint. Reheats and freezes well.",
+    "source_url": "https://pinchofyum.com/best-anytime-baked-chicken-meatballs",
+    "notes_sourced": true,
+    "nutrition": {
+      "calories": 236,
+      "protein_g": 19.5,
+      "fiber_g": 0.5,
+      "fat_g": 14.1,
+      "saturated_fat_g": 3.8,
+      "sodium_mg": 466,
+      "servings": 25
+    }
+  },
+  {
+    "id": "poy-chicken-meatballs-peppers-orzo",
+    "name": "Chicken Meatballs with Peppers and Orzo",
+    "cuisine": "Italian",
+    "meal_type": "dinner",
+    "role": "main",
+    "key_ingredients": [
+      "ground chicken",
+      "bell peppers",
+      "capers",
+      "tomato sauce",
+      "orzo",
+      "parmesan"
+    ],
+    "summary": "Browned poultry meatballs simmered with sweet peppers and capers, served over orzo.",
+    "technique_notes": "Brown the meatballs and remove them, then cook the peppers in the same pan and scrape up the fond — that browned residue is the sauce's backbone. Return the meatballs to simmer in tomato sauce and capers, loosening with water as needed. Cook orzo separately and stir something creamy through it rather than into the sauce.",
+    "source_url": "https://pinchofyum.com/chicken-meatballs-with-peppers-and-orzo",
+    "notes_sourced": true,
+    "nutrition": {
+      "calories": 573,
+      "protein_g": 36.7,
+      "fiber_g": 4.6,
+      "fat_g": 20.0,
+      "saturated_fat_g": 8.0,
+      "sodium_mg": 561,
+      "servings": 4
+    }
+  },
+  {
+    "id": "poy-sheet-pan-meatballs-green-sauce",
+    "name": "Sheet Pan Meatballs with Tomato Salad and Green Sauce",
+    "cuisine": "Mediterranean",
+    "meal_type": "dinner",
+    "role": "main",
+    "key_ingredients": [
+      "ground beef",
+      "parsley",
+      "cilantro",
+      "walnuts",
+      "capers",
+      "lemon",
+      "tomatoes"
+    ],
+    "summary": "One herb-walnut-caper base split two ways — half into the meatballs, half into a chimichurri-style sauce.",
+    "technique_notes": "Pulse garlic, herbs, capers and walnuts to a fine chop, not a paste, then split it: half mixed into the meat, half loosened with lemon and oil into the sauce. The shared base is what ties plate to sauce. Bake meatballs at 425°F for only 10-12 minutes. Serve over tzatziki with the tomato salad.",
+    "source_url": "https://pinchofyum.com/sheet-pan-meatballs-with-tomato-salad-and-green-sauce",
+    "notes_sourced": true,
+    "nutrition": {
+      "calories": 615,
+      "protein_g": 33.4,
+      "fiber_g": 3.7,
+      "fat_g": 44.0,
+      "saturated_fat_g": 7.4,
+      "sodium_mg": 1230,
+      "servings": 4
+    }
+  },
+  {
+    "id": "poy-garlic-herb-chicken-grain-salad",
+    "name": "Garlic Herb Chicken and Grain Salad",
+    "cuisine": "Mediterranean",
+    "meal_type": "lunch",
+    "role": "main",
+    "key_ingredients": [
+      "cooked chicken",
+      "brown rice",
+      "quinoa",
+      "tomatoes",
+      "walnuts",
+      "basil",
+      "parsley"
+    ],
+    "summary": "Chicken and mixed grains tossed in a blended basil-parsley-walnut dressing.",
+    "technique_notes": "Blend the dressing until slightly creamy — the walnuts emulsify it — and let the tossed salad sit 30 minutes before eating so the grains absorb it. Keeps about three days, but hold the tomatoes out until serving or they water the whole thing down. Rotisserie chicken and pre-cooked grains make this an assembly job.",
+    "source_url": "https://pinchofyum.com/healthy-chicken-salad",
+    "notes_sourced": true,
+    "nutrition": {
+      "calories": 465,
+      "protein_g": 18.9,
+      "fiber_g": 4.1,
+      "fat_g": 37.0,
+      "saturated_fat_g": 5.2,
+      "sodium_mg": 419,
+      "servings": 6
+    }
+  },
+  {
+    "id": "poy-red-curry-lentils",
+    "name": "Red Curry Lentils",
+    "cuisine": "Thai",
+    "meal_type": "either",
+    "role": "main",
+    "key_ingredients": [
+      "lentils",
+      "red curry paste",
+      "tomato puree",
+      "garam masala",
+      "ginger",
+      "coconut milk"
+    ],
+    "summary": "Cooked lentils simmered into a spiced tomato-curry base, served over rice.",
+    "technique_notes": "Fry the curry paste and dry spices in fat for 1-2 minutes before adding liquid — blooming them is what gives depth. Add tomato puree and simmer smooth, then fold in cooked lentils and simmer 15-20 minutes longer; it improves the longer it goes. Swap the butter for olive oil and keep coconut milk to a splash to hold saturated fat down.",
+    "source_url": "https://pinchofyum.com/red-curry-lentils",
+    "notes_sourced": true,
+    "nutrition": {
+      "calories": 249,
+      "protein_g": 12.5,
+      "fiber_g": 14.5,
+      "fat_g": 6.5,
+      "saturated_fat_g": 4.3,
+      "sodium_mg": 181,
+      "servings": 6
+    }
+  },
+  {
+    "id": "poy-chopped-thai-chicken-salad",
+    "name": "Chopped Thai-Style Chicken Salad with Peanut Dressing",
+    "cuisine": "Thai",
+    "meal_type": "lunch",
+    "role": "main",
+    "key_ingredients": [
+      "cabbage",
+      "carrots",
+      "chicken",
+      "peanuts",
+      "cilantro",
+      "lime",
+      "peanut butter"
+    ],
+    "summary": "Finely shredded raw cabbage and carrot with chicken and a blended peanut-lime dressing.",
+    "technique_notes": "Shred the cabbage very thin, coleslaw-thin — a mandoline makes the difference between a salad and a pile of wedges. Blend the dressing and thin with water to a pourable consistency. Dress only what you'll eat; it holds a few hours once tossed. Use low-sodium soy and lean on lime juice, since the dressing carries all the salt.",
+    "source_url": "https://pinchofyum.com/chopped-thai-chicken-salad",
+    "notes_sourced": true,
+    "nutrition": {
+      "calories": 456,
+      "protein_g": 19.6,
+      "fiber_g": 6.0,
+      "fat_g": 30.4,
+      "saturated_fat_g": 5.1,
+      "sodium_mg": 645,
+      "servings": 4
+    }
   }
 ]
