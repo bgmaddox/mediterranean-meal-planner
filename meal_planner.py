@@ -322,7 +322,7 @@ def swap_meal(
                 "kid_adaptation": "string — required" if bool(prefs.get("children")) else "string or null",
                 "health_highlights": ["string"],
                 "uric_acid_tip": "string or null",
-                "nutrition_estimate": {"calories_per_adult_serving": "int", "protein_g": "int", "fiber_g": "int", "fat_g": "int", "saturated_fat_note": "string or null"},
+                "nutrition_estimate": {"calories_per_adult_serving": "int", "protein_g": "int", "fiber_g": "int", "fat_g": "int", "sodium_mg": "int", "saturated_fat_note": "string or null"},
             }
         }
         if has_paired_lunch:
@@ -337,7 +337,7 @@ def swap_meal(
                 "ingredients": [{"name": "str", "quantity": "str", "unit": "str", "pantry_staple": "bool"}],
                 "pack_instructions": "string",
                 "health_highlights": ["string"],
-                "nutrition_estimate": {"calories_per_adult_serving": "int", "protein_g": "int", "fiber_g": "int", "fat_g": "int", "saturated_fat_note": "string or null"},
+                "nutrition_estimate": {"calories_per_adult_serving": "int", "protein_g": "int", "fiber_g": "int", "fat_g": "int", "sodium_mg": "int", "saturated_fat_note": "string or null"},
             }
     else:
         schema = {
@@ -352,7 +352,7 @@ def swap_meal(
                 "ingredients": [{"name": "str", "quantity": "str", "unit": "str", "pantry_staple": "bool"}],
                 "pack_instructions": "string",
                 "health_highlights": ["string"],
-                "nutrition_estimate": {"calories_per_adult_serving": "int", "protein_g": "int", "fiber_g": "int", "fat_g": "int", "saturated_fat_note": "string or null"},
+                "nutrition_estimate": {"calories_per_adult_serving": "int", "protein_g": "int", "fiber_g": "int", "fat_g": "int", "sodium_mg": "int", "saturated_fat_note": "string or null"},
             }
         }
 

@@ -449,6 +449,10 @@ with tab_generate:
             sum(m.get("nutrition_estimate", {}).get("fiber_g", 0)
                 for m in plan.get("dinners", [])) // max(len(plan.get("dinners", [])), 1)
         )
+        avg_sodium = (
+            sum(m.get("nutrition_estimate", {}).get("sodium_mg", 0)
+                for m in plan.get("dinners", [])) // max(len(plan.get("dinners", [])), 1)
+        )
         t_cal = prefs.get("target_calories_lunch_dinner", 1450)
         t_prot = prefs.get("target_protein_g", 100)
         t_fib = prefs.get("target_fiber_g", 18)
@@ -462,6 +466,7 @@ with tab_generate:
             avg_cal=avg_cal, t_cal=t_cal,
             avg_protein=avg_protein, t_prot=t_prot,
             avg_fiber=avg_fiber, t_fib=t_fib,
+            avg_sodium=avg_sodium, t_sodium=prefs.get("target_sodium_mg", 700),
         ))
         st.caption("Nutrition covers lunch + dinner only. Breakfast and snacks not tracked. Cost: non-pantry only, ±20–30%. Nutrition ±15–20%.")
 
@@ -627,11 +632,19 @@ with tab_generate:
                 nut = dinner.get("nutrition_estimate")
                 if nut:
                     with st.expander("Nutrition estimate (per adult serving)"):
-                        nc1, nc2, nc3, nc4 = st.columns(4)
+                        nc1, nc2, nc3, nc4, nc5 = st.columns(5)
                         nc1.metric("Calories", nut.get("calories_per_adult_serving", "—"))
                         nc2.metric("Protein", f"{nut.get('protein_g', '—')}g")
                         nc3.metric("Fiber", f"{nut.get('fiber_g', '—')}g")
                         nc4.metric("Fat", f"{nut.get('fat_g', '—')}g")
+                        nc5.metric("Sodium", f"{nut.get('sodium_mg', '—')}mg")
+                        sod = nut.get("sodium_mg")
+                        if isinstance(sod, (int, float)) and sod > 700:
+                            st.caption(
+                                f"⚠️ {int(sod)}mg sodium — above the 700mg target. "
+                                "Rinse canned legumes, use low-sodium broth, or ease off "
+                                "the olives/feta."
+                            )
                         if nut.get("saturated_fat_note"):
                             st.caption(nut["saturated_fat_note"])
 
@@ -756,11 +769,12 @@ with tab_generate:
                 nut = lunch.get("nutrition_estimate")
                 if nut:
                     with st.expander("Nutrition estimate (per adult serving)"):
-                        nc1, nc2, nc3, nc4 = st.columns(4)
+                        nc1, nc2, nc3, nc4, nc5 = st.columns(5)
                         nc1.metric("Calories", nut.get("calories_per_adult_serving", "—"))
                         nc2.metric("Protein", f"{nut.get('protein_g', '—')}g")
                         nc3.metric("Fiber", f"{nut.get('fiber_g', '—')}g")
                         nc4.metric("Fat", f"{nut.get('fat_g', '—')}g")
+                        nc5.metric("Sodium", f"{nut.get('sodium_mg', '—')}mg")
 
         # ── Recently removed (lunches) ────────────────────────────────────────
         removed_lunches = [r for r in st.session_state.deleted_meals if r["type"] == "lunch"]
@@ -1197,11 +1211,18 @@ def _settings_fragment():
         min_value=5, max_value=60,
         value=prefs.get("target_fiber_g", 18), step=1,
     )
+    t_sod = st.number_input(
+        "Sodium ceiling per adult dinner serving (mg)",
+        min_value=300, max_value=2000,
+        value=prefs.get("target_sodium_mg", 700), step=50,
+        help="A ceiling, not a goal — meals are flagged when they exceed it.",
+    )
     if st.button("Save Nutrition Targets"):
         data_store.update_preferences(
             target_calories_lunch_dinner=int(t_cal),
             target_protein_g=int(t_prot),
             target_fiber_g=int(t_fib),
+            target_sodium_mg=int(t_sod),
         )
         st.success("Saved.")
 

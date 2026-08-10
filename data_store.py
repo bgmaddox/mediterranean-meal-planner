@@ -267,6 +267,7 @@ def update_preferences(**kwargs) -> UserPreferences:
         "target_calories_lunch_dinner",
         "target_protein_g",
         "target_fiber_g",
+        "target_sodium_mg",
     }
     for key, value in kwargs.items():
         if key in valid_keys:
@@ -386,6 +387,7 @@ def add_anchor_recipe(
     key_ingredients: list[str] | None = None,
     summary: str = "",
     technique_notes: str = "",
+    nutrition: dict | None = None,
 ) -> AnchorRecipe:
     """
     Add a user-defined anchor recipe to the gitignored user file.
@@ -415,6 +417,8 @@ def add_anchor_recipe(
         "summary": summary.strip(),
         "technique_notes": technique_notes.strip(),
     }
+    if nutrition:
+        entry["nutrition"] = nutrition
     user = load_anchor_user_recipes()
     user.append(entry)
     _write(ANCHOR_RECIPES_USER_FILE, user)
