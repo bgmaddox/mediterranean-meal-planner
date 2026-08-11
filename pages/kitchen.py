@@ -328,6 +328,7 @@ def _render_dinner_card(meal: dict, badge: str) -> str:
     prot = nut.get("protein_g", "—")
     fib = nut.get("fiber_g", "—")
     fat = nut.get("fat_g", "—")
+    sod = nut.get("sodium_mg", "—")
 
     return f"""
 <div class="recipe-card">
@@ -358,6 +359,7 @@ def _render_dinner_card(meal: dict, badge: str) -> str:
     <div class="nut-item"><span class="nut-value">{_e(prot)}g</span><span class="nut-label">Protein</span></div>
     <div class="nut-item"><span class="nut-value">{_e(fib)}g</span><span class="nut-label">Fiber</span></div>
     <div class="nut-item"><span class="nut-value">{_e(fat)}g</span><span class="nut-label">Fat</span></div>
+    <div class="nut-item"><span class="nut-value">{_e(sod)}mg</span><span class="nut-label">Sodium</span></div>
   </div>
 </div>
 """
@@ -397,6 +399,7 @@ def _render_lunch_card(meal: dict, badge: str) -> str:
     prot = nut.get("protein_g", "—")
     fib = nut.get("fiber_g", "—")
     fat = nut.get("fat_g", "—")
+    sod = nut.get("sodium_mg", "—")
 
     return f"""
 <div class="recipe-card">
@@ -428,6 +431,7 @@ def _render_lunch_card(meal: dict, badge: str) -> str:
     <div class="nut-item"><span class="nut-value">{_e(prot)}g</span><span class="nut-label">Protein</span></div>
     <div class="nut-item"><span class="nut-value">{_e(fib)}g</span><span class="nut-label">Fiber</span></div>
     <div class="nut-item"><span class="nut-value">{_e(fat)}g</span><span class="nut-label">Fat</span></div>
+    <div class="nut-item"><span class="nut-value">{_e(sod)}mg</span><span class="nut-label">Sodium</span></div>
   </div>
 </div>
 """

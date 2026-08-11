@@ -263,12 +263,19 @@ def render_week_summary_card(
     avg_cal: int, t_cal: int,
     avg_protein: int, t_prot: int,
     avg_fiber: int, t_fib: int,
+    avg_sodium: int = 0, t_sodium: int = 700,
 ) -> str:
     """Full-width 'this week at a glance' banner."""
     def tracked(value: int, target: int, label: str, suffix: str) -> str:
         variant = "ok" if value >= target else "warn"
         return _stat(f"{value}{suffix}", label, variant=variant,
                      sub=f"target {target}{suffix}")
+
+    def tracked_ceiling(value: int, target: int, label: str, suffix: str) -> str:
+        """Like `tracked`, but for metrics where lower is better (sodium)."""
+        variant = "ok" if value <= target else "warn"
+        return _stat(f"{value}{suffix}", label, variant=variant,
+                     sub=f"max {target}{suffix}")
 
     stats = (
         _stat(str(fish), "Fish meals")
@@ -282,6 +289,8 @@ def render_week_summary_card(
         + tracked(avg_protein, t_prot, "Protein/day", "g")
         + tracked(avg_fiber, t_fib, "Fiber/day", "g")
     )
+    if avg_sodium:
+        stats += tracked_ceiling(avg_sodium, t_sodium, "Sodium/meal", "mg")
     return (
         '<div class="med-summary">'
         '<div class="med-summary__title">This week at a glance</div>'

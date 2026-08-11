@@ -504,6 +504,9 @@ def _footer_note(nut: dict, cost: dict) -> str:
         parts.append(f"<span>{fib}g fiber</span>")
     if fat is not None:
         parts.append(f"<span>{fat}g fat</span>")
+    sod = nut.get("sodium_mg")
+    if sod is not None:
+        parts.append(f"<span>{sod}mg sodium</span>")
     if cps is not None:
         parts.append(f"<span>~${cps:.2f}/serving</span>")
     if not parts:

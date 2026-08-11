@@ -37,6 +37,7 @@ class NutritionEstimate(TypedDict):
     protein_g: int
     fiber_g: int
     fat_g: int
+    sodium_mg: int                      # Target ≤700 per adult serving; ceiling ~1200
     saturated_fat_note: Optional[str]   # e.g. "Low — salmon fat is mostly unsaturated"
 
 
@@ -146,6 +147,23 @@ class RecipeLibraryEntry(TypedDict):
     meal: DinnerMeal                    # Full meal dict (DinnerMeal or LunchMeal)
 
 
+class AnchorNutrition(TypedDict, total=False):
+    """Real per-serving nutrition from the source recipe's published data.
+
+    Unlike NutritionEstimate (which Claude guesses), these are the actual
+    computed figures from the source site's recipe card. They are injected into
+    the prompt to calibrate Claude's own estimates against real dishes. Every
+    field is optional — sources vary in what they publish.
+    """
+    calories: int
+    protein_g: float
+    fiber_g: float
+    fat_g: float
+    saturated_fat_g: float
+    sodium_mg: int
+    servings: int                       # Servings the figures are based on
+
+
 class AnchorRecipe(TypedDict):
     """A real-world recipe used to anchor Claude's generation (curated seed set).
 
@@ -166,6 +184,7 @@ class AnchorRecipe(TypedDict):
     technique_notes: str                # Tested, non-obvious procedural tips Claude should follow (not a full recipe), e.g. 'Separate bok choy stems from leaves; sear stems 2 min before adding leaves.' May be empty.
     source_url: Optional[str]           # URL the technique_notes were derived from; absent/"" = self-generated
     notes_sourced: bool                 # True once technique_notes are enriched from a real recipe page
+    nutrition: Optional[AnchorNutrition]  # Real published per-serving nutrition; absent for most entries
 
 
 class MealHistoryEntry(TypedDict):
@@ -208,3 +227,4 @@ class UserPreferences(TypedDict):
     target_calories_lunch_dinner: int  # Default: 1450 (supports ~2100 kcal/day total)
     target_protein_g: int              # Default: 100g (from L+D; supports weight loss at goal weight)
     target_fiber_g: int                # Default: 18g  (from L+D; supports ≥25g/day total)
+    target_sodium_mg: int              # Default: 700mg per adult dinner serving (a ceiling, not a goal)

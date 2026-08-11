@@ -118,7 +118,11 @@ meat stocks; encourage low-fat dairy, vitamin C foods, cherries; legumes and \
 leafy greens are safe and encouraged.
 - Cholesterol improvement: salmon 2–3x/week across the full week, legumes, \
 oats/barley, EVOO, walnuts.
-- Weight loss: high fiber, high protein, low glycemic, olive oil as the primary fat."""
+- Weight loss: high fiber, high protein, low glycemic, olive oil as the primary fat.
+- Sodium restraint: target ≤700 mg per adult dinner serving; never exceed \
+~1,200 mg. Watch the usual culprits — olives, feta, canned beans, broth, soy/fish \
+sauce, harissa and other chile pastes, jarred sauces, and cured meat. Build flavor \
+with lemon, vinegar, herbs, garlic, and spice instead of salt."""
 
 PLATE_GEOMETRY_SUMMARY = """\
 Mediterranean plate geometry: vegetables are roughly half the plate by volume \
@@ -164,6 +168,7 @@ OUTPUT_SCHEMA = {
                     "protein_g": "integer",
                     "fiber_g": "integer",
                     "fat_g": "integer",
+                    "sodium_mg": "integer — target ≤700 per adult serving; hard ceiling ~1200",
                     "saturated_fat_note": "string or null — e.g. 'Low — salmon fat is mostly unsaturated'"
                 },
                 "cost_estimate": {
@@ -203,6 +208,7 @@ OUTPUT_SCHEMA = {
                     "protein_g": "integer",
                     "fiber_g": "integer",
                     "fat_g": "integer",
+                    "sodium_mg": "integer — target ≤700 per adult serving; hard ceiling ~1200",
                     "saturated_fat_note": "string or null"
                 },
                 "cost_estimate": {
@@ -458,6 +464,19 @@ def build_system_prompt(
                 line += f". {r['summary']}"
             if r.get("technique_notes"):
                 line += f"\n      • Technique: {r['technique_notes']}"
+            nut = r.get("nutrition") or {}
+            if nut:
+                bits = []
+                if nut.get("calories") is not None:
+                    bits.append(f"{nut['calories']} kcal")
+                if nut.get("protein_g") is not None:
+                    bits.append(f"{nut['protein_g']}g protein")
+                if nut.get("fiber_g") is not None:
+                    bits.append(f"{nut['fiber_g']}g fiber")
+                if nut.get("sodium_mg") is not None:
+                    bits.append(f"{nut['sodium_mg']}mg sodium")
+                if bits:
+                    line += f"\n      • Actual per serving: {', '.join(bits)}"
             lines.append(line)
         anchor_block = (
             "## Anchor Recipes (real-world inspiration)\n"
@@ -470,6 +489,11 @@ def build_system_prompt(
             "**Side/mezze anchors** (salads, dips, braised/roasted vegetables) build the vegetable "
             "components of vegetable-forward and mezze-style dinners — use them for real, "
             "technique-driven character instead of generic treatments.\n\n"
+            "An **Actual per serving** line is the real published nutrition for that dish as "
+            "originally written. Use it to calibrate your own `nutrition_estimate` numbers for "
+            "similar dishes — these are measured, your estimates are not. Where the original's "
+            "sodium exceeds our ceiling, that is a signal to adapt the recipe down (rinse legumes, "
+            "unsalted broth, less feta/olives), not to reproduce the number.\n\n"
             "A **Technique** note is the tested, non-obvious procedure from the real recipe (how to "
             "cut/time an ingredient so it cooks evenly). Follow it for the relevant ingredients in "
             "your `instructions` — adapting only as far as your swaps require — rather than improvising "
@@ -821,11 +845,20 @@ For every dinner and lunch, include a `nutrition_estimate` object with:
 - `protein_g` (integer)
 - `fiber_g` (integer)
 - `fat_g` (integer)
+- `sodium_mg` (integer)
 - `saturated_fat_note` (string or null — note only when saturated fat is meaningfully high or low)
 
 These are your best estimates for a typical adult portion of this recipe. \
 Accuracy of ±15–20% is acceptable and expected. Do not include a disclaimer in the JSON — \
 the app handles that in the UI.
+
+Sodium is a design constraint, not just a reported number. Aim for **≤700 mg per \
+adult dinner serving** and treat ~1,200 mg as a hard ceiling. If a dish's natural \
+form would blow past that — briny olives and feta together, canned beans plus \
+broth plus a salty paste — adjust the recipe itself: rinse canned legumes, use \
+low-sodium or unsalted broth, cut the added salt, and lean on lemon, vinegar, \
+herbs, garlic, and chile for flavor. Do not simply report a high number; fix the \
+recipe so it fits, and reflect the fix in `instructions`.
 
 ---
 
