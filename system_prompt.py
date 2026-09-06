@@ -106,21 +106,31 @@ PANTRY_STAPLES = [
 ]
 
 # ─────────────────────────────────────────────────────────────────────────────
+# SODIUM THRESHOLDS — authoritative values, referenced by the prompt text below
+# and by constraint_check.py so the two can never disagree.
+# The per-serving target is a user preference (target_sodium_mg); this default
+# and the hard ceiling live here.
+# ─────────────────────────────────────────────────────────────────────────────
+SODIUM_TARGET_DEFAULT_MG = 700
+SODIUM_HARD_CEILING_MG = 1200
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # SHARED RULE SUMMARIES
 # Single source of truth for the condensed rules injected into the smaller
 # edit prompts in meal_planner.py (swap / substitute). The full generation
 # prompt states these rules at length below; these summaries exist so the
 # edit calls can never drift out of sync when a rule changes.
 # ─────────────────────────────────────────────────────────────────────────────
-HEALTH_RULES_SUMMARY = """\
+HEALTH_RULES_SUMMARY = f"""\
 - Uric acid management: avoid organ meats, sardines as a staple, fructose/juice, \
 meat stocks; encourage low-fat dairy, vitamin C foods, cherries; legumes and \
 leafy greens are safe and encouraged.
 - Cholesterol improvement: salmon 2–3x/week across the full week, legumes, \
 oats/barley, EVOO, walnuts.
 - Weight loss: high fiber, high protein, low glycemic, olive oil as the primary fat.
-- Sodium restraint: target ≤700 mg per adult dinner serving; never exceed \
-~1,200 mg. Watch the usual culprits — olives, feta, canned beans, broth, soy/fish \
+- Sodium restraint: target ≤{SODIUM_TARGET_DEFAULT_MG} mg per adult dinner serving; never exceed \
+~{SODIUM_HARD_CEILING_MG:,} mg. Watch the usual culprits — olives, feta, canned beans, broth, soy/fish \
 sauce, harissa and other chile pastes, jarred sauces, and cured meat. Build flavor \
 with lemon, vinegar, herbs, garlic, and spice instead of salt."""
 
@@ -168,7 +178,7 @@ OUTPUT_SCHEMA = {
                     "protein_g": "integer",
                     "fiber_g": "integer",
                     "fat_g": "integer",
-                    "sodium_mg": "integer — target ≤700 per adult serving; hard ceiling ~1200",
+                    "sodium_mg": f"integer — target ≤{SODIUM_TARGET_DEFAULT_MG} per adult serving; hard ceiling ~{SODIUM_HARD_CEILING_MG}",
                     "saturated_fat_note": "string or null — e.g. 'Low — salmon fat is mostly unsaturated'"
                 },
                 "cost_estimate": {
@@ -208,7 +218,7 @@ OUTPUT_SCHEMA = {
                     "protein_g": "integer",
                     "fiber_g": "integer",
                     "fat_g": "integer",
-                    "sodium_mg": "integer — target ≤700 per adult serving; hard ceiling ~1200",
+                    "sodium_mg": f"integer — target ≤{SODIUM_TARGET_DEFAULT_MG} per adult serving; hard ceiling ~{SODIUM_HARD_CEILING_MG}",
                     "saturated_fat_note": "string or null"
                 },
                 "cost_estimate": {
@@ -852,8 +862,8 @@ These are your best estimates for a typical adult portion of this recipe. \
 Accuracy of ±15–20% is acceptable and expected. Do not include a disclaimer in the JSON — \
 the app handles that in the UI.
 
-Sodium is a design constraint, not just a reported number. Aim for **≤700 mg per \
-adult dinner serving** and treat ~1,200 mg as a hard ceiling. If a dish's natural \
+Sodium is a design constraint, not just a reported number. Aim for **≤{SODIUM_TARGET_DEFAULT_MG} mg per \
+adult dinner serving** and treat ~{SODIUM_HARD_CEILING_MG:,} mg as a hard ceiling. If a dish's natural \
 form would blow past that — briny olives and feta together, canned beans plus \
 broth plus a salty paste — adjust the recipe itself: rinse canned legumes, use \
 low-sodium or unsalted broth, cut the added salt, and lean on lemon, vinegar, \

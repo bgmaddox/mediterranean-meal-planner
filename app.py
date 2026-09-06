@@ -170,6 +170,8 @@ def _prompt_preview_dialog():
                         system_edited, user_edited,
                         expected_days=st.session_state.pending_days,
                         require_kid_adaptation=st.session_state.pending_require_kid,
+                        user_constraints=data_store.active_constraints_for_prompt(),
+                        history=data_store.load_history()[:6],
                     )
                 except MealPlanError as e:
                     st.error(f"Could not generate plan: {e}")

@@ -24,6 +24,7 @@ from datetime import date
 
 import anthropic
 
+import constraint_check
 import data_store
 from schemas import DinnerMeal, LunchMeal, WeekPlan
 from system_prompt import (
@@ -34,6 +35,12 @@ from system_prompt import (
 )
 
 MODEL = "claude-opus-4-8"
+
+
+# Generation attempts before giving up. Each attempt is a full plan generation,
+# so this is deliberately small; the extra attempt over the original 2 exists
+# because constraint checking now rejects plans that previously slipped through.
+_MAX_GENERATION_ATTEMPTS = 3
 
 
 class MealPlanError(Exception):
@@ -111,21 +118,41 @@ def build_generation_prompts(
     return system_prompt, _DEFAULT_USER_MESSAGE, require_kid
 
 
-def generate_week_plan_from_prompts(system_prompt: str, user_message: str, expected_days: int = 5, require_kid_adaptation: bool = True) -> WeekPlan:
+def generate_week_plan_from_prompts(
+    system_prompt: str,
+    user_message: str,
+    expected_days: int = 5,
+    require_kid_adaptation: bool = True,
+    user_constraints: list[str] | None = None,
+    target_sodium_mg: int | None = None,
+    history: list | None = None,
+) -> WeekPlan:
     """
     Call Claude with pre-built prompts and return a validated WeekPlan.
     Used after the prompt-preview dialog allows editing.
 
+    Structural validation (`_validate_plan`) and constraint checking
+    (`constraint_check.check_week_plan`) both run on the response. A hard
+    constraint violation — a banned ingredient, fish in a lunch, sodium over
+    the ceiling — is rejected the same way a malformed response is, and the
+    specific reason is fed back into the next attempt. Soft findings are
+    attached to the plan under `_soft_violations` for the UI to surface; they
+    never trigger a regeneration.
+
     Raises
     ------
     MealPlanError on API failure, or if the response is still invalid after
-    one automatic retry (the retry feeds the failure reason back to Claude).
+    the automatic retries (each retry feeds the failure reason back to Claude).
     """
     client = _client()
     message = user_message
     last_error: MealPlanError | None = None
+    if target_sodium_mg is None:
+        target_sodium_mg = data_store.load_preferences().get(
+            "target_sodium_mg", constraint_check.SODIUM_TARGET_DEFAULT_MG
+        )
 
-    for attempt in range(2):
+    for attempt in range(_MAX_GENERATION_ATTEMPTS):
         try:
             response = client.messages.create(
                 model=MODEL,
@@ -154,6 +181,23 @@ def generate_week_plan_from_prompts(system_prompt: str, user_message: str, expec
 
             plan: WeekPlan = data["week_plan"]
             _validate_plan(plan, expected_days, require_kid_adaptation=require_kid_adaptation)
+
+            violations = constraint_check.check_week_plan(
+                plan,
+                user_constraints=user_constraints,
+                target_sodium_mg=target_sodium_mg,
+                history=history,
+            )
+            hard = constraint_check.hard_violations(violations)
+            if hard:
+                raise MealPlanError(
+                    "The plan breaks food constraints that are absolute:\n"
+                    + constraint_check.format_violations(hard)
+                )
+
+            plan["_soft_violations"] = [
+                v for v in violations if v["severity"] == "soft"
+            ]
             return plan
         except MealPlanError as e:
             last_error = e
@@ -191,7 +235,17 @@ def generate_week_plan(week_notes: str | None = None, cuisine_notes: str | None 
     MealPlanError on API or parse failure.
     """
     system_prompt, user_message, require_kid = build_generation_prompts(week_notes, cuisine_notes, use_up_ingredients, days)
-    return generate_week_plan_from_prompts(system_prompt, user_message, expected_days=days, require_kid_adaptation=require_kid)
+    return generate_week_plan_from_prompts(
+        system_prompt,
+        user_message,
+        expected_days=days,
+        require_kid_adaptation=require_kid,
+        user_constraints=data_store.active_constraints_for_prompt(),
+        target_sodium_mg=data_store.load_preferences().get(
+            "target_sodium_mg", constraint_check.SODIUM_TARGET_DEFAULT_MG
+        ),
+        history=data_store.load_history()[:6],
+    )
 
 
 def _validate_plan(plan: WeekPlan, days: int = 5, require_kid_adaptation: bool = True) -> None:

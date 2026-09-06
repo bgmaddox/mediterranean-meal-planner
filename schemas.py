@@ -120,6 +120,10 @@ class WeekPlan(TypedDict):
     sunday_prep_list: list[SundayPrepTask]
     week_summary: WeekSummary
     snacks: NotRequired[list[SnackSuggestion]]  # Optional — absent in plans saved before the snacks feature
+    # Non-blocking findings from constraint_check.check_week_plan() — over the
+    # sodium target but under the ceiling, near-repeats of recent weeks, etc.
+    # Attached at generation time; absent on plans saved before that check existed.
+    _soft_violations: NotRequired[list[dict]]
 
 
 # ─────────────────────────────────────────────────────────────────────────────
