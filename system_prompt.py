@@ -602,7 +602,14 @@ def build_system_prompt(
     ) if has_kids else ""
 
     _kid_adaptation_rule = (
-        "- **Kid adaptation is mandatory on every dinner.** Specific and practical — not a placeholder."
+        "- **Kid adaptation is mandatory on every dinner.** Specific and practical — not a placeholder.\n"
+        "- **The `instructions` must make the adaptation possible.** This is the single most common "
+        "error in generated plans: promising \"less spice for the kids\" or \"sauce on the side\" in a "
+        "recipe whose method seasons or sauces everything at once, leaving nothing to hold back. If the "
+        "adaptation requires an unseasoned or unsauced portion, the instructions must create one — hold "
+        "the spices back and add them after the kids' share is ladled out, sauce the adult portion "
+        "separately, reserve plain pasta before it goes in the pan. Write the step. An adaptation the "
+        "method cannot deliver is worse than none, because the cook only discovers it mid-recipe."
     ) if has_kids else ""
 
     _kid_output_rule_5 = (
