@@ -268,6 +268,7 @@ def update_preferences(**kwargs) -> UserPreferences:
         "target_protein_g",
         "target_fiber_g",
         "target_sodium_mg",
+        "run_plan_critique",
     }
     for key, value in kwargs.items():
         if key in valid_keys:

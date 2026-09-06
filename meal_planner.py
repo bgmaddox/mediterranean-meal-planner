@@ -26,6 +26,7 @@ import anthropic
 
 import constraint_check
 import data_store
+import plan_critique
 from schemas import DinnerMeal, LunchMeal, WeekPlan
 from system_prompt import (
     DEFAULT_CONSTRAINTS,
@@ -195,9 +196,14 @@ def generate_week_plan_from_prompts(
                     + constraint_check.format_violations(hard)
                 )
 
-            plan["_soft_violations"] = [
-                v for v in violations if v["severity"] == "soft"
-            ]
+            soft = [v for v in violations if v["severity"] == "soft"]
+
+            # Advisory second opinion. Never blocks: critique_week_plan returns
+            # an empty list on any failure, and its findings are all soft.
+            if data_store.load_preferences().get("run_plan_critique", True):
+                soft += plan_critique.critique_week_plan(plan)
+
+            plan["_soft_violations"] = soft
             return plan
         except MealPlanError as e:
             last_error = e

@@ -81,6 +81,26 @@ SHELLFISH_TERMS = [
     "squid", "calamari", "octopus",
 ]
 
+# Primary animal proteins — used to sanity-check a 'vegetable_forward' or
+# 'mezze' composition label against what the dish is actually built around.
+CENTERPIECE_PROTEIN_TERMS = [
+    "chicken breast", "chicken thigh", "chicken", "turkey breast", "ground turkey",
+    "beef", "steak", "ground beef", "lamb", "pork", "sausage", "salmon fillet",
+    "salmon", "tuna steak", "shrimp",
+]
+
+
+# Words in an ingredient name that carry no identity — an instruction step will
+# not say 'the boneless' — so they cannot stand in as evidence the ingredient
+# was used.
+_INGREDIENT_MODIFIERS = {
+    "fresh", "dried", "frozen", "canned", "jarred", "leftover", "baby", "large",
+    "small", "whole", "ground", "chopped", "sliced", "diced", "minced", "grated",
+    "shredded", "boneless", "skinless", "extra", "virgin", "sodium", "reduced",
+    "unsalted", "cooked", "raw", "plain", "lean", "thinly", "roughly", "halved",
+    "optional", "packed", "drained", "rinsed", "toasted",
+}
+
 
 def _term_re(term: str) -> re.Pattern:
     """Word-boundary, plural-tolerant matcher for a multi-word term."""
@@ -96,6 +116,7 @@ _COMPILED: dict[str, list[tuple[str, re.Pattern]]] = {
         "fish": FISH_TERMS,
         "fish_trace": FISH_TRACE_TERMS,
         "shellfish": SHELLFISH_TERMS,
+        "centerpiece_protein": CENTERPIECE_PROTEIN_TERMS,
     }.items()
 }
 
@@ -287,6 +308,134 @@ def _check_repeats(plan: WeekPlan, history: list[MealHistoryEntry],
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# WEEK-LEVEL CHECKS
+# These are rules the prompt states but nothing verified: how often fish shows
+# up, whether 'special' ingredients actually get reused, whether the leftover
+# plumbing between dinners and lunches connects. All soft except structural
+# breakage, because each is a plan-quality signal rather than an absolute.
+# ─────────────────────────────────────────────────────────────────────────────
+
+def _week_level(code: str, severity: Severity, message: str) -> Violation:
+    return {"code": code, "severity": severity, "meal_id": "",
+            "meal_name": "", "message": message}
+
+
+def _check_fish_frequency(plan: WeekPlan) -> list[Violation]:
+    """Cholesterol rule: oily fish 2-3x/week. Scaled down for short weeks."""
+    dinners = plan.get("dinners") or []
+    if not dinners:
+        return []
+    with_fish = [d for d in dinners if _find(_searchable(d), "fish")]
+    expected_min = 2 if len(dinners) >= 4 else 1
+    if len(with_fish) < expected_min:
+        return [_week_level(
+            "fish_below_target", "soft",
+            f"has {len(with_fish)} fish dinner(s) across {len(dinners)} dinners; the "
+            f"cholesterol rule asks for {expected_min}-3 (salmon 2-3x/week)")]
+    if len(with_fish) > 3:
+        return [_week_level(
+            "fish_above_target", "soft",
+            f"has {len(with_fish)} fish dinners; more than 3 crowds out the legume and "
+            f"vegetable-forward nights")]
+    return []
+
+
+def _check_special_ingredient_reuse(plan: WeekPlan) -> list[Violation]:
+    """An ingredient flagged `special` is meant to appear in 2+ meals, so a
+    one-off purchase does not go to waste."""
+    meals = [*(plan.get("dinners") or []), *(plan.get("lunches") or [])]
+    uses: dict[str, set[str]] = {}
+    for meal in meals:
+        for ing in meal.get("ingredients") or []:
+            if not ing.get("special"):
+                continue
+            key = str(ing.get("name", "")).strip().lower()
+            if key:
+                uses.setdefault(key, set()).add(meal.get("name", ""))
+    return [
+        _week_level("special_ingredient_unused", "soft",
+                    f"flags '{name}' as a special ingredient but uses it in only one meal "
+                    f"({next(iter(where))}) — special ingredients should appear in 2+ meals")
+        for name, where in sorted(uses.items()) if len(where) < 2
+    ]
+
+
+def _check_leftover_links(plan: WeekPlan) -> list[Violation]:
+    """The dinner→lunch leftover plumbing. A dangling reference is structural
+    breakage, so it is hard; the softer mismatches are advisory."""
+    dinners = plan.get("dinners") or []
+    lunches = plan.get("lunches") or []
+    dinner_ids = {str(d.get("id", "")) for d in dinners}
+    out: list[Violation] = []
+
+    claimed: set[str] = set()
+    for lunch in lunches:
+        if lunch.get("source") != "leftover":
+            continue
+        ref = str(lunch.get("leftover_from_dinner_id") or "")
+        if not ref:
+            out.append(_v("leftover_unlinked", "soft", lunch,
+                          "is a leftover lunch with no leftover_from_dinner_id"))
+        elif ref not in dinner_ids:
+            out.append(_v("leftover_broken_link", "hard", lunch,
+                          f"is a leftover of dinner '{ref}', which is not in this plan"))
+        else:
+            claimed.add(ref)
+
+    for dinner in dinners:
+        if dinner.get("generates_lunch") and str(dinner.get("id", "")) not in claimed:
+            out.append(_v("lunch_not_generated", "soft", dinner,
+                          "is marked generates_lunch but no lunch claims it as leftovers"))
+    return out
+
+
+def _check_composition_labels(plan: WeekPlan) -> list[Violation]:
+    """A dinner labeled vegetable_forward or mezze should not be built around a
+    meat centerpiece. Small amounts of protein are fine and expected, so this
+    only fires on a primary protein in the ingredient list."""
+    out: list[Violation] = []
+    for dinner in plan.get("dinners") or []:
+        if dinner.get("composition") not in ("vegetable_forward", "mezze"):
+            continue
+        hit = _find(_ingredient_text(dinner), "centerpiece_protein")
+        if hit:
+            out.append(_v("composition_mislabeled", "soft", dinner,
+                          f"is labeled '{dinner['composition']}' but lists '{hit}' as an "
+                          f"ingredient — check that vegetables are genuinely the centerpiece"))
+    return out
+
+
+def _check_unused_ingredients(plan: WeekPlan) -> list[Violation]:
+    """A non-pantry ingredient that never appears in the instructions gets
+    bought and never used.
+
+    Deliberately forgiving: an ingredient counts as used if *any* meaningful
+    word of its name shows up in the method. Recipes name things loosely —
+    'boneless skinless chicken breast' becomes 'the chicken', 'feta cheese'
+    becomes 'the feta' — and a checker that demands the full phrase produces
+    nothing but false positives.
+    """
+    out: list[Violation] = []
+    for meal in [*(plan.get("dinners") or []), *(plan.get("lunches") or [])]:
+        prose = _prose_text(meal).lower()
+        if not prose:
+            continue
+        for ing in meal.get("ingredients") or []:
+            if ing.get("pantry_staple"):
+                continue
+            name = str(ing.get("name", "")).lower()
+            tokens = [t for t in re.split(r"[^a-z]+", name)
+                      if len(t) > 3 and t not in _INGREDIENT_MODIFIERS]
+            if not tokens:
+                continue
+            if not any(t.rstrip("s") in prose for t in tokens):
+                out.append(_v("ingredient_never_used", "soft", meal,
+                              f"lists '{ing.get('name')}' but the instructions never "
+                              f"mention it"))
+    return out
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # PUBLIC API
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -334,6 +483,11 @@ def check_week_plan(
         out += _check_sodium(meal, target_sodium_mg)
 
     out += _check_repeats(plan, history or [])
+    out += _check_fish_frequency(plan)
+    out += _check_special_ingredient_reuse(plan)
+    out += _check_leftover_links(plan)
+    out += _check_composition_labels(plan)
+    out += _check_unused_ingredients(plan)
 
     out.sort(key=lambda v: 0 if v["severity"] == "hard" else 1)
     return out

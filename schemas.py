@@ -232,3 +232,4 @@ class UserPreferences(TypedDict):
     target_protein_g: int              # Default: 100g (from L+D; supports weight loss at goal weight)
     target_fiber_g: int                # Default: 18g  (from L+D; supports ≥25g/day total)
     target_sodium_mg: int              # Default: 700mg per adult dinner serving (a ceiling, not a goal)
+    run_plan_critique: bool            # Default True — advisory Claude review pass after generation
