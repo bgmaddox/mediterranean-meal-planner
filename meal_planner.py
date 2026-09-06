@@ -462,7 +462,14 @@ def repair_plan_defects(
         if finding.get("meal_id"):
             by_meal.setdefault(finding["meal_id"], []).append(finding)
 
-    unresolved: list[dict] = [f for f in defects if not f.get("meal_id")]
+    def tag(findings: list[dict], outcome: str) -> list[dict]:
+        """Record *why* a defect is still on the list, so 'repair failed',
+        'repair was reverted' and 'the fix did not take' stay distinguishable."""
+        return [{**f, "repair_outcome": outcome} for f in findings]
+
+    unresolved: list[dict] = tag(
+        [f for f in defects if not f.get("meal_id")], "not_repairable"
+    )
     dinners_by_id = {str(d.get("id", "")): d for d in plan.get("dinners") or []}
 
     for meal_id, findings in by_meal.items():
@@ -479,7 +486,7 @@ def repair_plan_defects(
             try:
                 repaired = repair_meal(original, meal_type, findings, linked_dinner=linked)
             except MealPlanError:
-                unresolved += findings
+                unresolved += tag(findings, "repair_failed")
                 break
 
             meals[idx] = repaired
@@ -487,7 +494,7 @@ def repair_plan_defects(
             if introduced:
                 # The repair broke a rule the original satisfied. Keep the original.
                 meals[idx] = original
-                unresolved += findings
+                unresolved += tag(findings, "repair_reverted")
                 break
 
             if reproof:
@@ -497,7 +504,7 @@ def repair_plan_defects(
                 # The repair is kept either way — it passed every hard check. But a
                 # defect the fix did not resolve stays visible rather than silently
                 # disappearing because we tried.
-                unresolved += still_wrong
+                unresolved += tag(still_wrong, "survived_repair")
             break
 
     return plan, unresolved

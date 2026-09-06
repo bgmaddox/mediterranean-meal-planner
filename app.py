@@ -491,9 +491,17 @@ with tab_generate:
                         "A second opinion, not a rule — judgment calls that code can't check. "
                         "Worth reading, not worth obeying."
                     )
+                    # Why a defect is still listed, for the ones that went through repair.
+                    outcome_label = {
+                        "survived_repair": "fix attempted, didn't resolve it",
+                        "repair_failed": "fix attempt failed",
+                        "repair_reverted": "fix reverted — it broke a constraint",
+                    }
                     for n in from_critique:
                         label = f"**{n['meal_name']}** " if n["meal_name"] else ""
-                        st.markdown(f"- {label}{n['message']}")
+                        note = outcome_label.get(n.get("repair_outcome"))
+                        suffix = f" _({note})_" if note else ""
+                        st.markdown(f"- {label}{n['message']}{suffix}")
 
         special = summary.get("special_ingredients", [])
         if special:

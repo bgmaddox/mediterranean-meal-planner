@@ -27,7 +27,7 @@ from __future__ import annotations
 
 import difflib
 import re
-from typing import Iterable, Literal, Optional, TypedDict
+from typing import Iterable, Literal, NotRequired, Optional, TypedDict
 
 from schemas import WeekPlan, MealHistoryEntry
 from system_prompt import SODIUM_HARD_CEILING_MG, SODIUM_TARGET_DEFAULT_MG
@@ -42,6 +42,10 @@ class Violation(TypedDict):
     meal_id: str         # '' for week-level findings
     meal_name: str
     message: str         # human-readable, and readable enough to send back to Claude
+    # Set by meal_planner.repair_plan_defects on a defect that survived the repair
+    # pass, saying which way it survived. Without it, "repair failed", "repair was
+    # reverted" and "the fix didn't take" are indistinguishable after the fact.
+    repair_outcome: NotRequired[str]
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -352,12 +356,23 @@ def _check_special_ingredient_reuse(plan: WeekPlan) -> list[Violation]:
             key = str(ing.get("name", "")).strip().lower()
             if key:
                 uses.setdefault(key, set()).add(meal.get("name", ""))
-    return [
-        _week_level("special_ingredient_unused", "soft",
-                    f"flags '{name}' as a special ingredient but uses it in only one meal "
-                    f"({next(iter(where))}) — special ingredients should appear in 2+ meals")
-        for name, where in sorted(uses.items()) if len(where) < 2
-    ]
+    lonely = [(name, next(iter(where)))
+              for name, where in sorted(uses.items()) if len(where) < 2]
+    if not lonely:
+        return []
+
+    # One line per ingredient buried the three findings that mattered on the first
+    # real generation — eight of eleven notes were this one rule. Collapse them.
+    if len(lonely) == 1:
+        name, where = lonely[0]
+        detail = f"'{name}' (only in {where})"
+    else:
+        detail = ", ".join(f"'{name}'" for name, _ in lonely)
+    return [_week_level(
+        "special_ingredient_unused", "soft",
+        f"flags {len(lonely)} ingredient(s) as special but uses each in only one meal: "
+        f"{detail} — a special ingredient is a one-off worth reusing, so it should "
+        f"appear in 2+ meals (or not be flagged special)")]
 
 
 def _check_leftover_links(plan: WeekPlan) -> list[Violation]:

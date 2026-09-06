@@ -265,7 +265,10 @@ def test_special_ingredient_used_once_is_flagged():
         {"id": "d2", "name": "B", "ingredients": [special("pomegranate molasses")], "instructions": []},
     ])
     msgs = [v["message"] for v in cc.check_week_plan(p) if v["code"] == "special_ingredient_unused"]
-    assert len(msgs) == 2
+    # Collapsed into a single finding naming both — see
+    # test_many_lonely_special_ingredients_collapse_to_one_finding.
+    assert len(msgs) == 1
+    assert "harissa paste" in msgs[0] and "pomegranate molasses" in msgs[0]
 
 
 def test_special_ingredient_reused_passes():
@@ -415,3 +418,22 @@ def test_anchor_recipe_library_has_no_banned_ingredients():
         }
         findings += cc._check_banned(as_meal)
     assert not findings, [(v["meal_id"], v["message"]) for v in findings]
+
+
+def test_many_lonely_special_ingredients_collapse_to_one_finding():
+    """One line per ingredient buried the findings that mattered: eight of eleven
+    notes on the first real generation were this single rule."""
+    meals = [{"id": f"d{i}", "name": f"Dinner {i}", "instructions": [],
+              "ingredients": [special(f"ingredient {i}")]} for i in range(8)]
+    v = [x for x in cc.check_week_plan(plan(dinners=meals))
+         if x["code"] == "special_ingredient_unused"]
+    assert len(v) == 1
+    assert "8 ingredient(s)" in v[0]["message"]
+    assert "ingredient 7" in v[0]["message"]
+
+
+def test_single_lonely_special_ingredient_names_its_meal():
+    p = plan(dinners=[{"id": "d1", "name": "Tagine", "instructions": [],
+                       "ingredients": [special("ras el hanout")]}])
+    v = [x for x in cc.check_week_plan(p) if x["code"] == "special_ingredient_unused"]
+    assert len(v) == 1 and "only in Tagine" in v[0]["message"]

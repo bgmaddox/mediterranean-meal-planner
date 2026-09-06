@@ -302,3 +302,45 @@ def test_a_new_violation_is_still_rejected_on_such_a_plan(fake_repair):
     plan, unresolved = meal_planner.repair_plan_defects(plan, [finding()])
     assert plan["dinners"][0] == original
     assert len(unresolved) == 1
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Why a defect is still unresolved
+# ─────────────────────────────────────────────────────────────────────────────
+
+def test_failed_repair_is_tagged(fake_repair):
+    fake_repair(MealPlanError("boom"))
+    _, unresolved = meal_planner.repair_plan_defects(plan_with(dinner()), [finding()])
+    assert unresolved[0]["repair_outcome"] == "repair_failed"
+
+
+def test_reverted_repair_is_tagged(fake_repair):
+    fake_repair(dinner(ingredients=[{"name": "cremini mushrooms", "quantity": "8",
+                                     "unit": "oz", "pantry_staple": False,
+                                     "special": False}]))
+    _, unresolved = meal_planner.repair_plan_defects(plan_with(dinner()), [finding()])
+    assert unresolved[0]["repair_outcome"] == "repair_reverted"
+
+
+def test_surviving_defect_is_tagged(monkeypatch, fake_repair):
+    fake_repair(dinner(cook_time_minutes=45))
+    monkeypatch.setattr(plan_critique, "review_meal",
+                        lambda *a, **k: [finding(message="still wrong")])
+    _, unresolved = meal_planner.repair_plan_defects(
+        plan_with(dinner()), [finding()], reproof=True)
+    assert unresolved[0]["repair_outcome"] == "survived_repair"
+
+
+def test_week_level_finding_is_tagged_not_repairable(fake_repair):
+    fake_repair(dinner())
+    _, unresolved = meal_planner.repair_plan_defects(
+        plan_with(dinner()), [finding(meal_id="")])
+    assert unresolved[0]["repair_outcome"] == "not_repairable"
+
+
+def test_tagging_does_not_mutate_the_original_finding(fake_repair):
+    """The caller's list must not grow keys behind its back."""
+    fake_repair(MealPlanError("boom"))
+    original = finding()
+    meal_planner.repair_plan_defects(plan_with(dinner()), [original])
+    assert "repair_outcome" not in original

@@ -165,7 +165,7 @@ OUTPUT_SCHEMA = {
                         "quantity": "string",
                         "unit": "string",
                         "pantry_staple": "boolean",
-                        "special": "boolean — true if non-staple purchased this week; must appear in 2+ meals"
+                        "special": "boolean — waste flag, NOT 'non-staple'. True only for a one-off specialty item or an oversized perishable that would go to waste used once (za'atar, ras el hanout, fresh herbs, feta). NOT ordinary produce or proteins bought per-recipe (bell peppers, carrots, tomatoes, chicken). Anything flagged true must appear in 2+ meals."
                     }
                 ],
                 "instructions": ["string — numbered steps for a home cook"],
@@ -838,7 +838,22 @@ Items the family always has on hand. They must still appear in each recipe's `in
 {staples_str}
 
 ## Special Ingredient Rule:
-Non-staple perishables or specialty items must appear in ≥2 meals this week (confirm in `ingredient_overlap_notes`).
+`special: true` is a **waste flag**, not a synonym for "not a pantry staple". Set it only \
+for an ingredient that is bought as a one-off and would go to waste or sit unused if only \
+one recipe called for it — a specialty item you buy a whole jar of for one tablespoon \
+(ras el hanout, za'atar, pomegranate molasses, harissa, preserved lemon, tahini-adjacent \
+pastes), or a perishable sold in a quantity far larger than one meal needs (a bunch of \
+fresh herbs, a tub of Greek yogurt, a block of feta).
+
+Do **not** flag ordinary produce and staple proteins that are bought in the amount a \
+single recipe uses and keep or freeze well — bell peppers, carrots, tomatoes, zucchini, \
+onions, canned beans, chicken, salmon. Those are simply ingredients. Flagging them is the \
+most common error here, and it turns a real efficiency rule into noise.
+
+Anything you do flag `special: true` **must appear in ≥2 meals this week** — that is the \
+entire point of the flag. If an ingredient only earns one meal, either build a second use \
+for it or leave `special: false`. Confirm every special ingredient in \
+`ingredient_overlap_notes`.
 
 ---
 
