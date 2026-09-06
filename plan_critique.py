@@ -38,9 +38,19 @@ from constraint_check import Violation
 from schemas import WeekPlan
 from system_prompt import HEALTH_RULES_SUMMARY, PLATE_GEOMETRY_SUMMARY
 
-# The reviewer runs on the current flagship. Drop to "claude-sonnet-5" if the
-# per-generation cost matters more than the quality of the review.
-CRITIQUE_MODEL = "claude-opus-5"
+# Sonnet 5 rather than Opus 5, on measurement rather than principle. On the same
+# stored week, three Sonnet runs found 10, 14 and 13 defects against Opus 5's 10,
+# recovered 9 of Opus's 10 (all three missed the same one), and found two that
+# Opus missed entirely — leftover lunches contradicting their own dinner's
+# lunch_scaling_instructions. It cost $0.195 against ~$0.42 and ran in 35s
+# against 72s.
+#
+# The honest caveat: that spread of 10/14/13 on an identical plan is run-to-run
+# variance wider than the gap between the models, and Opus was only sampled once.
+# The evidence supports "Sonnet is not worse for half the price", not "Sonnet is
+# better". Writing a corrected recipe is the harder half and stays on the
+# generation model — see meal_planner.repair_meal.
+CRITIQUE_MODEL = "claude-sonnet-5"
 
 # How many per-meal reviews run at once. A week is 10-14 meals; these are small
 # independent calls, so they parallelize cleanly.

@@ -410,6 +410,12 @@ def repair_plan_defects(
     user_constraints: list[str] | None = None,
     target_sodium_mg: int | None = None,
     history: list | None = None,
+    # Re-proofing stays on. It was the obvious thing to cut when the review model
+    # was Opus 5 and it cost about a third of the run; on Sonnet 5 that is roughly
+    # $0.12, and it buys the one thing this pipeline exists for — knowing whether
+    # a fix actually landed. On the real stored week it caught two defects the
+    # repairs introduced or left behind, which would otherwise have shipped
+    # silently under the impression they were fixed.
     reproof: bool = True,
 ) -> tuple[WeekPlan, list[dict]]:
     """
