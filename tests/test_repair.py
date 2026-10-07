@@ -193,10 +193,33 @@ class FakeBlock:
         self.type, self.text = "text", text
 
 
+class FakeThinking:
+    type = "thinking"
+    thinking = ""
+
+
 class FakeResp:
+    # Opus 5.5 always opens with a thinking block, so the fake does too — a
+    # caller reading content[0] as text would fail here the way it would live.
+    stop_reason = "end_turn"
+
     def __init__(self, payload):
-        self.content = [FakeBlock(payload if isinstance(payload, str)
-                                  else json.dumps(payload))]
+        self.content = [FakeThinking(), FakeBlock(payload if isinstance(payload, str)
+                                                  else json.dumps(payload))]
+
+
+class FakeStream:
+    def __init__(self, resp):
+        self.resp = resp
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        return False
+
+    def get_final_message(self):
+        return self.resp
 
 
 @pytest.fixture
@@ -205,11 +228,11 @@ def fake_api(monkeypatch):
 
     def install(payload):
         class M:
-            def create(self, **kw):
+            def stream(self, **kw):
                 calls.append(kw)
                 if isinstance(payload, Exception):
                     raise payload
-                return FakeResp(payload)
+                return FakeStream(FakeResp(payload))
         class C:
             messages = M()
         monkeypatch.setattr(meal_planner, "_client", lambda: C())

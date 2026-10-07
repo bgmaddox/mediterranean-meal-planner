@@ -38,19 +38,15 @@ from constraint_check import Violation
 from schemas import WeekPlan
 from system_prompt import HEALTH_RULES_SUMMARY, PLATE_GEOMETRY_SUMMARY
 
-# Sonnet 5 rather than Opus 5, on measurement rather than principle. On the same
-# stored week, three Sonnet runs found 10, 14 and 13 defects against Opus 5's 10,
-# recovered 9 of Opus's 10 (all three missed the same one), and found two that
-# Opus missed entirely — leftover lunches contradicting their own dinner's
-# lunch_scaling_instructions. It cost $0.195 against ~$0.42 and ran in 35s
-# against 72s.
-#
-# The honest caveat: that spread of 10/14/13 on an identical plan is run-to-run
-# variance wider than the gap between the models, and Opus was only sampled once.
-# The evidence supports "Sonnet is not worse for half the price", not "Sonnet is
-# better". Writing a corrected recipe is the harder half and stays on the
-# generation model — see meal_planner.repair_meal.
-CRITIQUE_MODEL = "claude-sonnet-5"
+# Opus 5.5, by choice (2026-10-07), with everything on one model. The earlier
+# measurement chose Sonnet 5 over Opus 5: on the same stored week, three Sonnet
+# runs found 10, 14 and 13 defects against Opus 5's 10, at $0.195 against ~$0.42.
+# That spread was run-to-run variance wider than the gap between models, so it
+# showed "Sonnet is not worse for half the price", not "Sonnet is better".
+# Opus 5.5 costs less than Opus 5 did ($4/$20 per MTok), which narrows the gap
+# to 2x. The app is now the backup path, and the primary path (a Claude Code
+# session) has no per-call cost. To go back, set this to "claude-sonnet-5-5".
+CRITIQUE_MODEL = "claude-opus-5-5"
 
 # How many per-meal reviews run at once. A week is 10-14 meals; these are small
 # independent calls, so they parallelize cleanly.

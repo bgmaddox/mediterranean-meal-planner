@@ -36,7 +36,13 @@ from system_prompt import (
     build_system_prompt,
 )
 
-MODEL = "claude-opus-4-8"
+MODEL = "claude-opus-5-5"
+
+# Opus 5.5 always thinks (it cannot be disabled), so a response opens with a
+# thinking block, and its default effort is `medium`. Every call goes through
+# _ask(), which streams (thinking makes long calls long), sets effort
+# explicitly, and returns only the text blocks.
+_MAX_TOKENS = 64000
 
 
 # Generation attempts before giving up. Each attempt is a full plan generation,
@@ -57,6 +63,30 @@ def _client() -> anthropic.Anthropic:
             "Export it before running the app."
         )
     return anthropic.Anthropic(api_key=api_key)
+
+
+def _ask(system: str, user_message: str, *, effort: str = "high",
+         client: Optional[anthropic.Anthropic] = None) -> str:
+    """One call to MODEL. Returns the concatenated text blocks.
+
+    Raises anthropic.APIError on API failure (callers wrap it in MealPlanError),
+    and MealPlanError if the response was cut off or refused — a truncated JSON
+    plan would otherwise surface as a confusing parse error.
+    """
+    client = client or _client()
+    with client.messages.stream(
+        model=MODEL,
+        max_tokens=_MAX_TOKENS,
+        system=system,
+        messages=[{"role": "user", "content": user_message}],
+        output_config={"effort": effort},
+    ) as stream:
+        response = stream.get_final_message()
+    if response.stop_reason == "max_tokens":
+        raise MealPlanError("Claude's response was cut off before it finished.")
+    if response.stop_reason == "refusal":
+        raise MealPlanError("Claude declined this request.")
+    return "".join(b.text for b in response.content if b.type == "text")
 
 
 def _strip_fences(raw: str) -> str:
@@ -156,17 +186,12 @@ def generate_week_plan_from_prompts(
 
     for attempt in range(_MAX_GENERATION_ATTEMPTS):
         try:
-            response = client.messages.create(
-                model=MODEL,
-                max_tokens=16000,
-                system=system_prompt,
-                messages=[{"role": "user", "content": message}],
-            )
+            text = _ask(system_prompt, message, client=client)
         except anthropic.APIError as e:
             # Infrastructure failure — retrying with a modified prompt won't help.
             raise MealPlanError(f"Claude API error: {e}") from e
 
-        raw = _strip_fences(response.content[0].text)
+        raw = _strip_fences(text)
 
         try:
             try:
@@ -379,16 +404,11 @@ as the recipe above, including "id": "{meal.get('id', '')}". Change only what th
 problems require, plus whatever must change to stay consistent with it."""
 
     try:
-        response = _client().messages.create(
-            model=MODEL,
-            max_tokens=4000,
-            system=_REPAIR_SYSTEM,
-            messages=[{"role": "user", "content": user_message}],
-        )
+        text = _ask(_REPAIR_SYSTEM, user_message)
     except anthropic.APIError as e:
         raise MealPlanError(f"Claude API error during repair: {e}") from e
 
-    raw = _strip_fences(response.content[0].text)
+    raw = _strip_fences(text)
     try:
         repaired = json.loads(raw)
     except json.JSONDecodeError as e:
@@ -674,16 +694,11 @@ Return ONLY this JSON structure:
 {json.dumps(schema, indent=2)}"""
 
     try:
-        response = _client().messages.create(
-            model=MODEL,
-            max_tokens=3000,
-            system=_SWAP_SYSTEM,
-            messages=[{"role": "user", "content": user_message}],
-        )
+        text = _ask(_SWAP_SYSTEM, user_message)
     except anthropic.APIError as e:
         raise MealPlanError(f"Claude API error during swap: {e}") from e
 
-    raw = _strip_fences(response.content[0].text)
+    raw = _strip_fences(text)
 
     try:
         data = json.loads(raw)
@@ -845,16 +860,11 @@ Current {meal_type}{paired_note} as JSON:
 {json.dumps(payload, indent=2)}"""
 
     try:
-        response = _client().messages.create(
-            model=MODEL,
-            max_tokens=3000,
-            system=_SUBSTITUTE_SYSTEM,
-            messages=[{"role": "user", "content": user_message}],
-        )
+        text = _ask(_SUBSTITUTE_SYSTEM, user_message)
     except anthropic.APIError as e:
         raise MealPlanError(f"Claude API error during substitution: {e}") from e
 
-    raw = _strip_fences(response.content[0].text)
+    raw = _strip_fences(text)
 
     try:
         data = json.loads(raw)
@@ -974,16 +984,11 @@ Current {meal_type} as JSON:
 {json.dumps({"meal": meal}, indent=2)}"""
 
     try:
-        response = _client().messages.create(
-            model=MODEL,
-            max_tokens=3000,
-            system=_SCALE_SYSTEM,
-            messages=[{"role": "user", "content": user_message}],
-        )
+        text = _ask(_SCALE_SYSTEM, user_message)
     except anthropic.APIError as e:
         raise MealPlanError(f"Claude API error during resize: {e}") from e
 
-    raw = _strip_fences(response.content[0].text)
+    raw = _strip_fences(text)
 
     try:
         data = json.loads(raw)
@@ -1097,12 +1102,7 @@ def generate_kid_notes(week_plan: WeekPlan) -> str:
     )
 
     try:
-        response = _client().messages.create(
-            model=MODEL,
-            max_tokens=3000,
-            system=kid_notes_system,
-            messages=[{"role": "user", "content": user_message}],
-        )
+        text = _ask(kid_notes_system, user_message, effort="medium")
     except anthropic.APIError as e:
         raise MealPlanError(f"Claude API error during kid notes generation: {e}") from e
 
@@ -1113,4 +1113,4 @@ def generate_kid_notes(week_plan: WeekPlan) -> str:
         f"{'=' * 47}\n\n"
     )
 
-    return header + response.content[0].text.strip()
+    return header + text.strip()
