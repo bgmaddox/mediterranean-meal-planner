@@ -146,7 +146,7 @@ def test_review_packets_use_the_apps_rubric(sandbox):
     out = sandbox / "packets"
     cli.main(["review-packets", write(sandbox, "p.json", plan), "--out", str(out)])
     ids = [m["id"] for m in plan["dinners"] + plan["lunches"]]
-    assert sorted(p.stem for p in out.glob("*.md")) == sorted(ids + ["week"])
+    assert sorted(p.stem for p in out.glob("*.md")) == sorted(ids + ["week", "walkthrough", "shopping"])
     assert plan_critique._DEFECT_SYSTEM in (out / f"{ids[0]}.md").read_text()
 
     cli.main(["review-packets", write(sandbox, "p.json", plan), "--out", str(out),
@@ -308,3 +308,31 @@ def test_add_anchor_refuses_a_bad_recipe(sandbox):
     path = write(sandbox, "a.json", good_anchor(summary="Glaze with orange juice."))
     assert cli.main(["add-anchor", path, "--offline"]) == 1
     assert data_store.load_anchor_user_recipes() == before
+
+
+def test_week_level_packets_carry_their_rubrics_and_the_data(sandbox):
+    import week_review
+    plan = stored_week(CLEAN)
+    out = sandbox / "packets"
+    cli.main(["review-packets", write(sandbox, "p.json", plan), "--out", str(out)])
+    walk = (out / "walkthrough.md").read_text()
+    shop = (out / "shopping.md").read_text()
+    assert week_review.WALKTHROUGH_SYSTEM in walk and '"order"' in walk
+    assert plan["dinners"][0]["name"] in walk
+    assert week_review.SHOPPING_SYSTEM in shop
+    # Pantry staples are not shopping questions.
+    staple = next((i["name"].lower() for m in plan["dinners"] for i in m["ingredients"]
+                   if i.get("pantry_staple")), None)
+    if staple:
+        assert f'"{staple}":' not in shop.split("Who uses each ingredient:")[1].split("Instructions by meal")[0]
+
+
+def test_week_level_findings_are_accepted_as_notes(sandbox):
+    plan = stored_week(CLEAN)
+    notes = write(sandbox, "n.json", {"findings": [
+        {"meal_id": "", "meal_name": "", "category": "package_waste", "message": "buys a bunch of dill for 1 tbsp"},
+        {"meal_id": "", "meal_name": "", "category": "freshness", "message": "uses Sunday's berries on Friday"},
+    ]})
+    out = cli._session_notes(plan, notes)
+    assert {n["code"] for n in out} == {"critique_package_waste", "critique_freshness"}
+    assert all("repair_outcome" not in n for n in out)

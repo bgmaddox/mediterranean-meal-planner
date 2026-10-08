@@ -419,6 +419,13 @@ def cmd_review_packets(args) -> int:
             + "\n\nReview this week plan:\n\n" + pc._plan_for_review(plan)
         )
         written.append("week")
+        # Session-only rubrics: the week as cooked, and as shopped.
+        import shopping
+        import week_review
+        (out / "walkthrough.md").write_text(week_review.walkthrough_packet(plan))
+        (out / "shopping.md").write_text(
+            week_review.shopping_packet(plan, shopping.build_shopping_list(plan)))
+        written += ["walkthrough", "shopping"]
     print(f"Wrote {len(written)} packets to {out}: {', '.join(written)}")
     return 0
 
@@ -517,9 +524,11 @@ def _session_notes(plan: dict, notes_path: str | None) -> list[dict]:
     if not notes_path:
         return []
     import plan_critique as pc
+    import week_review
     raw = json.loads(Path(notes_path).read_text())
     findings = raw.get("findings", raw) if isinstance(raw, dict) else raw
-    notes = pc._to_violations(findings, pc._meal_ids(plan), pc.CATEGORIES, cap=100)
+    notes = pc._to_violations(findings, pc._meal_ids(plan),
+                              pc.CATEGORIES | week_review.CATEGORIES, cap=100)
     for n in notes:
         if n["code"].removeprefix("critique_") in pc.DEFECT_CATEGORIES:
             n["repair_outcome"] = "left_in_session"

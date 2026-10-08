@@ -496,6 +496,7 @@ with tab_generate:
                         "survived_repair": "fix attempted, didn't resolve it",
                         "repair_failed": "fix attempt failed",
                         "repair_reverted": "fix reverted — it broke a constraint",
+                        "left_in_session": "left as-is when planned in Claude Code",
                     }
                     for n in from_critique:
                         label = f"**{n['meal_name']}** " if n["meal_name"] else ""
