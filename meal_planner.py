@@ -21,10 +21,13 @@ All functions raise MealPlanError on API failure or unparseable response.
 import json
 import os
 from datetime import date
+from typing import Optional
 
 import anthropic
 
+import constraint_check
 import data_store
+import plan_critique
 from schemas import DinnerMeal, LunchMeal, WeekPlan
 from system_prompt import (
     DEFAULT_CONSTRAINTS,
@@ -33,7 +36,19 @@ from system_prompt import (
     build_system_prompt,
 )
 
-MODEL = "claude-opus-4-8"
+MODEL = "claude-opus-5-5"
+
+# Opus 5.5 always thinks (it cannot be disabled), so a response opens with a
+# thinking block, and its default effort is `medium`. Every call goes through
+# _ask(), which streams (thinking makes long calls long), sets effort
+# explicitly, and returns only the text blocks.
+_MAX_TOKENS = 64000
+
+
+# Generation attempts before giving up. Each attempt is a full plan generation,
+# so this is deliberately small; the extra attempt over the original 2 exists
+# because constraint checking now rejects plans that previously slipped through.
+_MAX_GENERATION_ATTEMPTS = 3
 
 
 class MealPlanError(Exception):
@@ -48,6 +63,30 @@ def _client() -> anthropic.Anthropic:
             "Export it before running the app."
         )
     return anthropic.Anthropic(api_key=api_key)
+
+
+def _ask(system: str, user_message: str, *, effort: str = "high",
+         client: Optional[anthropic.Anthropic] = None) -> str:
+    """One call to MODEL. Returns the concatenated text blocks.
+
+    Raises anthropic.APIError on API failure (callers wrap it in MealPlanError),
+    and MealPlanError if the response was cut off or refused — a truncated JSON
+    plan would otherwise surface as a confusing parse error.
+    """
+    client = client or _client()
+    with client.messages.stream(
+        model=MODEL,
+        max_tokens=_MAX_TOKENS,
+        system=system,
+        messages=[{"role": "user", "content": user_message}],
+        output_config={"effort": effort},
+    ) as stream:
+        response = stream.get_final_message()
+    if response.stop_reason == "max_tokens":
+        raise MealPlanError("Claude's response was cut off before it finished.")
+    if response.stop_reason == "refusal":
+        raise MealPlanError("Claude declined this request.")
+    return "".join(b.text for b in response.content if b.type == "text")
 
 
 def _strip_fences(raw: str) -> str:
@@ -76,21 +115,31 @@ def build_generation_prompts(
     cuisine_notes: str | None = None,
     use_up_ingredients: str | None = None,
     days: int = 5,
+    anchor_ids: list[str] | None = None,
 ) -> tuple[str, str]:
     """
     Build the system prompt and user message for generate_week_plan without
     calling the API. Used by the prompt-preview dialog in app.py.
+
+    `anchor_ids` replaces the random anchor sample with chosen recipes. A
+    Claude Code session picks them from the whole library (cli.py anchors);
+    the app keeps rotating a random sample.
 
     Returns
     -------
     (system_prompt, user_message, require_kid_adaptation)
     """
     prefs = data_store.load_preferences()
-    anchor_recipes = (
-        data_store.select_anchor_recipes(days=days, use_up_ingredients=use_up_ingredients)
-        if prefs.get("use_anchor_recipes", True)
-        else None
-    )
+    if anchor_ids:
+        by_id = {a["id"]: a for a in data_store.load_anchor_recipes()}
+        unknown = [i for i in anchor_ids if i not in by_id]
+        if unknown:
+            raise MealPlanError(f"Unknown anchor recipe id(s): {', '.join(unknown)}")
+        anchor_recipes = [by_id[i] for i in anchor_ids]
+    elif prefs.get("use_anchor_recipes", True):
+        anchor_recipes = data_store.select_anchor_recipes(days=days, use_up_ingredients=use_up_ingredients)
+    else:
+        anchor_recipes = None
     system_prompt = build_system_prompt(
         history=data_store.history_for_prompt(),
         favorites=data_store.load_favorites(),
@@ -111,33 +160,48 @@ def build_generation_prompts(
     return system_prompt, _DEFAULT_USER_MESSAGE, require_kid
 
 
-def generate_week_plan_from_prompts(system_prompt: str, user_message: str, expected_days: int = 5, require_kid_adaptation: bool = True) -> WeekPlan:
+def generate_week_plan_from_prompts(
+    system_prompt: str,
+    user_message: str,
+    expected_days: int = 5,
+    require_kid_adaptation: bool = True,
+    user_constraints: list[str] | None = None,
+    target_sodium_mg: int | None = None,
+    history: list | None = None,
+) -> WeekPlan:
     """
     Call Claude with pre-built prompts and return a validated WeekPlan.
     Used after the prompt-preview dialog allows editing.
 
+    Structural validation (`_validate_plan`) and constraint checking
+    (`constraint_check.check_week_plan`) both run on the response. A hard
+    constraint violation — a banned ingredient, fish in a lunch, sodium over
+    the ceiling — is rejected the same way a malformed response is, and the
+    specific reason is fed back into the next attempt. Soft findings are
+    attached to the plan under `_soft_violations` for the UI to surface; they
+    never trigger a regeneration.
+
     Raises
     ------
     MealPlanError on API failure, or if the response is still invalid after
-    one automatic retry (the retry feeds the failure reason back to Claude).
+    the automatic retries (each retry feeds the failure reason back to Claude).
     """
     client = _client()
     message = user_message
     last_error: MealPlanError | None = None
+    if target_sodium_mg is None:
+        target_sodium_mg = data_store.load_preferences().get(
+            "target_sodium_mg", constraint_check.SODIUM_TARGET_DEFAULT_MG
+        )
 
-    for attempt in range(2):
+    for attempt in range(_MAX_GENERATION_ATTEMPTS):
         try:
-            response = client.messages.create(
-                model=MODEL,
-                max_tokens=16000,
-                system=system_prompt,
-                messages=[{"role": "user", "content": message}],
-            )
+            text = _ask(system_prompt, message, client=client)
         except anthropic.APIError as e:
             # Infrastructure failure — retrying with a modified prompt won't help.
             raise MealPlanError(f"Claude API error: {e}") from e
 
-        raw = _strip_fences(response.content[0].text)
+        raw = _strip_fences(text)
 
         try:
             try:
@@ -154,6 +218,36 @@ def generate_week_plan_from_prompts(system_prompt: str, user_message: str, expec
 
             plan: WeekPlan = data["week_plan"]
             _validate_plan(plan, expected_days, require_kid_adaptation=require_kid_adaptation)
+
+            violations = constraint_check.check_week_plan(
+                plan,
+                user_constraints=user_constraints,
+                target_sodium_mg=target_sodium_mg,
+                history=history,
+            )
+            hard = constraint_check.hard_violations(violations)
+            if hard:
+                raise MealPlanError(
+                    "The plan breaks food constraints that are absolute:\n"
+                    + constraint_check.format_violations(hard)
+                )
+
+            soft = [v for v in violations if v["severity"] == "soft"]
+
+            # Model review. Defects (contradictions inside one recipe) are
+            # repaired in place; judgments (variety, plate geometry) are advisory.
+            # Both passes fail open, so a review failure costs notes, not the plan.
+            if data_store.load_preferences().get("run_plan_critique", True):
+                defects, judgments = plan_critique.critique_plan(plan)
+                plan, unresolved = repair_plan_defects(
+                    plan, defects,
+                    user_constraints=user_constraints,
+                    target_sodium_mg=target_sodium_mg,
+                    history=history,
+                )
+                soft += unresolved + judgments
+
+            plan["_soft_violations"] = soft
             return plan
         except MealPlanError as e:
             last_error = e
@@ -191,7 +285,17 @@ def generate_week_plan(week_notes: str | None = None, cuisine_notes: str | None 
     MealPlanError on API or parse failure.
     """
     system_prompt, user_message, require_kid = build_generation_prompts(week_notes, cuisine_notes, use_up_ingredients, days)
-    return generate_week_plan_from_prompts(system_prompt, user_message, expected_days=days, require_kid_adaptation=require_kid)
+    return generate_week_plan_from_prompts(
+        system_prompt,
+        user_message,
+        expected_days=days,
+        require_kid_adaptation=require_kid,
+        user_constraints=data_store.active_constraints_for_prompt(),
+        target_sodium_mg=data_store.load_preferences().get(
+            "target_sodium_mg", constraint_check.SODIUM_TARGET_DEFAULT_MG
+        ),
+        history=data_store.load_history()[:6],
+    )
 
 
 def _validate_plan(plan: WeekPlan, days: int = 5, require_kid_adaptation: bool = True) -> None:
@@ -221,6 +325,219 @@ def _validate_plan(plan: WeekPlan, days: int = 5, require_kid_adaptation: bool =
                 f"Week has only {non_classic} vegetable-forward/mezze dinner(s); "
                 f"at least {non_classic_min} required. Regenerate."
             )
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Repair a meal
+#
+# The response to "this one recipe contradicts itself" is to fix that recipe,
+# not to regenerate the week — a full regeneration discards four good dinners to
+# fix the fifth, and rolls the dice again on everything it replaces.
+#
+# Three rules keep the repair from doing harm:
+#   1. One attempt per meal, ever. A stubborn finding must not become a loop.
+#   2. The repaired plan is re-checked by constraint_check; a repair that
+#      introduces a hard violation is discarded and the original kept.
+#   3. The repaired meal is re-proofread. If the defect survives, the repair is
+#      still kept when it is clean, but the finding stays visible to the user.
+# ─────────────────────────────────────────────────────────────────────────────
+
+_REPAIR_SYSTEM = f"""You are fixing one recipe in a weekly meal plan. A reviewer found a specific problem with it. Your job is to return the same dish with that problem fixed — not a different dish.
+
+Rules:
+1. Keep the dish. Same name, same core ingredients, same method, same equipment, same slot in the week. You are correcting an error, not swapping the meal.
+2. Fix the problem at its cause. If the kid adaptation is impossible because the spices go in at the start, restructure the method so a portion can be pulled early — do not just reword the adaptation to describe what the method already does.
+3. Keep the `id` exactly as given.
+4. Everything you change must stay consistent with the rest of the recipe. If you change a quantity, update the servings, the nutrition estimate, and any scaling note that depends on it.
+5. Satisfy all health constraints:
+{HEALTH_RULES_SUMMARY}
+6. Follow {PLATE_GEOMETRY_SUMMARY}
+7. Obey every food constraint listed in the message — these are hard rules.
+
+Return ONLY valid JSON for a single meal object matching the schema provided. No preamble, no markdown fences."""
+
+
+def repair_meal(
+    meal: DinnerMeal | LunchMeal,
+    meal_type: str,
+    findings: list[dict],
+    linked_dinner: Optional[dict] = None,
+) -> DinnerMeal | LunchMeal:
+    """
+    Ask Claude to fix specific defects in one meal, keeping the dish the same.
+
+    Parameters
+    ----------
+    meal : DinnerMeal or LunchMeal
+        The meal to repair.
+    meal_type : str
+        'dinner' or 'lunch'.
+    findings : list of Violation
+        The defects to fix, from plan_critique.review_meal.
+    linked_dinner : dict, optional
+        For a leftover lunch, the dinner it comes from — a quantity or leftover
+        finding usually cannot be fixed without it.
+
+    Returns
+    -------
+    The repaired meal.
+
+    Raises
+    ------
+    MealPlanError on API failure, parse failure, or a response that changed the id.
+    """
+    prefs = data_store.load_preferences()
+    constraints = DEFAULT_CONSTRAINTS + data_store.active_constraints_for_prompt()
+    problems = "\n".join(f"- {f['message']}" for f in findings)
+
+    linked_block = ""
+    if linked_dinner is not None:
+        linked_block = (
+            f"\n\nThis lunch is the leftover of this dinner. Its portions and scaling "
+            f"note are the constraint you must fit:\n"
+            f"{json.dumps({k: linked_dinner.get(k) for k in ('name', 'servings', 'ingredients', 'lunch_scaling_instructions')}, indent=1)}"
+        )
+
+    user_message = f"""Fix this {meal_type}. A reviewer found these problems with it:
+{problems}
+
+The recipe as it stands:
+{json.dumps(meal, indent=1)}{linked_block}
+
+Food constraints — HARD RULES (never violate):
+{chr(10).join(f"- {c}" for c in constraints)}
+
+Household: {prefs['lunch_adult_count']} adult(s) for lunch; family of {2 + len(prefs.get('children') or [])} for dinner (2 adults + {len(prefs.get('children') or [])} kids).
+
+Return the corrected {meal_type} as a single JSON object with exactly the same keys \
+as the recipe above, including "id": "{meal.get('id', '')}". Change only what the \
+problems require, plus whatever must change to stay consistent with it."""
+
+    try:
+        text = _ask(_REPAIR_SYSTEM, user_message)
+    except anthropic.APIError as e:
+        raise MealPlanError(f"Claude API error during repair: {e}") from e
+
+    raw = _strip_fences(text)
+    try:
+        repaired = json.loads(raw)
+    except json.JSONDecodeError as e:
+        raise MealPlanError(f"Repair response was not valid JSON: {e}") from e
+
+    if not isinstance(repaired, dict) or not repaired.get("name"):
+        raise MealPlanError("Repair response was not a meal object.")
+    if str(repaired.get("id", "")) != str(meal.get("id", "")):
+        raise MealPlanError(
+            f"Repair changed the meal id ({meal.get('id')} -> {repaired.get('id')})."
+        )
+    return repaired
+
+
+def repair_plan_defects(
+    plan: WeekPlan,
+    defects: list[dict],
+    *,
+    user_constraints: list[str] | None = None,
+    target_sodium_mg: int | None = None,
+    history: list | None = None,
+    # Re-proofing stays on. It was the obvious thing to cut when the review model
+    # was Opus 5 and it cost about a third of the run; on Sonnet 5 that is roughly
+    # $0.12, and it buys the one thing this pipeline exists for — knowing whether
+    # a fix actually landed. On the real stored week it caught two defects the
+    # repairs introduced or left behind, which would otherwise have shipped
+    # silently under the impression they were fixed.
+    reproof: bool = True,
+) -> tuple[WeekPlan, list[dict]]:
+    """
+    Repair every meal a defect was found in, one attempt each.
+
+    A repaired meal is spliced into the plan only if the plan still passes
+    `constraint_check` with zero hard violations. Anything else — an API failure,
+    a malformed response, a repair that breaks a constraint — leaves the original
+    meal untouched.
+
+    Returns ``(plan, unresolved)``: the plan with accepted repairs applied, and
+    the findings that were not fixed, so they can still be shown to the user.
+    """
+    if not defects:
+        return plan, []
+
+    if target_sodium_mg is None:
+        target_sodium_mg = data_store.load_preferences().get(
+            "target_sodium_mg", constraint_check.SODIUM_TARGET_DEFAULT_MG
+        )
+
+    def hard_set(candidate: WeekPlan) -> set[tuple[str, str]]:
+        """Hard violations as (meal_id, code) pairs."""
+        return {
+            (v["meal_id"], v["code"])
+            for v in constraint_check.hard_violations(
+                constraint_check.check_week_plan(
+                    candidate,
+                    user_constraints=user_constraints,
+                    target_sodium_mg=target_sodium_mg,
+                    history=history,
+                )
+            )
+        }
+
+    # The bar is "this repair introduced nothing new", not "the plan is clean".
+    # A plan can arrive here already carrying a hard violation — repair_plan_defects
+    # is callable on a stored plan, not just on one fresh out of the generation
+    # gate — and measuring against zero would reject every repair on such a plan.
+    baseline_hard = hard_set(plan)
+
+    by_meal: dict[str, list[dict]] = {}
+    for finding in defects:
+        if finding.get("meal_id"):
+            by_meal.setdefault(finding["meal_id"], []).append(finding)
+
+    def tag(findings: list[dict], outcome: str) -> list[dict]:
+        """Record *why* a defect is still on the list, so 'repair failed',
+        'repair was reverted' and 'the fix did not take' stay distinguishable."""
+        return [{**f, "repair_outcome": outcome} for f in findings]
+
+    unresolved: list[dict] = tag(
+        [f for f in defects if not f.get("meal_id")], "not_repairable"
+    )
+    dinners_by_id = {str(d.get("id", "")): d for d in plan.get("dinners") or []}
+
+    for meal_id, findings in by_meal.items():
+        for meal_type, key in (("dinner", "dinners"), ("lunch", "lunches")):
+            meals = plan.get(key) or []
+            idx = next((i for i, m in enumerate(meals)
+                        if str(m.get("id", "")) == meal_id), None)
+            if idx is None:
+                continue
+
+            original = meals[idx]
+            linked = (dinners_by_id.get(str(original.get("leftover_from_dinner_id") or ""))
+                      if meal_type == "lunch" else None)
+            try:
+                repaired = repair_meal(original, meal_type, findings, linked_dinner=linked)
+            except MealPlanError:
+                unresolved += tag(findings, "repair_failed")
+                break
+
+            meals[idx] = repaired
+            introduced = hard_set(plan) - baseline_hard
+            if introduced:
+                # The repair broke a rule the original satisfied. Keep the original.
+                meals[idx] = original
+                unresolved += tag(findings, "repair_reverted")
+                break
+
+            if reproof:
+                still_wrong = plan_critique.review_meal(
+                    repaired, meal_type, linked_dinner=linked
+                )
+                # The repair is kept either way — it passed every hard check. But a
+                # defect the fix did not resolve stays visible rather than silently
+                # disappearing because we tried.
+                unresolved += tag(still_wrong, "survived_repair")
+            break
+
+    return plan, unresolved
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -387,16 +704,11 @@ Return ONLY this JSON structure:
 {json.dumps(schema, indent=2)}"""
 
     try:
-        response = _client().messages.create(
-            model=MODEL,
-            max_tokens=3000,
-            system=_SWAP_SYSTEM,
-            messages=[{"role": "user", "content": user_message}],
-        )
+        text = _ask(_SWAP_SYSTEM, user_message)
     except anthropic.APIError as e:
         raise MealPlanError(f"Claude API error during swap: {e}") from e
 
-    raw = _strip_fences(response.content[0].text)
+    raw = _strip_fences(text)
 
     try:
         data = json.loads(raw)
@@ -558,16 +870,11 @@ Current {meal_type}{paired_note} as JSON:
 {json.dumps(payload, indent=2)}"""
 
     try:
-        response = _client().messages.create(
-            model=MODEL,
-            max_tokens=3000,
-            system=_SUBSTITUTE_SYSTEM,
-            messages=[{"role": "user", "content": user_message}],
-        )
+        text = _ask(_SUBSTITUTE_SYSTEM, user_message)
     except anthropic.APIError as e:
         raise MealPlanError(f"Claude API error during substitution: {e}") from e
 
-    raw = _strip_fences(response.content[0].text)
+    raw = _strip_fences(text)
 
     try:
         data = json.loads(raw)
@@ -687,16 +994,11 @@ Current {meal_type} as JSON:
 {json.dumps({"meal": meal}, indent=2)}"""
 
     try:
-        response = _client().messages.create(
-            model=MODEL,
-            max_tokens=3000,
-            system=_SCALE_SYSTEM,
-            messages=[{"role": "user", "content": user_message}],
-        )
+        text = _ask(_SCALE_SYSTEM, user_message)
     except anthropic.APIError as e:
         raise MealPlanError(f"Claude API error during resize: {e}") from e
 
-    raw = _strip_fences(response.content[0].text)
+    raw = _strip_fences(text)
 
     try:
         data = json.loads(raw)
@@ -810,12 +1112,7 @@ def generate_kid_notes(week_plan: WeekPlan) -> str:
     )
 
     try:
-        response = _client().messages.create(
-            model=MODEL,
-            max_tokens=3000,
-            system=kid_notes_system,
-            messages=[{"role": "user", "content": user_message}],
-        )
+        text = _ask(kid_notes_system, user_message, effort="medium")
     except anthropic.APIError as e:
         raise MealPlanError(f"Claude API error during kid notes generation: {e}") from e
 
@@ -826,4 +1123,4 @@ def generate_kid_notes(week_plan: WeekPlan) -> str:
         f"{'=' * 47}\n\n"
     )
 
-    return header + response.content[0].text.strip()
+    return header + text.strip()

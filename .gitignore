@@ -39,3 +39,7 @@ temp/
 
 # Source recipe PDFs (copyrighted; not for the public repo)
 recipes/
+
+# Claude Code session planning: mirror of the Pi data, and session drafts
+.pi-data/
+sessions/

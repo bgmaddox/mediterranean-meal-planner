@@ -24,6 +24,7 @@ class Ingredient(TypedDict):
     unit: str
     pantry_staple: bool
     special: bool          # True → non-staple purchased this week; must appear in 2+ meals
+    made_in: NotRequired[Optional[str]]  # 'd3' / 'sunday_prep' — made in another recipe, not bought
 
 
 class DinnerServings(TypedDict):
@@ -120,6 +121,10 @@ class WeekPlan(TypedDict):
     sunday_prep_list: list[SundayPrepTask]
     week_summary: WeekSummary
     snacks: NotRequired[list[SnackSuggestion]]  # Optional — absent in plans saved before the snacks feature
+    # Non-blocking findings from constraint_check.check_week_plan() — over the
+    # sodium target but under the ceiling, near-repeats of recent weeks, etc.
+    # Attached at generation time; absent on plans saved before that check existed.
+    _soft_violations: NotRequired[list[dict]]
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -228,3 +233,4 @@ class UserPreferences(TypedDict):
     target_protein_g: int              # Default: 100g (from L+D; supports weight loss at goal weight)
     target_fiber_g: int                # Default: 18g  (from L+D; supports ≥25g/day total)
     target_sodium_mg: int              # Default: 700mg per adult dinner serving (a ceiling, not a goal)
+    run_plan_critique: bool            # Default True — advisory Claude review pass after generation

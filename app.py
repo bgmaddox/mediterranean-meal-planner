@@ -170,6 +170,8 @@ def _prompt_preview_dialog():
                         system_edited, user_edited,
                         expected_days=st.session_state.pending_days,
                         require_kid_adaptation=st.session_state.pending_require_kid,
+                        user_constraints=data_store.active_constraints_for_prompt(),
+                        history=data_store.load_history()[:6],
                     )
                 except MealPlanError as e:
                     st.error(f"Could not generate plan: {e}")
@@ -469,6 +471,38 @@ with tab_generate:
             avg_sodium=avg_sodium, t_sodium=prefs.get("target_sodium_mg", 700),
         ))
         st.caption("Nutrition covers lunch + dinner only. Breakfast and snacks not tracked. Cost: non-pantry only, ±20–30%. Nutrition ±15–20%.")
+
+        # ── Review notes ──────────────────────────────────────────────────────
+        # Soft findings from constraint_check plus the advisory critique pass.
+        # Nothing here blocked the plan; it is all "worth a look before you cook".
+        notes = plan.get("_soft_violations") or []
+        if notes:
+            from_critique = [n for n in notes if n["code"].startswith("critique_")]
+            from_rules = [n for n in notes if not n["code"].startswith("critique_")]
+            with st.expander(f"Review notes ({len(notes)})"):
+                if from_rules:
+                    st.markdown("**Rule checks**")
+                    for n in from_rules:
+                        label = f"**{n['meal_name']}** " if n["meal_name"] else ""
+                        st.markdown(f"- {label}{n['message']}")
+                if from_critique:
+                    st.markdown("**Claude's review of the plan**")
+                    st.caption(
+                        "A second opinion, not a rule — judgment calls that code can't check. "
+                        "Worth reading, not worth obeying."
+                    )
+                    # Why a defect is still listed, for the ones that went through repair.
+                    outcome_label = {
+                        "survived_repair": "fix attempted, didn't resolve it",
+                        "repair_failed": "fix attempt failed",
+                        "repair_reverted": "fix reverted — it broke a constraint",
+                        "left_in_session": "left as-is when planned in Claude Code",
+                    }
+                    for n in from_critique:
+                        label = f"**{n['meal_name']}** " if n["meal_name"] else ""
+                        note = outcome_label.get(n.get("repair_outcome"))
+                        suffix = f" _({note})_" if note else ""
+                        st.markdown(f"- {label}{n['message']}{suffix}")
 
         special = summary.get("special_ingredients", [])
         if special:
@@ -1217,12 +1251,20 @@ def _settings_fragment():
         value=prefs.get("target_sodium_mg", 700), step=50,
         help="A ceiling, not a goal — meals are flagged when they exceed it.",
     )
+    run_critique = st.checkbox(
+        "Ask Claude to review each generated plan",
+        value=prefs.get("run_plan_critique", True),
+        help="An extra API call after generation. Finds judgment-call problems the rule "
+             "checks can't — incoherent steps, quantities that don't match the servings, "
+             "a monotonous week. Advisory only: it never rejects or regenerates a plan.",
+    )
     if st.button("Save Nutrition Targets"):
         data_store.update_preferences(
             target_calories_lunch_dinner=int(t_cal),
             target_protein_g=int(t_prot),
             target_fiber_g=int(t_fib),
             target_sodium_mg=int(t_sod),
+            run_plan_critique=bool(run_critique),
         )
         st.success("Saved.")
 

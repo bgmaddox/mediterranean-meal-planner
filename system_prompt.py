@@ -106,21 +106,31 @@ PANTRY_STAPLES = [
 ]
 
 # ─────────────────────────────────────────────────────────────────────────────
+# SODIUM THRESHOLDS — authoritative values, referenced by the prompt text below
+# and by constraint_check.py so the two can never disagree.
+# The per-serving target is a user preference (target_sodium_mg); this default
+# and the hard ceiling live here.
+# ─────────────────────────────────────────────────────────────────────────────
+SODIUM_TARGET_DEFAULT_MG = 700
+SODIUM_HARD_CEILING_MG = 1200
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # SHARED RULE SUMMARIES
 # Single source of truth for the condensed rules injected into the smaller
 # edit prompts in meal_planner.py (swap / substitute). The full generation
 # prompt states these rules at length below; these summaries exist so the
 # edit calls can never drift out of sync when a rule changes.
 # ─────────────────────────────────────────────────────────────────────────────
-HEALTH_RULES_SUMMARY = """\
+HEALTH_RULES_SUMMARY = f"""\
 - Uric acid management: avoid organ meats, sardines as a staple, fructose/juice, \
 meat stocks; encourage low-fat dairy, vitamin C foods, cherries; legumes and \
 leafy greens are safe and encouraged.
 - Cholesterol improvement: salmon 2–3x/week across the full week, legumes, \
 oats/barley, EVOO, walnuts.
 - Weight loss: high fiber, high protein, low glycemic, olive oil as the primary fat.
-- Sodium restraint: target ≤700 mg per adult dinner serving; never exceed \
-~1,200 mg. Watch the usual culprits — olives, feta, canned beans, broth, soy/fish \
+- Sodium restraint: target ≤{SODIUM_TARGET_DEFAULT_MG} mg per adult dinner serving; never exceed \
+~{SODIUM_HARD_CEILING_MG:,} mg. Watch the usual culprits — olives, feta, canned beans, broth, soy/fish \
 sauce, harissa and other chile pastes, jarred sauces, and cured meat. Build flavor \
 with lemon, vinegar, herbs, garlic, and spice instead of salt."""
 
@@ -155,7 +165,8 @@ OUTPUT_SCHEMA = {
                         "quantity": "string",
                         "unit": "string",
                         "pantry_staple": "boolean",
-                        "special": "boolean — true if non-staple purchased this week; must appear in 2+ meals"
+                        "special": "boolean — waste flag, NOT 'non-staple'. True only for a one-off specialty item or an oversized perishable that would go to waste used once (za'atar, ras el hanout, fresh herbs, feta). NOT ordinary produce or proteins bought per-recipe (bell peppers, carrots, tomatoes, chicken). Anything flagged true must appear in 2+ meals.",
+                        "made_in": "string or null — only for a component cooked in another recipe this week, e.g. 'd3' for whipped feta made in d3, or 'sunday_prep'. Omit for anything bought."
                     }
                 ],
                 "instructions": ["string — numbered steps for a home cook"],
@@ -168,7 +179,7 @@ OUTPUT_SCHEMA = {
                     "protein_g": "integer",
                     "fiber_g": "integer",
                     "fat_g": "integer",
-                    "sodium_mg": "integer — target ≤700 per adult serving; hard ceiling ~1200",
+                    "sodium_mg": f"integer — target ≤{SODIUM_TARGET_DEFAULT_MG} per adult serving; hard ceiling ~{SODIUM_HARD_CEILING_MG}",
                     "saturated_fat_note": "string or null — e.g. 'Low — salmon fat is mostly unsaturated'"
                 },
                 "cost_estimate": {
@@ -198,7 +209,8 @@ OUTPUT_SCHEMA = {
                         "name": "string",
                         "quantity": "string",
                         "unit": "string",
-                        "pantry_staple": "boolean"
+                        "pantry_staple": "boolean",
+                        "made_in": "string or null — only for a component cooked in another recipe this week, e.g. 'd3' for whipped feta made in d3, or 'sunday_prep'. Omit for anything bought."
                     }
                 ],
                 "pack_instructions": "string",
@@ -208,7 +220,7 @@ OUTPUT_SCHEMA = {
                     "protein_g": "integer",
                     "fiber_g": "integer",
                     "fat_g": "integer",
-                    "sodium_mg": "integer — target ≤700 per adult serving; hard ceiling ~1200",
+                    "sodium_mg": f"integer — target ≤{SODIUM_TARGET_DEFAULT_MG} per adult serving; hard ceiling ~{SODIUM_HARD_CEILING_MG}",
                     "saturated_fat_note": "string or null"
                 },
                 "cost_estimate": {
@@ -240,7 +252,8 @@ OUTPUT_SCHEMA = {
                         "name": "string",
                         "quantity": "string",
                         "unit": "string",
-                        "pantry_staple": "boolean"
+                        "pantry_staple": "boolean",
+                        "made_in": "string or null — only for a component cooked in another recipe this week, e.g. 'd3' for whipped feta made in d3, or 'sunday_prep'. Omit for anything bought."
                     }
                 ]
             }
@@ -592,7 +605,14 @@ def build_system_prompt(
     ) if has_kids else ""
 
     _kid_adaptation_rule = (
-        "- **Kid adaptation is mandatory on every dinner.** Specific and practical — not a placeholder."
+        "- **Kid adaptation is mandatory on every dinner.** Specific and practical — not a placeholder.\n"
+        "- **The `instructions` must make the adaptation possible.** This is the single most common "
+        "error in generated plans: promising \"less spice for the kids\" or \"sauce on the side\" in a "
+        "recipe whose method seasons or sauces everything at once, leaving nothing to hold back. If the "
+        "adaptation requires an unseasoned or unsauced portion, the instructions must create one — hold "
+        "the spices back and add them after the kids' share is ladled out, sauce the adult portion "
+        "separately, reserve plain pasta before it goes in the pan. Write the step. An adaptation the "
+        "method cannot deliver is worse than none, because the cook only discovers it mid-recipe."
     ) if has_kids else ""
 
     _kid_output_rule_5 = (
@@ -620,7 +640,7 @@ a small handful of **walnuts or almonds** with fruit, olives + feta + cucumber.
     )
 
     _snacks_output_rule = (
-        "13. `snacks` is required: 2–3 snack suggestions following the Snacks rules. "
+        "14. `snacks` is required: 2–3 snack suggestions following the Snacks rules. "
         "Ingredients listed with quantities for the week so they can be shopped.\n"
         if include_snacks else ""
     )
@@ -821,7 +841,22 @@ Items the family always has on hand. They must still appear in each recipe's `in
 {staples_str}
 
 ## Special Ingredient Rule:
-Non-staple perishables or specialty items must appear in ≥2 meals this week (confirm in `ingredient_overlap_notes`).
+`special: true` is a **waste flag**, not a synonym for "not a pantry staple". Set it only \
+for an ingredient that is bought as a one-off and would go to waste or sit unused if only \
+one recipe called for it — a specialty item you buy a whole jar of for one tablespoon \
+(ras el hanout, za'atar, pomegranate molasses, harissa, preserved lemon, tahini-adjacent \
+pastes), or a perishable sold in a quantity far larger than one meal needs (a bunch of \
+fresh herbs, a tub of Greek yogurt, a block of feta).
+
+Do **not** flag ordinary produce and staple proteins that are bought in the amount a \
+single recipe uses and keep or freeze well — bell peppers, carrots, tomatoes, zucchini, \
+onions, canned beans, chicken, salmon. Those are simply ingredients. Flagging them is the \
+most common error here, and it turns a real efficiency rule into noise.
+
+Anything you do flag `special: true` **must appear in ≥2 meals this week** — that is the \
+entire point of the flag. If an ingredient only earns one meal, either build a second use \
+for it or leave `special: false`. Confirm every special ingredient in \
+`ingredient_overlap_notes`.
 
 ---
 
@@ -852,8 +887,8 @@ These are your best estimates for a typical adult portion of this recipe. \
 Accuracy of ±15–20% is acceptable and expected. Do not include a disclaimer in the JSON — \
 the app handles that in the UI.
 
-Sodium is a design constraint, not just a reported number. Aim for **≤700 mg per \
-adult dinner serving** and treat ~1,200 mg as a hard ceiling. If a dish's natural \
+Sodium is a design constraint, not just a reported number. Aim for **≤{SODIUM_TARGET_DEFAULT_MG} mg per \
+adult dinner serving** and treat ~{SODIUM_HARD_CEILING_MG:,} mg as a hard ceiling. If a dish's natural \
 form would blow past that — briny olives and feta together, canned beans plus \
 broth plus a salty paste — adjust the recipe itself: rinse canned legumes, use \
 low-sodium or unsalted broth, cut the added salt, and lean on lemon, vinegar, \
@@ -888,4 +923,5 @@ The response must begin with `{{` and end with `}}`.
 Base adult portions on a ~500–550 kcal dinner for weight loss. Portion guidance per adult: **3–4 oz cooked for a main animal protein (fish may be 4–5 oz)**, **1.5–2+ cups vegetables total — on classic plates split across two vegetable components**, ~1/2 cup cooked grain when a grain is included at all, smaller portions for mezze plates. Vegetables are the volume of the meal; do not compensate for a smaller protein with more grain. \
 {_kid_portion_sentence}
 12. `composition` is required on every dinner: 'classic', 'vegetable_forward', or 'mezze'. The week must include at least {"1" if days < 5 else "2"} vegetable_forward or mezze dinner{"" if days < 5 else "s"}.
+13. A component made in another recipe this week (whipped feta, a sauce, a spice blend, cooked grains from Sunday prep) is listed where it's used with `made_in` set to that meal's id or 'sunday_prep', so it stays off the shopping list. The recipe that makes it must buy and make enough for every use, and say so in its instructions.
 {_snacks_output_rule}"""

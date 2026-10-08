@@ -74,3 +74,21 @@ rationale, user profile, pantry staples, equipment, and overall design. Its
 | Season / Weather Awareness | ✅ Built (`current_date` + "Notes for this week" free-text) |
 | Kid Meal Notes Export | ✅ Built (`generate_kid_notes`) |
 | Weekly Email Report | ⚠️ **Backend built (`email_report.py` + schema fields), UI not wired.** See `FUTURE_WORK.md`. |
+
+---
+
+## `MEAL_COMPOSITION_PLAN.md` — plate composition & vegetable-side variety
+
+**Status: ✅ Complete.** Archived 2026-09-06. The plan's own header said
+"Not started" long after all three phases had shipped — it was written in June
+and never updated as the work landed piecemeal across several commits.
+
+| Phase | How it was implemented |
+|---|---|
+| **1 — Prompt-only composition variety** | `98bd69c` made Mediterranean plate geometry a hard constraint (smaller protein, half-plate vegetables, fiber floor, enforced composition mix) rather than a prompt suggestion. `39ef733` added the legume target and hoisted the shared rule constants. `b5fac6a` added the named lathera archetypes (briam, imam bayildi) and weekly snack suggestions. The `composition` field (`classic` / `vegetable_forward` / `mezze`) is on every dinner in `schemas.py`, and `meal_planner._validate_plan()` rejects a week with too few non-classic dinners. |
+| **2 — Side/mezze anchor recipes** | The `role` field (`main` / `side`) was added to `AnchorRecipe` (`a9013c5`); 32 anchors now carry `role: "side"`, sourced from Olive Tomato (`67d32bd`), Mediterranean Dish (`83945d6`), and Mediterranean Living (`27e9088`). `data_store.select_anchor_recipes()` reserves 2–3 dedicated side slots per selection so vegetable-forward and mezze dinners have real-recipe grounding. |
+| **3 — Prompt optimization audit** | Absorbed into the ongoing prompt work rather than run as a discrete phase. |
+
+**Verified after the fact.** `constraint_check._check_composition_labels()` now
+flags a dinner labelled `vegetable_forward` or `mezze` that still lists a meat
+centrepiece — the plan asked for the labels, and this checks they mean something.

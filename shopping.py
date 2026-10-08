@@ -130,6 +130,10 @@ def build_shopping_list(
     seen: dict[str, ShoppingItem] = {}
     pantry_seen: dict[str, ShoppingItem] = {}
     for ing in all_ingredients:
+        # Made in another recipe this week (whipped feta from d3, Sunday-prep
+        # grains): its raw ingredients are already on the list via that recipe.
+        if ing.get("made_in"):
+            continue
         name_key = ing["name"].lower().strip()
         if ing.get("pantry_staple", False) or name_key in _STAPLES_SET:
             if name_key in pantry_seen:
