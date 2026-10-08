@@ -20,6 +20,8 @@ app's history and recipe library are never overwritten from here.
   .venv/bin/python cli.py review-packets plan.json --out DIR
   .venv/bin/python cli.py save plan.json --notes findings.json --pdf
   .venv/bin/python cli.py push                        # send anything queued offline
+  .venv/bin/python cli.py week [2026-10-12] [--export sessions/2026-10-12/plan.json]
+  .venv/bin/python cli.py feedback sessions/2026-10-12/feedback.json
 
 No command here calls the Anthropic API.
 """
@@ -76,21 +78,14 @@ for name in {files!r}:
 print(json.dumps(out))
 """
 
-_IMPORT_SCRIPT = """
+# Writes run a function from pi_ops.py on the Pi: this file's copy of pi_ops is
+# sent along, against the Pi's own data_store.
+_OP_RUNNER = """
 import base64, json, os, sys
 os.chdir(os.path.expanduser("{app}"))
 sys.path.insert(0, ".")
 import data_store
-plan = json.loads(base64.b64decode("{payload}"))
-week = "{week}"
-if any(e["week_start"] == week for e in data_store.load_history()):
-    data_store.update_history_plan(plan, week)
-    action = "replaced"
-else:
-    data_store.append_to_history(plan, week)
-    action = "added"
-data_store.add_recipes_from_plan(plan)
-print(json.dumps({{"action": action, "weeks": len(data_store.load_history())}}))
+print(json.dumps({op}(data_store, json.loads(base64.b64decode("{payload}")))))
 """
 
 
@@ -128,7 +123,7 @@ def pull(quiet: bool = False) -> None:
     # A plan queued while offline isn't on the Pi yet — re-apply it to the
     # mirror so the next plan still sees it in history.
     for queued in sorted(OUTBOX.glob("*.json")) if OUTBOX.exists() else []:
-        _apply_locally(json.loads(queued.read_text()))
+        _local_op("import_week", json.loads(queued.read_text()))
     if not quiet:
         import data_store
         weeks = [e["week_start"] for e in data_store.load_history()]
@@ -153,19 +148,18 @@ def _ensure_mirror(offline: bool) -> None:
             raise
 
 
-def _apply_locally(item: dict) -> None:
+def _local_op(op: str, payload: dict) -> dict:
+    """Run a pi_ops function against the local mirror instead of the Pi."""
     import data_store
-    plan, week = item["plan"], item["week_start"]
-    if any(e["week_start"] == week for e in data_store.load_history()):
-        data_store.update_history_plan(plan, week)
-    else:
-        data_store.append_to_history(plan, week)
-    data_store.add_recipes_from_plan(plan)
+    import pi_ops
+    return getattr(pi_ops, op)(data_store, payload)
 
 
-def _send(plan: dict, week: str) -> dict:
-    payload = base64.b64encode(json.dumps(plan).encode()).decode()
-    raw = _run_on_pi(_IMPORT_SCRIPT.format(app=PI_APP, payload=payload, week=week))
+def _pi_op(op: str, payload: dict) -> dict:
+    import pi_ops
+    source = Path(pi_ops.__file__).read_text()
+    encoded = base64.b64encode(json.dumps(payload).encode()).decode()
+    raw = _run_on_pi(source + _OP_RUNNER.format(app=PI_APP, op=op, payload=encoded))
     return json.loads(raw.strip().splitlines()[-1])
 
 
@@ -190,10 +184,19 @@ def run_checks(plan: dict, days: int | None = None) -> tuple[list[str], list[dic
     from meal_planner import MealPlanError, _validate_plan
 
     prefs = data_store.load_preferences()
-    days = days or len(plan.get("dinners") or [])
+    view = plan
+    if days is None:
+        # No count given: a saved week edited mid-week ("eating out Wednesday")
+        # can have fewer dinners than lunches. _validate_plan only counts the
+        # lunches, so match their count to the dinners; everything else it
+        # checks is per-dinner. New plans pass --days and get the strict check.
+        days = len(plan.get("dinners") or [])
+        lunches = plan.get("lunches") or []
+        if lunches and len(lunches) != days:
+            view = {**plan, "lunches": (lunches * days)[:days]}
     structural = []
     try:
-        _validate_plan(plan, days, require_kid_adaptation=bool(prefs.get("children")))
+        _validate_plan(view, days, require_kid_adaptation=bool(prefs.get("children")))
     except MealPlanError as e:
         structural.append(str(e))
 
@@ -260,19 +263,30 @@ def cmd_check(args) -> int:
 
 
 def cmd_summary(args) -> int:
-    plan = load_plan(args.plan)
+    _print_summary(load_plan(args.plan))
+    return 0
+
+
+def _print_summary(plan: dict, ratings: dict | None = None) -> None:
+    """One line per meal. `ratings` maps a meal name to its favorite entry."""
+    ratings = ratings or {}
+
+    def rated(name):
+        f = ratings.get(name)
+        return f"  [{f['rating']}/5{' — ' + f['feedback'] if f.get('feedback') else ''}]" if f else ""
+
     print("DINNERS")
     for d in plan.get("dinners") or []:
         n = d.get("nutrition_estimate") or {}
         lunch = " +lunch" if d.get("generates_lunch") else ""
-        print(f"  {d.get('id')}  {d.get('name')}")
+        print(f"  {d.get('id')}  {d.get('name')}{rated(d.get('name'))}")
         print(f"      {d.get('composition')}, {d.get('cook_time_minutes')} min, "
               f"{d.get('primary_equipment')}{lunch} | {n.get('calories_per_adult_serving')} kcal, "
               f"{n.get('protein_g')}g protein, {n.get('fiber_g')}g fiber, {n.get('sodium_mg')}mg Na")
     print("LUNCHES")
     for l in plan.get("lunches") or []:
         src = f"leftover of {l.get('leftover_from_dinner_id')}" if l.get("source") == "leftover" else "standalone"
-        print(f"  {l.get('id')}  {l.get('name')}  ({src}, {l.get('reheat')})")
+        print(f"  {l.get('id')}  {l.get('name')}  ({src}, {l.get('reheat')}){rated(l.get('name'))}")
     s = plan.get("week_summary") or {}
     print(f"WEEK  fish {s.get('fish_meal_count')}, red meat {s.get('red_meat_meal_count')}, "
           f"vegetarian {s.get('vegetarian_meal_count')}, est. ${s.get('estimated_weekly_grocery_cost_usd')}")
@@ -280,7 +294,84 @@ def cmd_summary(args) -> int:
         print(f"      specials: {', '.join(s['special_ingredients'])}")
     for snack in plan.get("snacks") or []:
         print(f"SNACK {snack.get('name')}")
+
+
+def _find_week(week: str | None) -> dict:
+    import data_store
+    history = data_store.load_history()
+    if not history:
+        raise CLIError("History is empty.")
+    if week is None:
+        return history[0]
+    entry = next((e for e in history if e["week_start"] == week), None)
+    if entry is None:
+        raise CLIError(f"No week {week}. Saved weeks: {', '.join(e['week_start'] for e in history)}")
+    return entry
+
+
+def cmd_week(args) -> int:
+    """Show a saved week (newest by default), or export it to edit mid-week."""
+    _ensure_mirror(args.offline)
+    import data_store
+    entry = _find_week(args.week_start)
+    plan = entry["plan"]
+    ratings = {f["name"]: f for f in data_store.load_favorites()}
+    print(f"WEEK OF {entry['week_start']}")
+    _print_summary(plan, ratings)
+
+    if args.export:
+        out = Path(args.export)
+        out.parent.mkdir(parents=True, exist_ok=True)
+        clean = {k: v for k, v in plan.items() if k != "_soft_violations"}
+        out.write_text(json.dumps({"week_plan": clean}, indent=1))
+        # Carry the week's review notes forward, so a re-save doesn't drop them.
+        notes = [n for n in plan.get("_soft_violations") or [] if n["code"].startswith("critique_")]
+        notes_path = out.with_name("notes.json")
+        if notes and not notes_path.exists():
+            findings = [{"meal_id": n["meal_id"], "meal_name": n["meal_name"],
+                         "category": n["code"].removeprefix("critique_"),
+                         "message": n["message"]} for n in notes]
+            notes_path.write_text(json.dumps({"findings": findings}, indent=1))
+            print(f"\nExported to {out} (+ {len(findings)} review notes in {notes_path.name}).")
+        else:
+            print(f"\nExported to {out}.")
+        print(f"Re-save with: cli.py save {out} --week-start {entry['week_start']}"
+              + (f" --notes {notes_path}" if notes_path.exists() else ""))
     return 0
+
+
+def cmd_feedback(args) -> int:
+    """Record how a week went: ratings and notes become favorites (low ratings
+    included), ingredient dislikes become constraints. Written on the Pi."""
+    payload = json.loads(Path(args.file).read_text())
+    _ensure_mirror(args.offline)
+    # Validate against the mirror first, so a typo in a meal id fails here
+    # rather than half-way through on the Pi.
+    try:
+        _local_op("apply_feedback", payload) if args.offline else _validate_feedback(payload)
+    except (ValueError, KeyError) as e:
+        raise CLIError(f"Feedback not recorded: {e}")
+    if args.offline:
+        print("Recorded in the local mirror only (--offline). The Pi still needs it: "
+              "re-run without --offline when it is reachable.")
+        return 0
+    result = _pi_op("apply_feedback", payload)
+    pull(quiet=True)
+    for label, key in (("New favorites", "favorites_added"), ("Updated", "favorites_updated"),
+                       ("New constraints", "constraints_added")):
+        if result[key]:
+            print(f"{label}: " + "; ".join(result[key]))
+    return 0
+
+
+def _validate_feedback(payload: dict) -> None:
+    entry = _find_week(payload["week_start"])
+    ids = {str(m.get("id")) for k in ("dinners", "lunches") for m in entry["plan"].get(k) or []}
+    for fb in payload.get("meals") or []:
+        if str(fb.get("id")) not in ids:
+            raise ValueError(f"week {payload['week_start']} has no meal {fb.get('id')!r}")
+        if not 1 <= int(fb["rating"]) <= 5:
+            raise ValueError(f"rating for {fb['id']} must be 1-5")
 
 
 _PACKET_FORMAT = """
@@ -362,7 +453,7 @@ def cmd_save(args) -> int:
     sent = False
     if not args.offline:
         try:
-            result = _send(plan, week)
+            result = _pi_op("import_week", item)
             sent = True
             print(f"Saved to the Pi: week {week} {result['action']} "
                   f"({result['weeks']} weeks in history).")
@@ -374,7 +465,7 @@ def cmd_save(args) -> int:
     else:
         OUTBOX.mkdir(parents=True, exist_ok=True)
         (OUTBOX / f"{week}.json").write_text(json.dumps(item))
-        _apply_locally(item)
+        _local_op("import_week", item)
         print(f"Queued in {OUTBOX}/ — run `cli.py push` when the Pi is back.")
 
     if args.pdf or args.drive:
@@ -400,7 +491,7 @@ def cmd_push(args) -> int:
         return 0
     for path in queued:
         item = json.loads(path.read_text())
-        result = _send(item["plan"], item["week_start"])
+        result = _pi_op("import_week", item)
         path.unlink()
         print(f"Sent week {item['week_start']} ({result['action']}).")
     pull(quiet=True)
@@ -450,6 +541,17 @@ def main(argv: list[str] | None = None) -> int:
     sp.add_argument("--drive", action="store_true", help="also upload the PDF to Google Drive")
     offline(sp)
     sp.set_defaults(fn=cmd_save)
+
+    sp = sub.add_parser("week", help="show a saved week with its ratings; --export to edit it mid-week")
+    sp.add_argument("week_start", nargs="?", help="defaults to the newest week")
+    sp.add_argument("--export", help="write the plan here for editing, e.g. sessions/<week>/plan.json")
+    offline(sp)
+    sp.set_defaults(fn=cmd_week)
+
+    sp = sub.add_parser("feedback", help="record how a week went (ratings, notes, dislikes) on the Pi")
+    sp.add_argument("file", help='JSON: {"week_start", "meals": [{"id","rating","tags","feedback"}], "constraints": [...]}')
+    offline(sp)
+    sp.set_defaults(fn=cmd_feedback)
 
     sub.add_parser("push", help="send weeks queued while the Pi was offline").set_defaults(fn=cmd_push)
 

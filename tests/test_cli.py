@@ -152,3 +152,103 @@ def test_review_packets_use_the_apps_rubric(sandbox):
     cli.main(["review-packets", write(sandbox, "p.json", plan), "--out", str(out),
               "--only", ids[0]])
     assert [p.stem for p in out.glob("*.md")] == [ids[0]]
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Weekly feedback (pi_ops.apply_feedback) and mid-week export
+# ─────────────────────────────────────────────────────────────────────────────
+
+import pi_ops  # noqa: E402
+
+
+def saved_week(sandbox) -> tuple[str, dict]:
+    """Save the clean stored week into the sandbox and return (week_start, plan)."""
+    plan = stored_week(CLEAN)
+    cli.main(["save", write(sandbox, "p.json", plan), "--offline", "--week-start", "2026-10-12"])
+    return "2026-10-12", data_store.load_history()[0]["plan"]
+
+
+def test_feedback_creates_favorites_including_low_ratings(sandbox):
+    week, plan = saved_week(sandbox)
+    d1, d2 = plan["dinners"][0], plan["dinners"][1]
+    data_store._write(data_store.FAVORITES_FILE, [])
+    out = pi_ops.apply_feedback(data_store, {"week_start": week, "meals": [
+        {"id": d1["id"], "rating": 5, "tags": ["kids loved it"], "feedback": "make again"},
+        {"id": d2["id"], "rating": 1, "feedback": "nobody ate it"},
+    ]})
+    favs = {f["name"]: f for f in data_store.load_favorites()}
+    assert favs[d1["name"]]["rating"] == 5
+    assert favs[d2["name"]]["rating"] == 1          # a bad rating is still recorded
+    assert favs[d1["name"]]["feedback"] == f"{week}: make again"
+    assert favs[d1["name"]]["last_made"] == week    # the week it was made, not today
+    assert sorted(out["favorites_added"]) == sorted([d1["name"], d2["name"]])
+
+
+def test_feedback_updates_an_existing_favorite_and_keeps_old_notes(sandbox):
+    week, plan = saved_week(sandbox)
+    d1 = plan["dinners"][0]
+    data_store._write(data_store.FAVORITES_FILE, [])
+    pi_ops.apply_feedback(data_store, {"week_start": week, "meals": [
+        {"id": d1["id"], "rating": 3, "tags": ["quick"], "feedback": "fine"}]})
+    pi_ops.apply_feedback(data_store, {"week_start": week, "meals": [
+        {"id": d1["id"], "rating": 4, "tags": ["quick", "kids loved it"], "feedback": "better"}]})
+    fav = next(f for f in data_store.load_favorites() if f["name"] == d1["name"])
+    assert fav["rating"] == 4
+    assert fav["tags"] == ["quick", "kids loved it"]
+    assert fav["feedback"] == f"{week}: fine | {week}: better"
+    assert len(data_store.load_favorites()) == 1
+
+
+def test_feedback_adds_constraints_without_duplicates(sandbox):
+    week, _ = saved_week(sandbox)
+    data_store._write(data_store.CONSTRAINTS_FILE, [])
+    out = pi_ops.apply_feedback(data_store, {"week_start": week, "meals": [],
+                                             "constraints": ["No fennel — disliked", "no fennel — disliked", ""]})
+    assert out["constraints_added"] == ["No fennel — disliked"]
+    assert len(data_store.load_constraints()) == 1
+
+
+def test_feedback_rejects_unknown_week_or_meal(sandbox):
+    week, _ = saved_week(sandbox)
+    with pytest.raises(ValueError):
+        pi_ops.apply_feedback(data_store, {"week_start": "1999-01-04", "meals": []})
+    with pytest.raises(ValueError):
+        pi_ops.apply_feedback(data_store, {"week_start": week, "meals": [{"id": "d99", "rating": 3}]})
+
+
+def test_cli_feedback_validates_before_writing(sandbox):
+    week, _ = saved_week(sandbox)
+    before = data_store.load_favorites()
+    bad = write(sandbox, "fb.json", {"week_start": week, "meals": [{"id": "d99", "rating": 3}]})
+    assert cli.main(["feedback", bad, "--offline"]) == 2
+    assert data_store.load_favorites() == before
+
+
+def test_week_export_round_trips_and_carries_review_notes(sandbox):
+    week, plan = saved_week(sandbox)
+    plan["_soft_violations"] = [{"code": "critique_variety", "severity": "soft", "meal_id": "",
+                                 "meal_name": "", "message": "leans on soups"}]
+    data_store.update_history_plan(plan, week)
+    out = sandbox / "edit" / "plan.json"
+    assert cli.main(["week", week, "--export", str(out), "--offline"]) == 0
+    exported = cli.load_plan(str(out))
+    assert "_soft_violations" not in exported
+    assert exported["dinners"] == plan["dinners"]
+    notes = json.loads((out.parent / "notes.json").read_text())["findings"]
+    assert notes == [{"meal_id": "", "meal_name": "", "category": "variety", "message": "leans on soups"}]
+    # Re-saving the edited week replaces it rather than adding one.
+    count = len(data_store.load_history())
+    cli.main(["save", str(out), "--offline", "--week-start", week, "--notes", str(out.parent / "notes.json")])
+    assert len(data_store.load_history()) == count
+
+
+def test_mid_week_edit_may_drop_a_dinner_but_new_plans_may_not(sandbox):
+    plan = stored_week(CLEAN)
+    # Drop a dinner nothing depends on, as "eating out Wednesday" would.
+    linked = {l.get("leftover_from_dinner_id") for l in plan["lunches"]}
+    victim = next(d for d in plan["dinners"] if d["id"] not in linked)
+    plan["dinners"] = [d for d in plan["dinners"] if d is not victim]
+    path = write(sandbox, "p.json", plan)
+    n = len(plan["lunches"])
+    assert cli.main(["check", path, "--offline"]) == 0                    # saved-week edit
+    assert cli.main(["check", path, "--offline", "--days", str(n)]) == 1  # new plan: strict
