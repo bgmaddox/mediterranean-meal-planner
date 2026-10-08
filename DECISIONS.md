@@ -70,6 +70,16 @@ week through the Pi's own `data_store` over SSH. Do not sync by copying files in
 direction: the app writes favorites and ratings on the Pi, and the Mac's `data/` is a
 test corpus the tests depend on.
 
+**A low rating is feedback, not a deletion** (2026-10-07). The weekly look-back saves
+every rated meal as a favorite, 1–2★ included, because the prompt reads 1–2★ as "include
+rarely". A disliked *dish* gets a low rating. A disliked *ingredient* gets a constraint,
+which the checker enforces.
+
+**Session reviewers: two per dinner, pending measurement** (2026-10-07). This is a bet
+based on the 10/14/13 run-to-run spread, not a measured result. `sessions/review-log.md`
+records each session's reviewer count, tokens, and how often reviewer B found what A
+missed. If B rarely adds anything, go back to one.
+
 ---
 
 ## Do not repeat
