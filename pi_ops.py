@@ -88,3 +88,43 @@ def apply_feedback(ds, p):
 
     return {"favorites_added": added, "favorites_updated": updated,
             "constraints_added": constraints_added}
+
+
+def add_anchor(ds, p):
+    """Add a recipe to the user anchor library (the gitignored user file).
+
+    Written directly rather than through ds.add_anchor_recipe, which on the
+    deployed version can't record `role`, `source_url` or `notes_sourced`.
+    A recipe already in the library — same source URL or same name — is not
+    added twice.
+    """
+    name = p["name"].strip()
+    for a in ds.load_anchor_recipes():
+        same_url = p.get("source_url") and a.get("source_url") == p["source_url"]
+        if same_url or a["name"].strip().lower() == name.lower():
+            return {"action": "exists", "id": a["id"]}
+
+    existing = {a["id"] for a in ds.load_anchor_recipes()}
+    base = ds._slugify(name)
+    rid, n = base, 2
+    while rid in existing:
+        rid, n = f"{base}-{n}", n + 1
+
+    entry = {
+        "id": rid,
+        "name": name,
+        "cuisine": (p.get("cuisine") or "").strip() or "Other",
+        "meal_type": p.get("meal_type") if p.get("meal_type") in ("dinner", "lunch", "either") else "either",
+        "role": p.get("role") if p.get("role") in ("main", "side") else "main",
+        "key_ingredients": [k.strip() for k in p.get("key_ingredients") or [] if k.strip()],
+        "summary": (p.get("summary") or "").strip(),
+        "technique_notes": (p.get("technique_notes") or "").strip(),
+        "source_url": p.get("source_url") or "",
+        "notes_sourced": bool(p.get("source_url")),
+    }
+    if p.get("nutrition"):
+        entry["nutrition"] = p["nutrition"]
+    user = ds.load_anchor_user_recipes()
+    user.append(entry)
+    ds._write(ds.ANCHOR_RECIPES_USER_FILE, user)
+    return {"action": "added", "id": rid}

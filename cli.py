@@ -22,6 +22,9 @@ app's history and recipe library are never overwritten from here.
   .venv/bin/python cli.py push                        # send anything queued offline
   .venv/bin/python cli.py week [2026-10-12] [--export sessions/2026-10-12/plan.json]
   .venv/bin/python cli.py feedback sessions/2026-10-12/feedback.json
+  .venv/bin/python cli.py anchors [--role side] [--search lentil]
+  .venv/bin/python cli.py context --anchors greek-lemon-chicken,...
+  .venv/bin/python cli.py add-anchor sessions/2026-10-12/new_anchor.json
 
 No command here calls the Anthropic API.
 """
@@ -231,6 +234,7 @@ def cmd_context(args) -> int:
     system_prompt, user_message, require_kid = meal_planner.build_generation_prompts(
         week_notes=args.notes, cuisine_notes=args.cuisine,
         use_up_ingredients=args.use_up, days=args.days,
+        anchor_ids=[i.strip() for i in args.anchors.split(",") if i.strip()] if args.anchors else None,
     )
     print(system_prompt)
     print("\n" + "=" * 79)
@@ -419,6 +423,94 @@ def cmd_review_packets(args) -> int:
     return 0
 
 
+def cmd_anchors(args) -> int:
+    """The whole anchor library, one line each, so a session can choose anchors
+    deliberately instead of taking the app's random sample of 10."""
+    _ensure_mirror(args.offline)
+    import data_store
+    anchors = data_store.load_anchor_recipes()
+    if args.show:
+        wanted = set(args.show.split(","))
+        for a in anchors:
+            if a["id"] in wanted:
+                print(json.dumps(a, indent=1))
+        return 0
+    term = (args.search or "").lower()
+    picked = [
+        a for a in anchors
+        if (not args.role or a.get("role") == args.role)
+        and (not args.cuisine or args.cuisine.lower() in a.get("cuisine", "").lower())
+        and (not term or term in " ".join([a["name"], a.get("summary", ""),
+                                           *a.get("key_ingredients", [])]).lower())
+    ]
+    user_ids = {a["id"] for a in data_store.load_anchor_user_recipes()}
+    print("id | cuisine | meal_type | name | key ingredients   (* sourced notes, N real nutrition, U added in-session/by you)")
+    for role in ("main", "side"):
+        group = [a for a in picked if a.get("role", "main") == role]
+        if not group:
+            continue
+        print(f"\n{role.upper()} ({len(group)})")
+        for a in sorted(group, key=lambda a: (a.get("cuisine", ""), a["name"])):
+            marks = ("*" if a.get("notes_sourced") else "") + ("N" if a.get("nutrition") else "") \
+                + ("U" if a["id"] in user_ids else "")
+            keys = ", ".join(a.get("key_ingredients", [])[:5])
+            print(f"{a['id']}{(' ' + marks) if marks else ''} | {a.get('cuisine', '')} | "
+                  f"{a.get('meal_type', '')} | {a['name']} | {keys}")
+    print(f"\n{len(picked)} of {len(anchors)} anchors.")
+    return 0
+
+
+TECHNIQUE_NOTES_MAX_WORDS = 60   # they go into every prompt, and the one-page PDF
+
+
+def _anchor_problems(anchor: dict) -> list[str]:
+    """Why a recipe can't go into the library. Screens for the banned
+    ingredients and the household's own dislikes — the library has carried
+    'orange' into generation twice before (see DECISIONS.md)."""
+    import constraint_check as cc
+    import data_store
+    problems = [f"missing {k}" for k in ("name", "summary", "key_ingredients") if not anchor.get(k)]
+    if anchor.get("role") not in ("main", "side"):
+        problems.append("role must be 'main' or 'side'")
+    words = len((anchor.get("technique_notes") or "").split())
+    if words > TECHNIQUE_NOTES_MAX_WORDS:
+        problems.append(f"technique_notes is {words} words; keep it to {TECHNIQUE_NOTES_MAX_WORDS}")
+    as_meal = {
+        "id": "", "name": anchor.get("name", ""),
+        "ingredients": [{"name": k} for k in anchor.get("key_ingredients", [])],
+        "instructions": [anchor.get("summary", ""), anchor.get("technique_notes", "")],
+    }
+    terms, _ = cc.parse_user_constraints(data_store.active_constraints_for_prompt())
+    for v in cc._check_banned(as_meal) + cc._check_user_terms(as_meal, terms):
+        problems.append(v["message"])
+    return problems
+
+
+def cmd_add_anchor(args) -> int:
+    _ensure_mirror(args.offline)
+    anchor = json.loads(Path(args.file).read_text())
+    problems = _anchor_problems(anchor)
+    if problems:
+        print("Not added:")
+        for pr in problems:
+            print(f"  {pr}")
+        return 1
+    if not anchor.get("source_url"):
+        print("(no source_url — this recipe's notes will be marked as self-generated)")
+    if args.offline:
+        result = _local_op("add_anchor", anchor)
+        print(f"Anchor {result['id']} {result['action']} in the local mirror only (--offline); "
+              "re-run without --offline to put it on the Pi.")
+        return 0
+    result = _pi_op("add_anchor", anchor)
+    pull(quiet=True)
+    if result["action"] == "exists":
+        print(f"Already in the library as {result['id']}.")
+    else:
+        print(f"Added {result['id']} to the Pi's anchor library.")
+    return 0
+
+
 def _session_notes(plan: dict, notes_path: str | None) -> list[dict]:
     """Reviewer findings left unfixed, validated the same way the app
     validates its reviewer's output."""
@@ -514,8 +606,23 @@ def main(argv: list[str] | None = None) -> int:
     sp.add_argument("--cuisine", help="cuisine mood for the week")
     sp.add_argument("--use-up", help="ingredients on hand to use up")
     sp.add_argument("--days", type=int, default=5)
+    sp.add_argument("--anchors", help="comma-separated anchor ids to use instead of the random sample")
     offline(sp)
     sp.set_defaults(fn=cmd_context)
+
+    sp = sub.add_parser("anchors", help="the whole anchor library, one line each")
+    sp.add_argument("--role", choices=["main", "side"])
+    sp.add_argument("--cuisine")
+    sp.add_argument("--search", help="match name, summary or key ingredients")
+    sp.add_argument("--show", help="comma-separated ids: print the full entries")
+    offline(sp)
+    sp.set_defaults(fn=cmd_anchors)
+
+    sp = sub.add_parser("add-anchor", help="screen a recipe, then add it to the Pi's anchor library")
+    sp.add_argument("file", help="JSON: name, cuisine, meal_type, role, key_ingredients, summary, "
+                                 "technique_notes, source_url, nutrition (optional)")
+    offline(sp)
+    sp.set_defaults(fn=cmd_add_anchor)
 
     sp = sub.add_parser("check", help="run the app's structural and constraint checks")
     sp.add_argument("plan")

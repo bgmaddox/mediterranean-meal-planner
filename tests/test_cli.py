@@ -252,3 +252,59 @@ def test_mid_week_edit_may_drop_a_dinner_but_new_plans_may_not(sandbox):
     n = len(plan["lunches"])
     assert cli.main(["check", path, "--offline"]) == 0                    # saved-week edit
     assert cli.main(["check", path, "--offline", "--days", str(n)]) == 1  # new plan: strict
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Choosing and adding anchor recipes
+# ─────────────────────────────────────────────────────────────────────────────
+
+def good_anchor(**over):
+    a = {"name": "Test Lentil Soup", "cuisine": "Turkish", "meal_type": "dinner", "role": "main",
+         "key_ingredients": ["red lentils", "carrot", "cumin"],
+         "summary": "Simmer lentils with carrot and cumin, then blend.",
+         "technique_notes": "Bloom the cumin in oil before the lentils go in.",
+         "source_url": "https://example.com/lentil-soup"}
+    a.update(over)
+    return a
+
+
+def test_context_uses_chosen_anchors(sandbox, capsys):
+    import data_store as ds
+    chosen = [a["id"] for a in ds.load_anchor_recipes()[:2]]
+    names = [a["name"] for a in ds.load_anchor_recipes()[:2]]
+    assert cli.main(["context", "--offline", "--anchors", ",".join(chosen)]) == 0
+    out = capsys.readouterr().out
+    assert all(n in out for n in names)
+
+
+def test_context_rejects_an_unknown_anchor(sandbox):
+    import meal_planner
+    with pytest.raises(meal_planner.MealPlanError):
+        cli.main(["context", "--offline", "--anchors", "no-such-anchor"])
+
+
+def test_add_anchor_screens_banned_and_disliked_ingredients(sandbox):
+    data_store._write(data_store.CONSTRAINTS_FILE, [{"id": "1", "text": "No fennel", "active": True}])
+    assert cli._anchor_problems(good_anchor()) == []
+    assert cli._anchor_problems(good_anchor(technique_notes="Finish with orange zest."))
+    assert cli._anchor_problems(good_anchor(key_ingredients=["lentils", "fennel bulb"]))
+    assert cli._anchor_problems(good_anchor(role="entree"))
+    assert cli._anchor_problems(good_anchor(technique_notes="word " * 61))
+
+
+def test_add_anchor_writes_user_file_once(sandbox):
+    path = write(sandbox, "a.json", good_anchor())
+    assert cli.main(["add-anchor", path, "--offline"]) == 0
+    assert cli.main(["add-anchor", path, "--offline"]) == 0   # second time: "exists"
+    user = data_store.load_anchor_user_recipes()
+    assert len([a for a in user if a["name"] == "Test Lentil Soup"]) == 1
+    entry = user[-1]
+    assert entry["notes_sourced"] is True and entry["role"] == "main"
+    assert entry["id"] in {a["id"] for a in data_store.load_anchor_recipes()}
+
+
+def test_add_anchor_refuses_a_bad_recipe(sandbox):
+    before = data_store.load_anchor_user_recipes()
+    path = write(sandbox, "a.json", good_anchor(summary="Glaze with orange juice."))
+    assert cli.main(["add-anchor", path, "--offline"]) == 1
+    assert data_store.load_anchor_user_recipes() == before

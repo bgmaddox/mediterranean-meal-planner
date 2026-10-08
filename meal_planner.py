@@ -115,21 +115,31 @@ def build_generation_prompts(
     cuisine_notes: str | None = None,
     use_up_ingredients: str | None = None,
     days: int = 5,
+    anchor_ids: list[str] | None = None,
 ) -> tuple[str, str]:
     """
     Build the system prompt and user message for generate_week_plan without
     calling the API. Used by the prompt-preview dialog in app.py.
+
+    `anchor_ids` replaces the random anchor sample with chosen recipes. A
+    Claude Code session picks them from the whole library (cli.py anchors);
+    the app keeps rotating a random sample.
 
     Returns
     -------
     (system_prompt, user_message, require_kid_adaptation)
     """
     prefs = data_store.load_preferences()
-    anchor_recipes = (
-        data_store.select_anchor_recipes(days=days, use_up_ingredients=use_up_ingredients)
-        if prefs.get("use_anchor_recipes", True)
-        else None
-    )
+    if anchor_ids:
+        by_id = {a["id"]: a for a in data_store.load_anchor_recipes()}
+        unknown = [i for i in anchor_ids if i not in by_id]
+        if unknown:
+            raise MealPlanError(f"Unknown anchor recipe id(s): {', '.join(unknown)}")
+        anchor_recipes = [by_id[i] for i in anchor_ids]
+    elif prefs.get("use_anchor_recipes", True):
+        anchor_recipes = data_store.select_anchor_recipes(days=days, use_up_ingredients=use_up_ingredients)
+    else:
+        anchor_recipes = None
     system_prompt = build_system_prompt(
         history=data_store.history_for_prompt(),
         favorites=data_store.load_favorites(),
