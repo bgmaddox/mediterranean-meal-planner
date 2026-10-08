@@ -165,7 +165,8 @@ OUTPUT_SCHEMA = {
                         "quantity": "string",
                         "unit": "string",
                         "pantry_staple": "boolean",
-                        "special": "boolean — waste flag, NOT 'non-staple'. True only for a one-off specialty item or an oversized perishable that would go to waste used once (za'atar, ras el hanout, fresh herbs, feta). NOT ordinary produce or proteins bought per-recipe (bell peppers, carrots, tomatoes, chicken). Anything flagged true must appear in 2+ meals."
+                        "special": "boolean — waste flag, NOT 'non-staple'. True only for a one-off specialty item or an oversized perishable that would go to waste used once (za'atar, ras el hanout, fresh herbs, feta). NOT ordinary produce or proteins bought per-recipe (bell peppers, carrots, tomatoes, chicken). Anything flagged true must appear in 2+ meals.",
+                        "made_in": "string or null — only for a component cooked in another recipe this week, e.g. 'd3' for whipped feta made in d3, or 'sunday_prep'. Omit for anything bought."
                     }
                 ],
                 "instructions": ["string — numbered steps for a home cook"],
@@ -208,7 +209,8 @@ OUTPUT_SCHEMA = {
                         "name": "string",
                         "quantity": "string",
                         "unit": "string",
-                        "pantry_staple": "boolean"
+                        "pantry_staple": "boolean",
+                        "made_in": "string or null — only for a component cooked in another recipe this week, e.g. 'd3' for whipped feta made in d3, or 'sunday_prep'. Omit for anything bought."
                     }
                 ],
                 "pack_instructions": "string",
@@ -250,7 +252,8 @@ OUTPUT_SCHEMA = {
                         "name": "string",
                         "quantity": "string",
                         "unit": "string",
-                        "pantry_staple": "boolean"
+                        "pantry_staple": "boolean",
+                        "made_in": "string or null — only for a component cooked in another recipe this week, e.g. 'd3' for whipped feta made in d3, or 'sunday_prep'. Omit for anything bought."
                     }
                 ]
             }
@@ -637,7 +640,7 @@ a small handful of **walnuts or almonds** with fruit, olives + feta + cucumber.
     )
 
     _snacks_output_rule = (
-        "13. `snacks` is required: 2–3 snack suggestions following the Snacks rules. "
+        "14. `snacks` is required: 2–3 snack suggestions following the Snacks rules. "
         "Ingredients listed with quantities for the week so they can be shopped.\n"
         if include_snacks else ""
     )
@@ -920,4 +923,5 @@ The response must begin with `{{` and end with `}}`.
 Base adult portions on a ~500–550 kcal dinner for weight loss. Portion guidance per adult: **3–4 oz cooked for a main animal protein (fish may be 4–5 oz)**, **1.5–2+ cups vegetables total — on classic plates split across two vegetable components**, ~1/2 cup cooked grain when a grain is included at all, smaller portions for mezze plates. Vegetables are the volume of the meal; do not compensate for a smaller protein with more grain. \
 {_kid_portion_sentence}
 12. `composition` is required on every dinner: 'classic', 'vegetable_forward', or 'mezze'. The week must include at least {"1" if days < 5 else "2"} vegetable_forward or mezze dinner{"" if days < 5 else "s"}.
+13. A component made in another recipe this week (whipped feta, a sauce, a spice blend, cooked grains from Sunday prep) is listed where it's used with `made_in` set to that meal's id or 'sunday_prep', so it stays off the shopping list. The recipe that makes it must buy and make enough for every use, and say so in its instructions.
 {_snacks_output_rule}"""

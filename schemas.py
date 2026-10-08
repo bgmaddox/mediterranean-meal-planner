@@ -24,6 +24,7 @@ class Ingredient(TypedDict):
     unit: str
     pantry_staple: bool
     special: bool          # True → non-staple purchased this week; must appear in 2+ meals
+    made_in: NotRequired[Optional[str]]  # 'd3' / 'sunday_prep' — made in another recipe, not bought
 
 
 class DinnerServings(TypedDict):

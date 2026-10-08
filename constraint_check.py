@@ -404,6 +404,33 @@ def _check_leftover_links(plan: WeekPlan) -> list[Violation]:
     return out
 
 
+_MADE_ELSEWHERE_RE = re.compile(
+    r"\(from\b|\bfrom (d\d|l\d|dinner|sunday)|\breserved\b|\bleftover\b|\bprepped\b", re.I)
+
+
+def _check_made_in(plan: WeekPlan) -> list[Violation]:
+    """Components made in another recipe (whipped feta made in d3). Marked with
+    `made_in` they stay off the shopping list; unmarked, they get printed as
+    something to buy. The first real shopping review found exactly that."""
+    dinners = plan.get("dinners") or []
+    lunches = plan.get("lunches") or []
+    meal_ids = {str(m.get("id", "")) for m in [*dinners, *lunches]} | {"sunday_prep"}
+    out: list[Violation] = []
+    for meal in [*dinners, *lunches, *(plan.get("snacks") or [])]:
+        if meal.get("source") == "leftover":
+            continue   # leftover lunches are never shopped for
+        for ing in meal.get("ingredients") or []:
+            ref = ing.get("made_in")
+            if ref and str(ref) not in meal_ids:
+                out.append(_v("made_in_broken", "soft", meal,
+                              f"says '{ing['name']}' is made in '{ref}', which is not in this plan"))
+            elif not ref and not ing.get("pantry_staple") and _MADE_ELSEWHERE_RE.search(ing["name"]):
+                out.append(_v("made_elsewhere_unmarked", "soft", meal,
+                              f"lists '{ing['name']}', which looks made in another recipe but has "
+                              f"no made_in, so it will be printed on the shopping list"))
+    return out
+
+
 def _check_composition_labels(plan: WeekPlan) -> list[Violation]:
     """A dinner labeled vegetable_forward or mezze should not be built around a
     meat centerpiece. Small amounts of protein are fine and expected, so this
@@ -501,6 +528,7 @@ def check_week_plan(
     out += _check_fish_frequency(plan)
     out += _check_special_ingredient_reuse(plan)
     out += _check_leftover_links(plan)
+    out += _check_made_in(plan)
     out += _check_composition_labels(plan)
     out += _check_unused_ingredients(plan)
 
