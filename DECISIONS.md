@@ -80,6 +80,14 @@ based on the 10/14/13 run-to-run spread, not a measured result. `sessions/review
 records each session's reviewer count, tokens, and how often reviewer B found what A
 missed. If B rarely adds anything, go back to one.
 
+**Batch review packets per reviewer** (measured 2026-10-07). One reviewer costs about
+55k tokens, nearly all of it the fixed cost of starting it. The trial walkthrough and
+shopping reviewers read 15 KB and 7 KB packets and cost 56k and 53k. One reviewer per
+packet (18 per week) would be about 1M tokens; batched it's 6 reviewers. On their first
+real week (2026-08-29) the shopping reviewer found two real problems no code checks:
+thyme bought for 1 tbsp, and "whipped feta" printed on the shopping list though it's
+made in d3, with too little feta bought to make it.
+
 ---
 
 ## Do not repeat
