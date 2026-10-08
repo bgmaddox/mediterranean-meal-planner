@@ -51,12 +51,24 @@ Contradictions inside a recipe are objective enough to act on. Variety and plate
 geometry are matters of taste and stay advisory forever. Do not promote a judgment
 category to a defect category without evidence that it is checkable.
 
+**Superseded 2026-10-07: everything runs on Opus 5.5**, by the user's choice. The entry below is the measurement it replaces, kept because it is still the evidence if cost matters again.
+
 **Review runs on Sonnet 5, repairs on Opus 4.8** (`4491f03`). Measured, not assumed:
 three Sonnet review runs over the same week found 10/14/13 defects against Opus 5's 10,
 recovered 9 of its 10, found two it missed, and cost 46% as much. Note that 10/14/13
 spread — run-to-run variance is wider than the gap between models, so this says "not
 worse for half the price", not "better". Writing a corrected recipe was never measured
 on Sonnet; that is why repairs stayed on the generation model.
+
+**Weeks are planned in a Claude Code session first; the app is the backup** (2026-10-07).
+A session has no per-call cost, so review can run as often as it is useful. The session
+replaces only the model call. Prompt building, checks, review rubric and save path are
+the app's own code, run through `cli.py`, so the two paths cannot drift on rules.
+
+**The Pi's data is the only real copy.** A session reads a mirror of it and writes a
+week through the Pi's own `data_store` over SSH. Do not sync by copying files in either
+direction: the app writes favorites and ratings on the Pi, and the Mac's `data/` is a
+test corpus the tests depend on.
 
 ---
 

@@ -14,6 +14,7 @@ Files managed:
 """
 
 import json
+import os
 import random
 import re
 import uuid
@@ -32,13 +33,20 @@ from schemas import (
 )
 
 DATA_DIR = Path(__file__).parent / "data"
-HISTORY_FILE = DATA_DIR / "history.json"
-FAVORITES_FILE = DATA_DIR / "favorites.json"
-CONSTRAINTS_FILE = DATA_DIR / "constraints.json"
-PREFERENCES_FILE = DATA_DIR / "preferences.json"
-LIBRARY_FILE = DATA_DIR / "recipe_library.json"
+
+# Personal data (history, favorites, ...) can live elsewhere. The Pi holds the
+# real copy; cli.py points DIET_DATA_DIR at a local mirror of it so a Claude Code
+# session plans from the same history the app sees. The shipped anchor seed
+# always stays in DATA_DIR.
+PERSONAL_DIR = Path(os.environ.get("DIET_DATA_DIR") or DATA_DIR)
+
+HISTORY_FILE = PERSONAL_DIR / "history.json"
+FAVORITES_FILE = PERSONAL_DIR / "favorites.json"
+CONSTRAINTS_FILE = PERSONAL_DIR / "constraints.json"
+PREFERENCES_FILE = PERSONAL_DIR / "preferences.json"
+LIBRARY_FILE = PERSONAL_DIR / "recipe_library.json"
 ANCHOR_RECIPES_FILE = DATA_DIR / "anchor_recipes.json"          # shipped seed (git-tracked)
-ANCHOR_RECIPES_USER_FILE = DATA_DIR / "anchor_recipes_user.json"  # user additions (gitignored)
+ANCHOR_RECIPES_USER_FILE = PERSONAL_DIR / "anchor_recipes_user.json"  # user additions (gitignored)
 
 MAX_HISTORY_WEEKS = 12     # stored
 HISTORY_WEEKS_FOR_PROMPT = 6  # passed to Claude
@@ -50,8 +58,12 @@ def _read(path: Path) -> list | dict:
 
 
 def _write(path: Path, data: list | dict) -> None:
-    with open(path, "w") as f:
+    # Write-then-rename, so a reader never sees a half-written file. The Pi now
+    # has two writers — the app, and a plan imported over SSH by cli.py.
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    with open(tmp, "w") as f:
         json.dump(data, f, indent=2)
+    os.replace(tmp, path)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
