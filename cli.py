@@ -368,6 +368,83 @@ def cmd_feedback(args) -> int:
     return 0
 
 
+def _weight_cli(*args: str) -> str | None:
+    """Ask the separate Weight tracker project. None if it is missing or unreachable."""
+    root = Path(os.environ.get("WEIGHT_PROJECT", Path(__file__).resolve().parent.parent / "Weight"))
+    python, script = root / ".venv/bin/python", root / "cli.py"
+    if not python.exists() or not script.exists():
+        return None
+    try:
+        done = subprocess.run([str(python), str(script), *args], capture_output=True,
+                              text=True, timeout=45, cwd=root)
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    return done.stdout if done.returncode == 0 else None
+
+
+def format_intake(s: dict) -> list[str]:
+    """Planned vs logged, trend and days logged, from the tracker's summary."""
+    week = s.get("week") or {}
+    trend = s.get("trend") or {}
+    lines = [f"Days logged this week: {week.get('logged_days', 0)} of {week.get('target_days', 0)}"]
+    if week.get("mean_kcal"):
+        lines.append(f"Average on logged days: {week['mean_kcal']}")
+    plan = s.get("diet_week")
+    if plan:
+        lines.append(f"Planned dinners logged, week of {plan.get('week_start')}: "
+                     f"{plan.get('logged_dinners', 0)} of {plan.get('planned_dinners', 0)}")
+    else:
+        lines.append("No current Diet week in the tracker")
+    lines.append(f"7-day trend: {trend['mean_lb']:.1f} lb" if trend.get("enough")
+                 else "7-day trend: not enough weigh-ins")
+    return lines
+
+
+def cmd_intake(args) -> int:
+    """Read-only look-back from the tracker. Never fails the planning session."""
+    raw = _weight_cli("summary")
+    if raw is None:
+        print("Weight tracker unreachable; skipping.")
+        return 0
+    try:
+        summary = json.loads(raw)
+    except ValueError:
+        print("Weight tracker gave an unreadable answer; skipping.")
+        return 0
+    print("\n".join(format_intake(summary)))
+    pending = _weight_cli("ratings")
+    weeks = json.loads(pending) if pending else []
+    count = sum(len(w["meals"]) for w in weeks)
+    if not count:
+        return 0
+    if not args.apply_ratings:
+        print(f"{count} dinner rating(s) from the app are waiting; "
+              "re-run with --apply-ratings once the user agrees.")
+        return 0
+    _ensure_mirror(False)
+    for payload in weeks:
+        try:
+            _validate_feedback(payload)
+        except (ValueError, KeyError) as e:
+            raise CLIError(f"Ratings not recorded: {e}")
+        _pi_op("apply_feedback", payload)
+    pull(quiet=True)
+    _weight_cli("ratings", "--mark-sent")
+    print(f"Applied {count} rating(s).")
+    return 0
+
+
+def cmd_set_target(args) -> int:
+    """Change the lunch and dinner calorie target on the Pi, after a yes in session."""
+    payload = {"target_calories_lunch_dinner": args.calories}
+    if args.offline:
+        print(_local_op("set_target_calories", payload))
+        return 0
+    print(_pi_op("set_target_calories", payload))
+    pull(quiet=True)
+    return 0
+
+
 def _validate_feedback(payload: dict) -> None:
     entry = _find_week(payload["week_start"])
     ids = {str(m.get("id")) for k in ("dinners", "lunches") for m in entry["plan"].get(k) or []}
@@ -668,6 +745,15 @@ def main(argv: list[str] | None = None) -> int:
     sp.add_argument("file", help='JSON: {"week_start", "meals": [{"id","rating","tags","feedback"}], "constraints": [...]}')
     offline(sp)
     sp.set_defaults(fn=cmd_feedback)
+
+    sp = sub.add_parser("intake", help="read-only: planned vs logged and trend from the Weight tracker")
+    sp.add_argument("--apply-ratings", action="store_true", help="also apply ratings queued in the app")
+    sp.set_defaults(fn=cmd_intake)
+
+    sp = sub.add_parser("set-target", help="change the lunch and dinner calorie target on the Pi")
+    sp.add_argument("calories", type=int)
+    offline(sp)
+    sp.set_defaults(fn=cmd_set_target)
 
     sub.add_parser("push", help="send weeks queued while the Pi was offline").set_defaults(fn=cmd_push)
 

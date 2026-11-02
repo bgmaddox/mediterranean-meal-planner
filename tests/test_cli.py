@@ -336,3 +336,34 @@ def test_week_level_findings_are_accepted_as_notes(sandbox):
     out = cli._session_notes(plan, notes)
     assert {n["code"] for n in out} == {"critique_package_waste", "critique_freshness"}
     assert all("repair_outcome" not in n for n in out)
+
+
+def test_intake_skips_quietly_when_tracker_is_unreachable(sandbox, monkeypatch, capsys):
+    monkeypatch.setenv("WEIGHT_PROJECT", "/nonexistent")
+    assert cli.main(["intake"]) == 0
+    assert "unreachable" in capsys.readouterr().out
+
+
+def test_intake_formats_summary():
+    lines = cli.format_intake({
+        "week": {"logged_days": 4, "target_days": 5, "mean_kcal": "About 2,100 kcal"},
+        "trend": {"enough": True, "mean_lb": 186.44},
+        "diet_week": {"week_start": "2026-10-05", "logged_dinners": 2, "planned_dinners": 5},
+    })
+    assert "Days logged this week: 4 of 5" in lines
+    assert "Planned dinners logged, week of 2026-10-05: 2 of 5" in lines
+    assert "7-day trend: 186.4 lb" in lines
+
+
+def test_intake_without_plan_or_weigh_ins():
+    lines = cli.format_intake({"week": {}, "trend": {"enough": False}, "diet_week": None})
+    assert "No current Diet week in the tracker" in lines
+    assert "7-day trend: not enough weigh-ins" in lines
+
+
+def test_set_target_op_updates_preference_and_rejects_nonsense(sandbox):
+    result = pi_ops.set_target_calories(data_store, {"target_calories_lunch_dinner": 1500})
+    assert result["target_calories_lunch_dinner"] == 1500
+    assert data_store.load_preferences()["target_calories_lunch_dinner"] == 1500
+    with pytest.raises(ValueError):
+        pi_ops.set_target_calories(data_store, {"target_calories_lunch_dinner": 100})

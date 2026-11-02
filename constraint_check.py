@@ -281,6 +281,27 @@ def _check_sodium(meal: dict, target_mg: int) -> list[Violation]:
     return []
 
 
+ADDED_SUGAR_SOFT_G = 12
+SATURATED_FAT_SOFT_G = 10
+
+
+def _check_estimates(meal: dict) -> list[Violation]:
+    """Soft only: these are rough estimates, and old plans lack the fields."""
+    nutrition = meal.get("nutrition_estimate") or {}
+    out = []
+    sugar = nutrition.get("added_sugar_g")
+    if isinstance(sugar, (int, float)) and sugar > ADDED_SUGAR_SOFT_G:
+        out.append(_v("added_sugar_over_target", "soft", meal,
+                      f"is an estimated {int(sugar)} g added sugar per adult serving, "
+                      f"over the {ADDED_SUGAR_SOFT_G} g target"))
+    fat = nutrition.get("saturated_fat_g")
+    if isinstance(fat, (int, float)) and fat > SATURATED_FAT_SOFT_G:
+        out.append(_v("saturated_fat_over_target", "soft", meal,
+                      f"is an estimated {int(fat)} g saturated fat per adult serving, "
+                      f"over the {SATURATED_FAT_SOFT_G} g target"))
+    return out
+
+
 def _normalize_name(name: str) -> str:
     return re.sub(r"[^a-z0-9 ]", " ", (name or "").lower()).strip()
 
@@ -523,6 +544,7 @@ def check_week_plan(
 
     for meal in [*dinners, *lunches]:
         out += _check_sodium(meal, target_sodium_mg)
+        out += _check_estimates(meal)
 
     out += _check_repeats(plan, history or [])
     out += _check_fish_frequency(plan)

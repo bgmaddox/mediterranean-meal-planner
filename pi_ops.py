@@ -128,3 +128,15 @@ def add_anchor(ds, p):
     user.append(entry)
     ds._write(ds.ANCHOR_RECIPES_USER_FILE, user)
     return {"action": "added", "id": rid}
+
+
+def set_target_calories(ds, p):
+    """Lunch and dinner calorie target. Runs only after the user says yes in a session.
+
+    payload: {"target_calories_lunch_dinner": int}
+    """
+    value = int(p["target_calories_lunch_dinner"])
+    if not 800 <= value <= 3000:
+        raise ValueError(f"{value} is outside the sensible range for lunch and dinner")
+    prefs = ds.update_preferences(target_calories_lunch_dinner=value)
+    return {"target_calories_lunch_dinner": prefs["target_calories_lunch_dinner"]}

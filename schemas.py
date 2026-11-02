@@ -40,6 +40,9 @@ class NutritionEstimate(TypedDict):
     fat_g: int
     sodium_mg: int                      # Target ≤700 per adult serving; ceiling ~1200
     saturated_fat_note: Optional[str]   # e.g. "Low — salmon fat is mostly unsaturated"
+    carbs_g: NotRequired[int]           # Absent in plans saved before these fields
+    added_sugar_g: NotRequired[int]
+    saturated_fat_g: NotRequired[int]
 
 
 class ServingSize(TypedDict):

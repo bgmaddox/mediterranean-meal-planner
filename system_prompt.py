@@ -129,6 +129,9 @@ leafy greens are safe and encouraged.
 - Cholesterol improvement: salmon 2–3x/week across the full week, legumes, \
 oats/barley, EVOO, walnuts.
 - Weight loss: high fiber, high protein, low glycemic, olive oil as the primary fat.
+- Sugars and carbohydrates: prefer whole grains and legumes over refined starches, avoid \
+sugary sauces and drinks, and keep added sugar low; aim for ≤12 g added sugar and ≤10 g \
+saturated fat per adult serving.
 - Sodium restraint: target ≤{SODIUM_TARGET_DEFAULT_MG} mg per adult dinner serving; never exceed \
 ~{SODIUM_HARD_CEILING_MG:,} mg. Watch the usual culprits — olives, feta, canned beans, broth, soy/fish \
 sauce, harissa and other chile pastes, jarred sauces, and cured meat. Build flavor \
@@ -179,6 +182,9 @@ OUTPUT_SCHEMA = {
                     "protein_g": "integer",
                     "fiber_g": "integer",
                     "fat_g": "integer",
+                    "carbs_g": "integer",
+                    "added_sugar_g": "integer",
+                    "saturated_fat_g": "integer",
                     "sodium_mg": f"integer — target ≤{SODIUM_TARGET_DEFAULT_MG} per adult serving; hard ceiling ~{SODIUM_HARD_CEILING_MG}",
                     "saturated_fat_note": "string or null — e.g. 'Low — salmon fat is mostly unsaturated'"
                 },
@@ -220,6 +226,9 @@ OUTPUT_SCHEMA = {
                     "protein_g": "integer",
                     "fiber_g": "integer",
                     "fat_g": "integer",
+                    "carbs_g": "integer",
+                    "added_sugar_g": "integer",
+                    "saturated_fat_g": "integer",
                     "sodium_mg": f"integer — target ≤{SODIUM_TARGET_DEFAULT_MG} per adult serving; hard ceiling ~{SODIUM_HARD_CEILING_MG}",
                     "saturated_fat_note": "string or null"
                 },
@@ -880,6 +889,9 @@ For every dinner and lunch, include a `nutrition_estimate` object with:
 - `protein_g` (integer)
 - `fiber_g` (integer)
 - `fat_g` (integer)
+- `carbs_g` (integer)
+- `added_sugar_g` (integer)
+- `saturated_fat_g` (integer)
 - `sodium_mg` (integer)
 - `saturated_fat_note` (string or null — note only when saturated fat is meaningfully high or low)
 

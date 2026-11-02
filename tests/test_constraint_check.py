@@ -437,3 +437,14 @@ def test_single_lonely_special_ingredient_names_its_meal():
                        "ingredients": [special("ras el hanout")]}])
     v = [x for x in cc.check_week_plan(p) if x["code"] == "special_ingredient_unused"]
     assert len(v) == 1 and "only in Tagine" in v[0]["message"]
+
+
+def test_estimated_sugar_and_saturated_fat_are_soft_and_old_plans_are_fine():
+    import constraint_check as cc
+
+    meal = {"id": "d1", "name": "Glazed", "nutrition_estimate": {"added_sugar_g": 20, "saturated_fat_g": 14}}
+    found = cc._check_estimates(meal)
+    assert {v["severity"] for v in found} == {"soft"}
+    assert len(found) == 2
+    assert cc._check_estimates({"id": "d2", "name": "Old", "nutrition_estimate": {"protein_g": 30}}) == []
+    assert cc._check_estimates({"id": "d3", "name": "Fine", "nutrition_estimate": {"added_sugar_g": 12}}) == []
