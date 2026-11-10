@@ -38,7 +38,14 @@ SHOPPING_CATEGORIES = {
     "missing_from_list",   # instructions use an ingredient that isn't listed and isn't a pantry staple
 }
 
-CATEGORIES = WALKTHROUGH_CATEGORIES | SHOPPING_CATEGORIES
+LUNCH_WEEK_CATEGORIES = {
+    "batch_session",     # the Sunday cook doesn't fit the session: too long, or two steps need the same equipment at once
+    "holds_poorly",      # a recipe won't be good on its last assigned day, or the packing doesn't protect it
+    "reheat_quality",    # won't microwave well, or is marked cold but needs heat to be good
+    "sameness",          # the recipes are too alike, or too like the lunches kept from dinners (a judgment)
+}
+
+CATEGORIES = WALKTHROUGH_CATEGORIES | SHOPPING_CATEGORIES | LUNCH_WEEK_CATEGORIES
 
 WALKTHROUGH_SYSTEM = """You are walking through a week of family meals the way it \
 will actually be cooked: groceries bought on Sunday, Sunday prep done that afternoon, \
@@ -85,6 +92,33 @@ Do NOT report prices, brands, nutrition, taste, or banned ingredients.
 Most weeks have one to three real findings at most. An empty list is fine. Write each \
 `message` as a phrase completing "This week ___", naming the ingredient."""
 
+LUNCH_WEEK_SYSTEM = """You are walking through a week of office lunches the way it \
+will actually happen. Everything is cooked in one session on Sunday, portioned into \
+containers, and eaten on the days each recipe lists. At the office there is a microwave, \
+available for as long as needed, and nothing else: no oven, toaster or stovetop.
+
+First lay out the Sunday session: the order to cook the recipes in, what overlaps, and \
+the total active time. Return it as `session`, a short list of steps with minutes.
+
+Then report only real problems:
+- batch_session: the session runs well past 90 minutes of active time, or two steps need \
+the same pot, oven or burner at the same time, or a step is missing (nothing says to cool \
+or portion).
+- holds_poorly: a recipe will not be good on its LAST assigned day (Friday is five days \
+after the cook), whatever its `keeps_days` claims, or the packing puts together things \
+that ruin each other (dressed greens, cut cucumber or tomato, crunchy toppings, pasta \
+sitting in sauce). Say what fails and on which day.
+- reheat_quality: a microwaved lunch depends on something a microwave ruins (crispness, \
+a seared crust, bread), or a lunch marked cold is a dish that is poor cold.
+- sameness: the recipes are too alike in protein, base or flavor to feel like two \
+lunches, or too like the lunches listed under "kept". This one is a matter of taste.
+
+Do NOT report recipe-internal contradictions (each recipe is proofread separately), \
+nutrition, or banned ingredients, fish rules and fridge-life arithmetic, which code checks.
+
+The common, correct answer is a sensible session and no findings. Write each `message` as \
+a phrase completing "This lunch ___" or "This week ___"."""
+
 FINDINGS_FORMAT = """
 
 Reply with ONLY a JSON object, no prose around it:
@@ -127,3 +161,21 @@ def shopping_packet(plan: dict, sections: dict) -> str:
             + "\n\nShopping list:\n" + json.dumps(listed, indent=1)
             + "\n\nWho uses each ingredient:\n" + json.dumps(usage, indent=1)
             + "\n\nInstructions by meal (for missing_from_list):\n" + json.dumps(instructions, indent=1))
+
+
+def lunch_week_packet(plan: dict, batch_ids: list[str]) -> str:
+    """The lunch week as cooked and eaten. `plan` is the merged week; `batch_ids`
+    are the lunch-week recipes in it. Other lunches are listed as kept."""
+    lunches = plan.get("lunches") or []
+    keys = ("id", "name", "days", "servings", "keeps_days", "reheat", "cook_time_minutes",
+            "primary_equipment", "ingredients", "instructions", "pack_instructions")
+    view = {
+        "recipes": [{k: l.get(k) for k in keys} for l in lunches if str(l.get("id")) in batch_ids],
+        "kept": [{"id": l.get("id"), "name": l.get("name")} for l in lunches
+                 if str(l.get("id")) not in batch_ids],
+        "sunday_prep_list": [t for t in plan.get("sunday_prep_list") or [] if t.get("part") == "lunch"],
+    }
+    return (LUNCH_WEEK_SYSTEM
+            + FINDINGS_FORMAT % ('"session": ["0:00 start the lentils (25 min)", ...], ',
+                                 ", ".join(sorted(LUNCH_WEEK_CATEGORIES)))
+            + "\n\nThe lunch week:\n\n" + json.dumps(view, indent=1))

@@ -88,6 +88,28 @@ real week (2026-08-29) the shopping reviewer found two real problems no code che
 thyme bought for 1 tbsp, and "whipped feta" printed on the shopping list though it's
 made in d3, with too little feta bought to make it.
 
+**Fish is banned from microwaved lunches, not from lunches** (2026-11-10, user's choice).
+The rule was always about office smell. A lunch marked `none (cold)` may contain fish,
+for at most three days after the Sunday cook; a lunch that does not say it is cold is
+treated as heated, so the old hard rejection still covers every unclear case.
+
+**A lunch week is saved into its week, by part, not into a store of its own**
+(2026-11-10). One grocery trip and one Sunday prep per week means one record: one
+shopping list, one PDF, and the app shows it with no new tab. The costs were accepted and
+handled: a whole-week save refuses to drop lunch recipes, the dinner prompt's history
+skips lunch-only weeks, and the 12-week history cap was removed (the user's call:
+limiting it helped nothing). A separate lunch file
+would have avoided those at the price of merging two shopping lists.
+
+**The unit of a lunch week is a batch recipe, not a lunch per day** (2026-11-10). Two
+recipes cooked in one Sunday session, split 3 + 2. The plan's main risk is the late-week
+recipe, so fridge life is data (`keeps_days`) and arithmetic the checker does, and
+"still good on Friday" is the lunch reviewer's main question.
+
+**The office has a microwave with no time limit and nothing else.** An earlier draft
+capped reheating at two minutes and made it a setting; the user corrected that. Do not
+reintroduce a reheat-time rule.
+
 ---
 
 ## Do not repeat

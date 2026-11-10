@@ -94,12 +94,21 @@ class LunchMeal(TypedDict):
     nutrition_estimate: NutritionEstimate
     cost_estimate: CostEstimate
     serving_sizes: list[ServingSize]
+    # Lunch-week fields (lunch_week.py): a lunch planned on its own is a batch
+    # recipe cooked on Sunday, so it carries a method and a fridge life. Absent
+    # on the lunches a dinner week generates, and on plans saved before these.
+    instructions: NotRequired[list[str]]     # The Sunday cook
+    cook_time_minutes: NotRequired[int]
+    primary_equipment: NotRequired[str]
+    days: NotRequired[list[str]]             # 'Mon'..'Fri' — the days this batch is eaten
+    keeps_days: NotRequired[int]             # Fridge life counted from Sunday (Mon = 1, Fri = 5)
 
 
 class SundayPrepTask(TypedDict):
     task: str
     yields_for: list[str]               # Meal names this prep supports
     storage: str                        # How to store and how long it holds
+    part: NotRequired[str]              # 'lunch' on tasks a lunch week added, so re-saving it replaces only those
 
 
 class WeekSummary(TypedDict):

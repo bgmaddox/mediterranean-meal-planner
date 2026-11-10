@@ -285,7 +285,7 @@ OUTPUT_SCHEMA = {
 DEFAULT_CONSTRAINTS = [
     "No mushrooms — avoid entirely in all forms: whole, sliced, dried, or as part of sauces, broths, or umami pastes.",
     "No oranges or orange juice — wife's constraint. Lemons and limes are fine and encouraged.",
-    "No fish in lunches — fish should not be reheated at the office (smell). Avoid fish-based lunches entirely.",
+    "No reheated fish in lunches — fish must never be microwaved at the office (smell). Fish is allowed only in a lunch eaten cold (reheat: 'none (cold)').",
 ]
 
 
@@ -335,6 +335,235 @@ _PROTEIN_TARGETS = {
     6: "3 fish, ≤2 red meat, 1–2 vegetarian",
     7: "3–4 fish, ≤2 red meat, 2 vegetarian",
 }
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SHARED PROMPT SECTIONS
+# Used by build_system_prompt below and by lunch_prompt.build_lunch_prompt, so
+# the dinner-week prompt and the lunch-week prompt cannot drift on these rules.
+# ─────────────────────────────────────────────────────────────────────────────
+# Atlanta-specific seasonal guidance
+SEASON_GUIDANCE = {
+    "summer": (
+        "It is summer in Atlanta, GA — hot and humid (often 90°F+). "
+        "Strongly favor the gas grill and Blackstone griddle over the oven. "
+        "Lean toward cold or room-temperature lunches. "
+        "Choose lighter proteins (fish, shrimp, chicken breast) and fresh, raw preparations. "
+        "Minimize dishes that require the oven on hot nights."
+    ),
+    "fall": (
+        "It is fall in Atlanta, GA — pleasant temperatures, cooling down. "
+        "Introduce heartier soups, roasted root vegetables, and warming spices. "
+        "Slow cooker and Instant Pot meals are appropriate. "
+        "A good season for grain bowls, lentil stews, and baked dishes."
+    ),
+    "winter": (
+        "It is winter in Atlanta, GA — mild but variable; occasional cold snaps. "
+        "Favor Instant Pot, slow cooker, and oven-based meals. "
+        "Braises, lentil and bean stews, and baked fish are ideal. "
+        "Fewer cold lunches — warm, hearty options preferred."
+    ),
+    "spring": (
+        "It is spring in Atlanta, GA — pleasant and mild. "
+        "Fresh herbs, lighter proteins, and transitional dishes work well. "
+        "Good season to mix grilling with oven and stovetop cooking. "
+        "Cold and warm lunches are equally appropriate."
+    ),
+}
+
+
+def _favorites_block(favorites: list[dict] | None) -> str:
+    if favorites:
+        lines = []
+        for fav in favorites:
+            stars = "★" * fav.get("rating", 3) + "☆" * (5 - fav.get("rating", 3))
+            tags = ", ".join(fav.get("tags", []))
+            feedback = fav.get("feedback", "")
+            last_made = fav.get("last_made", "unknown")
+            line = f"  - {fav['name']} {stars} (last made: {last_made})"
+            if tags:
+                line += f" | Tags: {tags}"
+            if feedback:
+                line += f" | Note: {feedback}"
+            lines.append(line)
+        favorites_block = (
+            "## Saved Favorites\n"
+            "Work these in naturally based on ratings and recency. "
+            "5★: replicate closely. 3–4★: vary more freely. 1–2★: include rarely.\n\n"
+            + "\n".join(lines)
+        )
+    else:
+        favorites_block = (
+            "## Saved Favorites\n"
+            "No favorites yet. Focus on variety and building the family's repertoire."
+        )
+    return favorites_block
+
+
+def _anchor_lines(anchor_recipes: list[dict]) -> list[str]:
+    """One prompt entry per anchor recipe: name, key ingredients, technique, real nutrition."""
+    lines = []
+    for r in anchor_recipes:
+        ings = ", ".join(r.get("key_ingredients", []))
+        cuisine = r.get("cuisine", "")
+        mtype = r.get("meal_type", "either")
+        star = "⭐ " if r.get("matches_use_up") else ""
+        line = f"  - {star}{r['name']} ({cuisine}, {mtype})"
+        if ings:
+            line += f" — key: {ings}"
+        if r.get("summary"):
+            line += f". {r['summary']}"
+        if r.get("technique_notes"):
+            line += f"\n      • Technique: {r['technique_notes']}"
+        nut = r.get("nutrition") or {}
+        if nut:
+            bits = []
+            if nut.get("calories") is not None:
+                bits.append(f"{nut['calories']} kcal")
+            if nut.get("protein_g") is not None:
+                bits.append(f"{nut['protein_g']}g protein")
+            if nut.get("fiber_g") is not None:
+                bits.append(f"{nut['fiber_g']}g fiber")
+            if nut.get("sodium_mg") is not None:
+                bits.append(f"{nut['sodium_mg']}mg sodium")
+            if bits:
+                line += f"\n      • Actual per serving: {', '.join(bits)}"
+        lines.append(line)
+    return lines
+
+
+def _constraints_block(constraints: list[str] | None) -> str:
+    all_constraints = DEFAULT_CONSTRAINTS + (constraints or [])
+    constraints_block = (
+        "## Food Constraints — HARD RULES (never violate)\n"
+        + "\n".join(f"  - {c}" for c in all_constraints)
+    )
+    return constraints_block
+
+
+def _notes_block(week_notes: Optional[str]) -> str:
+    if week_notes and week_notes.strip():
+        notes_block = (
+            f"## Notes for This Week\n"
+            f"The user has provided the following context for this week's plan. "
+            f"Adapt meal choices accordingly:\n"
+            f"  \"{week_notes.strip()}\""
+        )
+    else:
+        notes_block = ""
+    return notes_block
+
+
+def _use_up_block(use_up_ingredients: Optional[str]) -> str:
+    if use_up_ingredients and use_up_ingredients.strip():
+        lines = [f"  - {line.strip()}" for line in use_up_ingredients.strip().splitlines() if line.strip()]
+        use_up_block = (
+            "## Ingredients to Use Up\n"
+            "The following items are already on hand and should be prioritized in this week's recipes. "
+            "Work them into at least 1–2 meals. Do not add them to the shopping list.\n"
+            + "\n".join(lines)
+        )
+    else:
+        use_up_block = ""
+    return use_up_block
+
+
+MEDITERRANEAN_PRINCIPLES = """\
+## Mediterranean Diet Principles (apply to all meals)
+- **Primary fat:** Extra virgin olive oil (or avocado oil for high-heat non-Mediterranean dishes).
+- **Base:** Vegetables, whole grains, legumes, fruit, nuts.
+- **Fish:** 2–3 dinners per week. Salmon is the top choice. Cod, tilapia, and other white fish are excellent.
+- **Poultry:** Lean, skinless chicken and turkey are unlimited.
+- **Eggs:** Fine in moderation.
+- **Red meat:** ≤2 meals/week. Lean cuts, 3–4 oz cooked per adult.
+- **Dairy:** Low-fat Greek yogurt and low-fat milk are encouraged.
+- **No organ meats, no processed meats, no deep-fried food.**"""
+
+URIC_ACID_AND_CHOLESTEROL_RULES = """\
+# HEALTH CONSTRAINT: URIC ACID MANAGEMENT
+
+## AVOID ENTIRELY:
+- Organ meats; processed and deli meats
+- Beer; all alcohol raises uric acid — avoid or minimize
+- Fruit juice, HFCS, sweetened drinks (fructose directly triggers uric acid production)
+- Meat and fish stocks, gravies, bone broths (purines concentrate in boiling liquid)
+
+## LIMIT:
+- Sardines, anchovies, mackerel, herring — at most once in the plan; not weekly staples
+- Canned tuna — fine 1–2x/week, not daily
+- Shellfish — 1–2x/week fine
+- Red meat — already limited to ≤2x/week; keep portions to 3–4 oz cooked
+
+## ACTIVELY RECOMMEND (lower uric acid):
+- Low-fat Greek yogurt and dairy — dairy proteins promote uric acid excretion; one of the strongest interventions
+- Bell peppers, lemon/lime, strawberries, tomatoes — vitamin C lowers serum uric acid
+- Cherries — strong clinical evidence; suggest as snack or topping
+- Celery — inhibits the enzyme that produces uric acid
+
+## CORRECTED GUIDANCE (do NOT apply outdated myths):
+- Spinach and leafy greens are SAFE — plant-source purines do not raise uric acid
+- Legumes are SAFE and ENCOURAGED — fiber/protein benefit far outweighs any theoretical purine concern
+
+## COOKING TECHNIQUE:
+When boiling or poaching chicken or fish, purines leach into the cooking liquid. Discarding it reduces purine load. \
+Include this as a `uric_acid_tip` in relevant recipes.
+
+---
+
+# HEALTH CONSTRAINT: CHOLESTEROL
+
+## Emphasize:
+- Salmon 2–3x/week (omega-3s raise HDL)
+- Extra virgin olive oil (raises HDL, anti-inflammatory)
+- Oats and barley (beta-glucan — strongest dietary LDL intervention)
+- Legumes (soluble fiber lowers LDL)
+- Walnuts, avocado, ground flaxseed, chia seeds
+
+## Limit:
+- Saturated fat: red meat already limited; use low-fat dairy
+- Full-fat cheese and cream: occasional accents only"""
+
+EQUIPMENT_SECTION = """\
+# COOKING EQUIPMENT
+
+The following equipment is available. Use whatever makes the best recipe — do NOT try to spread meals across different equipment or ensure each tool gets used. It is completely fine to have all stovetop meals, all sheet pan meals, or any other combination. Equipment variety is never a goal.
+
+- **Normal oven + convection toaster oven:** Sheet pan meals, roasting, baking
+- **Instant Pot / pressure cooker:** Dried beans in 25 min, stews in 20 min, pulled chicken in 15 min
+- **Slow cooker / Crockpot:** Set before work (6–8 hr); dinner ready at 6pm — ≤10 min active prep
+- **Gas grill:** Grilled proteins and vegetables
+- **Blackstone griddle:** High-heat searing for fish, chicken, vegetables
+- **Rice cooker:** Hands-free grains
+- **Microwave:** Reheating only"""
+
+_STAPLES_JSON = json.dumps(PANTRY_STAPLES, indent=2)
+
+INGREDIENT_EFFICIENCY_SECTION = f"""\
+# INGREDIENT EFFICIENCY
+
+## Pantry Staples
+Items the family always has on hand. They must still appear in each recipe's `ingredients` array with `pantry_staple: true` (see Output rule 1) so the cook knows how much to use; the app filters them from the shopping list.
+
+{_STAPLES_JSON}
+
+## Special Ingredient Rule:
+`special: true` is a **waste flag**, not a synonym for "not a pantry staple". Set it only \
+for an ingredient that is bought as a one-off and would go to waste or sit unused if only \
+one recipe called for it — a specialty item you buy a whole jar of for one tablespoon \
+(ras el hanout, za'atar, pomegranate molasses, harissa, preserved lemon, tahini-adjacent \
+pastes), or a perishable sold in a quantity far larger than one meal needs (a bunch of \
+fresh herbs, a tub of Greek yogurt, a block of feta).
+
+Do **not** flag ordinary produce and staple proteins that are bought in the amount a \
+single recipe uses and keep or freeze well — bell peppers, carrots, tomatoes, zucchini, \
+onions, canned beans, chicken, salmon. Those are simply ingredients. Flagging them is the \
+most common error here, and it turns a real efficiency rule into noise.
+
+Anything you do flag `special: true` **must appear in ≥2 meals this week** — that is the \
+entire point of the flag. If an ingredient only earns one meal, either build a second use \
+for it or leave `special: false`. Confirm every special ingredient in \
+`ingredient_overlap_notes`."""
+
 
 
 def build_system_prompt(
@@ -396,34 +625,7 @@ def build_system_prompt(
 
     season = get_season(current_date)
 
-    # Atlanta-specific seasonal guidance
-    season_guidance = {
-        "summer": (
-            "It is summer in Atlanta, GA — hot and humid (often 90°F+). "
-            "Strongly favor the gas grill and Blackstone griddle over the oven. "
-            "Lean toward cold or room-temperature lunches. "
-            "Choose lighter proteins (fish, shrimp, chicken breast) and fresh, raw preparations. "
-            "Minimize dishes that require the oven on hot nights."
-        ),
-        "fall": (
-            "It is fall in Atlanta, GA — pleasant temperatures, cooling down. "
-            "Introduce heartier soups, roasted root vegetables, and warming spices. "
-            "Slow cooker and Instant Pot meals are appropriate. "
-            "A good season for grain bowls, lentil stews, and baked dishes."
-        ),
-        "winter": (
-            "It is winter in Atlanta, GA — mild but variable; occasional cold snaps. "
-            "Favor Instant Pot, slow cooker, and oven-based meals. "
-            "Braises, lentil and bean stews, and baked fish are ideal. "
-            "Fewer cold lunches — warm, hearty options preferred."
-        ),
-        "spring": (
-            "It is spring in Atlanta, GA — pleasant and mild. "
-            "Fresh herbs, lighter proteins, and transitional dishes work well. "
-            "Good season to mix grilling with oven and stovetop cooking. "
-            "Cold and warm lunches are equally appropriate."
-        ),
-    }[season]
+    season_guidance = SEASON_GUIDANCE[season]
 
     # --- History section ---
     if history:
@@ -445,61 +647,11 @@ def build_system_prompt(
             "No history yet — first week. Start with crowd-pleasing Mediterranean staples."
         )
 
-    # --- Favorites section ---
-    if favorites:
-        lines = []
-        for fav in favorites:
-            stars = "★" * fav.get("rating", 3) + "☆" * (5 - fav.get("rating", 3))
-            tags = ", ".join(fav.get("tags", []))
-            feedback = fav.get("feedback", "")
-            last_made = fav.get("last_made", "unknown")
-            line = f"  - {fav['name']} {stars} (last made: {last_made})"
-            if tags:
-                line += f" | Tags: {tags}"
-            if feedback:
-                line += f" | Note: {feedback}"
-            lines.append(line)
-        favorites_block = (
-            "## Saved Favorites\n"
-            "Work these in naturally based on ratings and recency. "
-            "5★: replicate closely. 3–4★: vary more freely. 1–2★: include rarely.\n\n"
-            + "\n".join(lines)
-        )
-    else:
-        favorites_block = (
-            "## Saved Favorites\n"
-            "No favorites yet. Focus on variety and building the family's repertoire."
-        )
+    favorites_block = _favorites_block(favorites)
 
     # --- Anchor recipes section ---
     if anchor_recipes:
-        lines = []
-        for r in anchor_recipes:
-            ings = ", ".join(r.get("key_ingredients", []))
-            cuisine = r.get("cuisine", "")
-            mtype = r.get("meal_type", "either")
-            star = "⭐ " if r.get("matches_use_up") else ""
-            line = f"  - {star}{r['name']} ({cuisine}, {mtype})"
-            if ings:
-                line += f" — key: {ings}"
-            if r.get("summary"):
-                line += f". {r['summary']}"
-            if r.get("technique_notes"):
-                line += f"\n      • Technique: {r['technique_notes']}"
-            nut = r.get("nutrition") or {}
-            if nut:
-                bits = []
-                if nut.get("calories") is not None:
-                    bits.append(f"{nut['calories']} kcal")
-                if nut.get("protein_g") is not None:
-                    bits.append(f"{nut['protein_g']}g protein")
-                if nut.get("fiber_g") is not None:
-                    bits.append(f"{nut['fiber_g']}g fiber")
-                if nut.get("sodium_mg") is not None:
-                    bits.append(f"{nut['sodium_mg']}mg sodium")
-                if bits:
-                    line += f"\n      • Actual per serving: {', '.join(bits)}"
-            lines.append(line)
+        lines = _anchor_lines(anchor_recipes)
         anchor_block = (
             "## Anchor Recipes (real-world inspiration)\n"
             "A rotating selection of established recipes. Use several as STARTING POINTS rather than "
@@ -532,12 +684,7 @@ def build_system_prompt(
     else:
         anchor_block = ""
 
-    # --- Constraints section ---
-    all_constraints = DEFAULT_CONSTRAINTS + (constraints or [])
-    constraints_block = (
-        "## Food Constraints — HARD RULES (never violate)\n"
-        + "\n".join(f"  - {c}" for c in all_constraints)
-    )
+    constraints_block = _constraints_block(constraints)
 
     # --- Budget section ---
     if budget:
@@ -566,28 +713,9 @@ def build_system_prompt(
     else:
         cuisine_block = _default_cuisine
 
-    # --- Week notes section ---
-    if week_notes and week_notes.strip():
-        notes_block = (
-            f"## Notes for This Week\n"
-            f"The user has provided the following context for this week's plan. "
-            f"Adapt meal choices accordingly:\n"
-            f"  \"{week_notes.strip()}\""
-        )
-    else:
-        notes_block = ""
+    notes_block = _notes_block(week_notes)
 
-    # --- Use-up ingredients section ---
-    if use_up_ingredients and use_up_ingredients.strip():
-        lines = [f"  - {line.strip()}" for line in use_up_ingredients.strip().splitlines() if line.strip()]
-        use_up_block = (
-            "## Ingredients to Use Up\n"
-            "The following items are already on hand and should be prioritized in this week's recipes. "
-            "Work them into at least 1–2 meals. Do not add them to the shopping list.\n"
-            + "\n".join(lines)
-        )
-    else:
-        use_up_block = ""
+    use_up_block = _use_up_block(use_up_ingredients)
 
     # --- Portion scale instruction ---
     if abs(portion_scale - 1.0) > 0.01:
@@ -666,7 +794,6 @@ a small handful of **walnuts or almonds** with fruit, olives + feta + cucumber.
         for ss in schema_with_kids["week_plan"]["dinners"][0].get("serving_sizes", []):
             ss["kid_portion"] = ""
     schema_str = json.dumps(schema_with_kids, indent=2)
-    staples_str = json.dumps(PANTRY_STAPLES, indent=2)
 
     cost_block = """\
 ## Cost Estimation Guidelines
@@ -716,15 +843,7 @@ curry), and beyond.
 ## Cuisine Variety
 {cuisine_block}
 
-## Mediterranean Diet Principles (apply to all meals)
-- **Primary fat:** Extra virgin olive oil (or avocado oil for high-heat non-Mediterranean dishes).
-- **Base:** Vegetables, whole grains, legumes, fruit, nuts.
-- **Fish:** 2–3 dinners per week. Salmon is the top choice. Cod, tilapia, and other white fish are excellent.
-- **Poultry:** Lean, skinless chicken and turkey are unlimited.
-- **Eggs:** Fine in moderation.
-- **Red meat:** ≤2 meals/week. Lean cuts, 3–4 oz cooked per adult.
-- **Dairy:** Low-fat Greek yogurt and low-fat milk are encouraged.
-- **No organ meats, no processed meats, no deep-fried food.**
+{MEDITERRANEAN_PRINCIPLES}
 
 ## Meal Composition — vary the structure across the week
 Do not default every dinner to the same plate shape. Rotate among three archetypes: (1) **Classic plate** — protein + vegetables + optional whole grain/starch (valid, but not the only mode). (2) **Vegetable-forward** — a vegetable dish is the centerpiece with protein and/or grain secondary or folded in (e.g. white-bean-and-greens braise, stuffed vegetables, chickpea-and-vegetable tagine over a little couscous), with legumes, eggs, and dairy carrying the protein. This is the Greek **lathera** tradition — vegetables braised in generous olive oil served as the main course — and the named dishes from the longest-lived Mediterranean populations are your models: briam and soufico (layered baked vegetables), fasolakia yiahni (green bean stew), anginares à la polita (artichokes, peas, and potatoes in lemon-dill broth), imam bayildi (braised stuffed eggplant). Feta, Greek yogurt, or crusty bread traditionally completes the protein. (3) **Mezze / small-plate spread** — 3–4 smaller dishes served tapas-style (e.g. a dip + a vegetable dish + a legume dish + a small protein) instead of one plated entrée. At least 2 dinners should be vegetable-forward or mezze-style, not all classic plates (scale gently: ≥1 for a 3-day week, ≥2 for a 5+-day week). On those nights a grain is **optional**.
@@ -745,48 +864,7 @@ Every dinner should deliver **at least 10–12 g of fiber per adult serving**. T
 
 ---
 
-# HEALTH CONSTRAINT: URIC ACID MANAGEMENT
-
-## AVOID ENTIRELY:
-- Organ meats; processed and deli meats
-- Beer; all alcohol raises uric acid — avoid or minimize
-- Fruit juice, HFCS, sweetened drinks (fructose directly triggers uric acid production)
-- Meat and fish stocks, gravies, bone broths (purines concentrate in boiling liquid)
-
-## LIMIT:
-- Sardines, anchovies, mackerel, herring — at most once in the plan; not weekly staples
-- Canned tuna — fine 1–2x/week, not daily
-- Shellfish — 1–2x/week fine
-- Red meat — already limited to ≤2x/week; keep portions to 3–4 oz cooked
-
-## ACTIVELY RECOMMEND (lower uric acid):
-- Low-fat Greek yogurt and dairy — dairy proteins promote uric acid excretion; one of the strongest interventions
-- Bell peppers, lemon/lime, strawberries, tomatoes — vitamin C lowers serum uric acid
-- Cherries — strong clinical evidence; suggest as snack or topping
-- Celery — inhibits the enzyme that produces uric acid
-
-## CORRECTED GUIDANCE (do NOT apply outdated myths):
-- Spinach and leafy greens are SAFE — plant-source purines do not raise uric acid
-- Legumes are SAFE and ENCOURAGED — fiber/protein benefit far outweighs any theoretical purine concern
-
-## COOKING TECHNIQUE:
-When boiling or poaching chicken or fish, purines leach into the cooking liquid. Discarding it reduces purine load. \
-Include this as a `uric_acid_tip` in relevant recipes.
-
----
-
-# HEALTH CONSTRAINT: CHOLESTEROL
-
-## Emphasize:
-- Salmon 2–3x/week (omega-3s raise HDL)
-- Extra virgin olive oil (raises HDL, anti-inflammatory)
-- Oats and barley (beta-glucan — strongest dietary LDL intervention)
-- Legumes (soluble fiber lowers LDL)
-- Walnuts, avocado, ground flaxseed, chia seeds
-
-## Limit:
-- Saturated fat: red meat already limited; use low-fat dairy
-- Full-fat cheese and cream: occasional accents only
+{URIC_ACID_AND_CHOLESTEROL_RULES}
 
 ---
 
@@ -804,17 +882,7 @@ Include this as a `uric_acid_tip` in relevant recipes.
 
 ---
 
-# COOKING EQUIPMENT
-
-The following equipment is available. Use whatever makes the best recipe — do NOT try to spread meals across different equipment or ensure each tool gets used. It is completely fine to have all stovetop meals, all sheet pan meals, or any other combination. Equipment variety is never a goal.
-
-- **Normal oven + convection toaster oven:** Sheet pan meals, roasting, baking
-- **Instant Pot / pressure cooker:** Dried beans in 25 min, stews in 20 min, pulled chicken in 15 min
-- **Slow cooker / Crockpot:** Set before work (6–8 hr); dinner ready at 6pm — ≤10 min active prep
-- **Gas grill:** Grilled proteins and vegetables
-- **Blackstone griddle:** High-heat searing for fish, chicken, vegetables
-- **Rice cooker:** Hands-free grains
-- **Microwave:** Reheating only
+{EQUIPMENT_SECTION}
 
 ---
 
@@ -829,7 +897,7 @@ The following equipment is available. Use whatever makes the best recipe — do 
 
 ## Lunches — {days} per week, {lunch_adult_count} adult(s)
 - Office, weekdays. Microwave available; cold lunches are equally welcome.
-- **No fish in any form.**
+- **Fish only in a lunch eaten cold** (`reheat: 'none (cold)'`). Never in a microwaved lunch.
 - ≤5 min to assemble/reheat at the office.
 - Mix of standalone recipes and dinner leftovers.
 - Cold lunches (grain salads, wraps, hummus plates) don't need reheating notes.
@@ -842,30 +910,7 @@ The following equipment is available. Use whatever makes the best recipe — do 
 
 ---
 
-# INGREDIENT EFFICIENCY
-
-## Pantry Staples
-Items the family always has on hand. They must still appear in each recipe's `ingredients` array with `pantry_staple: true` (see Output rule 1) so the cook knows how much to use; the app filters them from the shopping list.
-
-{staples_str}
-
-## Special Ingredient Rule:
-`special: true` is a **waste flag**, not a synonym for "not a pantry staple". Set it only \
-for an ingredient that is bought as a one-off and would go to waste or sit unused if only \
-one recipe called for it — a specialty item you buy a whole jar of for one tablespoon \
-(ras el hanout, za'atar, pomegranate molasses, harissa, preserved lemon, tahini-adjacent \
-pastes), or a perishable sold in a quantity far larger than one meal needs (a bunch of \
-fresh herbs, a tub of Greek yogurt, a block of feta).
-
-Do **not** flag ordinary produce and staple proteins that are bought in the amount a \
-single recipe uses and keep or freeze well — bell peppers, carrots, tomatoes, zucchini, \
-onions, canned beans, chicken, salmon. Those are simply ingredients. Flagging them is the \
-most common error here, and it turns a real efficiency rule into noise.
-
-Anything you do flag `special: true` **must appear in ≥2 meals this week** — that is the \
-entire point of the flag. If an ingredient only earns one meal, either build a second use \
-for it or leave `special: false`. Confirm every special ingredient in \
-`ingredient_overlap_notes`.
+{INGREDIENT_EFFICIENCY_SECTION}
 
 ---
 

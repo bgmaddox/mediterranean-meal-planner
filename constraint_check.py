@@ -11,7 +11,8 @@ a matter of the model's judgment.
 Two severities:
 
   hard  — an unambiguous violation of a rule the household treats as absolute
-          (banned ingredient present, fish in a lunch, sodium over the ceiling).
+          (banned ingredient present, fish in a microwaved lunch, a batch lunch
+          eaten after its fridge life, sodium over the ceiling).
           `meal_planner` rejects the plan and regenerates, feeding the reason back.
   soft  — worth surfacing but not worth burning another generation on
           (over the sodium *target* but under the ceiling, a near-repeat of a
@@ -31,6 +32,7 @@ from typing import Iterable, Literal, NotRequired, Optional, TypedDict
 
 from schemas import WeekPlan, MealHistoryEntry
 from system_prompt import SODIUM_HARD_CEILING_MG, SODIUM_TARGET_DEFAULT_MG
+import lunch_week
 
 
 Severity = Literal["hard", "soft"]
@@ -247,11 +249,21 @@ def _check_lunch_fish(lunch: dict) -> list[Violation]:
     out: list[Violation] = []
     text = _searchable(lunch)
 
+    # Fish is allowed in a lunch eaten cold: the rule is about microwave smell.
+    # A lunch that does not say it is cold is treated as heated.
     hit = _find(text, "fish")
-    if hit:
+    if hit and not lunch_week.is_cold(lunch):
         out.append(_v("fish_in_lunch", "hard", lunch,
-                      f"is a fish lunch ('{hit}') — fish is never allowed in lunches "
-                      f"(cannot be reheated at the office)"))
+                      f"is a fish lunch ('{hit}') that is not eaten cold — fish is only "
+                      f"allowed in a lunch with reheat '{lunch_week.REHEAT_COLD}' "
+                      f"(it cannot be microwaved at the office)"))
+    elif hit:
+        last = lunch_week.last_day_number(lunch)
+        if last and last > lunch_week.FISH_LUNCH_MAX_KEEP_DAYS:
+            out.append(_v("fish_lunch_kept_too_long", "hard", lunch,
+                          f"is a fish lunch ('{hit}') eaten {last} days after the Sunday cook — "
+                          f"fish keeps at most {lunch_week.FISH_LUNCH_MAX_KEEP_DAYS} days, so it "
+                          f"can only cover the first {lunch_week.FISH_LUNCH_MAX_KEEP_DAYS} days"))
     hit = _find(text, "fish_trace")
     if hit:
         out.append(_v("fish_trace_in_lunch", "soft", lunch,
@@ -261,6 +273,21 @@ def _check_lunch_fish(lunch: dict) -> list[Violation]:
         out.append(_v("shellfish_in_lunch", "soft", lunch,
                       f"contains shellfish ('{hit}') — not banned, but reheats poorly at a desk"))
     return out
+
+
+def _check_lunch_fridge_life(lunch: dict) -> list[Violation]:
+    """A batch lunch is cooked on Sunday and eaten on its `days`. If its last
+    day is later than the recipe says it keeps, the plan contradicts itself.
+    Lunches from a dinner week carry neither field and are skipped."""
+    last = lunch_week.last_day_number(lunch)
+    keeps = lunch.get("keeps_days")
+    if last is None or not isinstance(keeps, (int, float)) or isinstance(keeps, bool):
+        return []
+    if last > keeps:
+        return [_v("lunch_outlives_fridge_life", "hard", lunch,
+                   f"is eaten {last} days after the Sunday cook but keeps only {int(keeps)} — "
+                   f"choose a dish that holds, freeze the late portions, or give it earlier days")]
+    return []
 
 
 def _check_sodium(meal: dict, target_mg: int) -> list[Violation]:
@@ -329,6 +356,37 @@ def _check_repeats(plan: WeekPlan, history: list[MealHistoryEntry],
                               f"duplicates '{prev_name}' already in this same week"))
                 break
         seen_this_week.append((norm, dinner.get("name", "")))
+    return out
+
+
+def _check_lunch_repeats(plan: WeekPlan, history: list[MealHistoryEntry],
+                         threshold: float = 0.82) -> list[Violation]:
+    """Near-duplicate names among the lunches that are their own recipe.
+    Leftover lunches are skipped: they are their dinner, which _check_repeats
+    covers. Soft both ways: sameness is the thing a lunch week exists to fix,
+    but it is not a reason to reject a plan."""
+    def own(lunches):
+        return [l for l in lunches or [] if l.get("source") != "leftover" and l.get("name")]
+
+    past = [(_normalize_name(l["name"]), l["name"], entry.get("week_start", ""))
+            for entry in history for l in own((entry.get("plan") or {}).get("lunches"))]
+    out: list[Violation] = []
+    seen: list[tuple[str, str]] = []
+    for lunch in own(plan.get("lunches")):
+        norm = _normalize_name(lunch["name"])
+        if not norm:
+            continue
+        for past_norm, past_name, week in past:
+            if difflib.SequenceMatcher(None, norm, past_norm).ratio() >= threshold:
+                out.append(_v("lunch_repeat_from_history", "soft", lunch,
+                              f"closely repeats the lunch '{past_name}' from the week of {week}"))
+                break
+        for prev_norm, prev_name in seen:
+            if difflib.SequenceMatcher(None, norm, prev_norm).ratio() >= threshold:
+                out.append(_v("lunch_repeat_within_week", "soft", lunch,
+                              f"is nearly the same lunch as '{prev_name}' in this same week"))
+                break
+        seen.append((norm, lunch["name"]))
     return out
 
 
@@ -541,12 +599,14 @@ def check_week_plan(
 
     for lunch in lunches:
         out += _check_lunch_fish(lunch)
+        out += _check_lunch_fridge_life(lunch)
 
     for meal in [*dinners, *lunches]:
         out += _check_sodium(meal, target_sodium_mg)
         out += _check_estimates(meal)
 
     out += _check_repeats(plan, history or [])
+    out += _check_lunch_repeats(plan, history or [])
     out += _check_fish_frequency(plan)
     out += _check_special_ingredient_reuse(plan)
     out += _check_leftover_links(plan)

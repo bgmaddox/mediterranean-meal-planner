@@ -7,7 +7,7 @@ One function per operation. Keeps file I/O out of app.py and other modules.
 All functions are synchronous; Streamlit's single-threaded model makes this safe.
 
 Files managed:
-  data/history.json     — MealHistoryEntry list, newest first, capped at 12 weeks
+  data/history.json     — MealHistoryEntry list, newest first, every week kept
   data/favorites.json   — FavoriteMeal list
   data/constraints.json — ConstraintEntry list
   data/preferences.json — UserPreferences dict (single object)
@@ -48,7 +48,6 @@ LIBRARY_FILE = PERSONAL_DIR / "recipe_library.json"
 ANCHOR_RECIPES_FILE = DATA_DIR / "anchor_recipes.json"          # shipped seed (git-tracked)
 ANCHOR_RECIPES_USER_FILE = PERSONAL_DIR / "anchor_recipes_user.json"  # user additions (gitignored)
 
-MAX_HISTORY_WEEKS = 12     # stored
 HISTORY_WEEKS_FOR_PROMPT = 6  # passed to Claude
 
 
@@ -77,7 +76,9 @@ def load_history() -> list[MealHistoryEntry]:
 
 def history_for_prompt() -> list[MealHistoryEntry]:
     """Return only the last HISTORY_WEEKS_FOR_PROMPT entries for Claude's context."""
-    return load_history()[:HISTORY_WEEKS_FOR_PROMPT]
+    # Lunch-only weeks have no dinners to avoid repeating; skipping them keeps
+    # the window at six weeks of dinners.
+    return [e for e in load_history() if e.get("meal_names")][:HISTORY_WEEKS_FOR_PROMPT]
 
 
 def update_history_plan(week_plan: WeekPlan, week_start: str) -> None:
@@ -116,7 +117,8 @@ def append_to_history(week_plan: WeekPlan, week_start: str | None = None) -> Non
 
     history = load_history()
     history.insert(0, entry)  # newest first
-    history = history[:MAX_HISTORY_WEEKS]  # cap
+    # No cap: every week is kept (decided 2026-11-10). A cap of 12 only ever
+    # discarded data; the prompt takes its own six-week window.
     _write(HISTORY_FILE, history)
 
 

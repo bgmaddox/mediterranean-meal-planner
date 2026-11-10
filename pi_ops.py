@@ -29,6 +29,77 @@ def import_week(ds, p):
     return {"action": action, "weeks": len(ds.load_history())}
 
 
+def merge_lunches(plan, lunches, prep, keep=()):
+    """A week's plan with its lunches replaced by a lunch week's batch recipes.
+
+    `plan` is the saved week, or None when the week has no plan yet (a
+    lunch-only week). `keep` lists ids of existing lunches to carry over, the
+    dinner leftovers the user still wants. Dinners, snacks and the summary are
+    never touched. Prep tasks a previous lunch week added (part == 'lunch') are
+    replaced; the dinners' own prep stays. Pure: no data_store, so cli.py runs
+    the same merge locally to check and preview what a save will produce.
+    """
+    keep = [str(k) for k in keep or []]
+    lunches = list(lunches or [])
+    tasks = [dict(t, part="lunch") for t in prep or []]
+    old = list((plan or {}).get("lunches") or [])
+    old_ids = {str(l.get("id")) for l in old}
+    missing = [k for k in keep if k not in old_ids]
+    if missing:
+        raise ValueError(f"Cannot keep {', '.join(missing)}: no such lunch in the saved week.")
+    clash = sorted({str(l.get("id")) for l in lunches} & set(keep))
+    if clash:
+        raise ValueError(f"New lunch id(s) {', '.join(clash)} are already used by a kept lunch.")
+
+    if plan is None:
+        cost = sum(float((l.get("cost_estimate") or {}).get("total_ingredient_cost_usd") or 0)
+                   for l in lunches)
+        return {
+            "dinners": [], "lunches": lunches, "sunday_prep_list": tasks,
+            "week_summary": {
+                "fish_meal_count": 0, "red_meat_meal_count": 0, "vegetarian_meal_count": 0,
+                "special_ingredients": [], "ingredient_overlap_notes": "",
+                "estimated_weekly_grocery_cost_usd": round(cost, 2),
+            },
+        }
+
+    merged = dict(plan)
+    merged["lunches"] = [l for l in old if str(l.get("id")) in keep] + lunches
+    merged["sunday_prep_list"] = [t for t in plan.get("sunday_prep_list") or []
+                                  if t.get("part") != "lunch"] + tasks
+    # Notes about a lunch that is gone would otherwise attach to its replacement.
+    dropped = old_ids - set(keep)
+    if plan.get("_soft_violations"):
+        merged["_soft_violations"] = [n for n in plan["_soft_violations"]
+                                      if str(n.get("meal_id", "")) not in dropped]
+    return merged
+
+
+def import_lunches(ds, p):
+    """Save a lunch week into its week: replace that week's lunches, or create
+    the week if it has no plan. The dinners already saved are left alone.
+
+    payload: {"week_start", "lunches", "sunday_prep_list", "keep": [ids],
+              "notes": [soft findings for the new lunches]}
+    """
+    week = p["week_start"]
+    entry = next((e for e in ds.load_history() if e["week_start"] == week), None)
+    merged = merge_lunches(entry["plan"] if entry else None, p.get("lunches"),
+                           p.get("sunday_prep_list"), p.get("keep"))
+    notes = list(merged.get("_soft_violations") or []) + list(p.get("notes") or [])
+    if notes:
+        merged["_soft_violations"] = notes
+    if entry:
+        ds.update_history_plan(merged, week)
+        action = "lunches replaced"
+    else:
+        ds.append_to_history(merged, week)
+        action = "added as a lunch-only week"
+    ds.add_recipes_from_plan({"dinners": [], "lunches": list(p.get("lunches") or [])})
+    return {"action": action, "weeks": len(ds.load_history()),
+            "dinners": len(merged.get("dinners") or []), "lunches": len(merged["lunches"])}
+
+
 def apply_feedback(ds, p):
     """Record how a week went.
 
