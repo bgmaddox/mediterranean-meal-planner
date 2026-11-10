@@ -374,6 +374,11 @@ def _render_lunch_card(meal: dict, badge: str) -> str:
     reheat = meal.get("reheat", "")
 
     source_label = "Leftover from dinner" if source == "leftover" else "Standalone lunch"
+    # A lunch-week recipe is cooked on Sunday and has a method of its own.
+    instructions = meal.get("instructions") or []
+    days = meal.get("days") or []
+    if days:
+        source_label = f"Sunday batch for {', '.join(days)}"
     reheat_label = "· Microwave" if "microwave" in (reheat or "").lower() else "· Cold (no reheat)"
     _meta_icon = "box" if source == "leftover" else "bowl"
     meta = f'{icons.icon(_meta_icon, size=15)} {_e(source_label)}  {_e(reheat_label)}'
@@ -394,6 +399,23 @@ def _render_lunch_card(meal: dict, badge: str) -> str:
         f'<div class="pack-callout">{icons.icon("backpack", size=16)} <strong>Pack:</strong>  {_e(pack)}</div>'
         if pack else ""
     )
+
+    if instructions:
+        steps_label = "Steps"
+        steps_body = "".join(
+            f"""<div class="step-row">
+              <span class="step-num">{i}.</span>
+              <span>{_e(step)}</span>
+            </div>"""
+            for i, step in enumerate(instructions, 1)
+        )
+    else:
+        steps_label = "How to Pack"
+        steps_body = (
+            '<div style="font-size:1.05rem; color:#2c3e2d; line-height:1.6; padding-top:4px;">'
+            + (_e(pack) if pack else "<em>See pack instructions below.</em>")
+            + "</div>"
+        )
 
     cal = nut.get("calories_per_adult_serving", "—")
     prot = nut.get("protein_g", "—")
@@ -417,10 +439,8 @@ def _render_lunch_card(meal: dict, badge: str) -> str:
       {rows_ing}
     </div>
     <div class="steps-col">
-      <div class="col-label">How to Pack</div>
-      <div style="font-size:1.05rem; color:#2c3e2d; line-height:1.6; padding-top:4px;">
-        {_e(pack) if pack else "<em>See pack instructions below.</em>"}
-      </div>
+      <div class="col-label">{steps_label}</div>
+      {steps_body}
     </div>
   </div>
 

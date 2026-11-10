@@ -161,6 +161,9 @@ body {
 }
 /* Dinners after the first get their own page */
 .pr-meal--dinner + .pr-meal--dinner { break-before: page; }
+/* A lunch-week recipe is a full two-column recipe; like a dinner, it does not
+   survive being split, so each one after the first starts a page. */
+.pr-meal--batch + .pr-meal--batch { break-before: page; }
 
 /* ── Dinner-only compaction (keep recipes to one page each) ───────────────── */
 .pr-meal--dinner { padding: 8pt 10pt; line-height: 1.4; }
@@ -547,6 +550,9 @@ def _cover(week_start: str, summary: dict, dinners: list) -> str:
         f'<span class="pr-summary__val">{veg}</span>'
         f'<span class="pr-summary__label">Vegetarian</span></div>'
     )
+    if not dinners:
+        # A lunch-only week: the dinner counts would all read zero.
+        stats_html = ""
     if has_composition:
         stats_html += (
             f'<div class="pr-summary__stat">'
@@ -586,6 +592,19 @@ def _cover(week_start: str, summary: dict, dinners: list) -> str:
 
 def _menu_table(dinners: list, lunches: list) -> str:
     """Side-by-side dinner + lunch menu for the week, row per slot."""
+    if not dinners:
+        # A lunch-only week: list each recipe against the days it covers.
+        rows = "".join(
+            f'<tr><td class="pr-menu__num">{i + 1}</td>'
+            f'<td>{_e(l.get("name", ""))}</td><td>{_e(", ".join(l.get("days") or []))}</td></tr>'
+            for i, l in enumerate(lunches)
+        )
+        return (
+            '<div class="pr-extras__heading">This Week\'s Lunches</div>'
+            '<table class="pr-menu">'
+            '<thead><tr><th></th><th>Lunch</th><th>Days</th></tr></thead>'
+            f'<tbody>{rows}</tbody></table>'
+        )
     rows = ""
     n = max(len(dinners), len(lunches))
     for i in range(n):
@@ -760,7 +779,20 @@ def _lunch(l: dict) -> str:
     nut  = l.get("nutrition_estimate") or {}
     cost = l.get("cost_estimate") or {}
 
+    # A lunch-week recipe is a Sunday batch: it has a method, the days it
+    # covers and a fridge life. Lunches from a dinner week have none of these.
+    instructions = l.get("instructions") or []
+    days = l.get("days") or []
+    if days:
+        source = f"Sunday batch for {', '.join(days)}"
+
     meta_parts = [f'<span>{_e(source)}</span>']
+    if days and l.get("servings"):
+        meta_parts.append(f'<span>{_e(l["servings"])} portions</span>')
+    if l.get("cook_time_minutes"):
+        meta_parts.append(f'<span>{_e(l["cook_time_minutes"])} min</span>')
+    if l.get("keeps_days"):
+        meta_parts.append(f'<span>keeps {_e(l["keeps_days"])} days</span>')
     if reheat:
         meta_parts.append(f'<span>{_e(reheat)}</span>')
     meta_html = f'<div class="pr-meal__meta">{"".join(meta_parts)}</div>'
@@ -795,8 +827,18 @@ def _lunch(l: dict) -> str:
 
     pack_html = _callout("prep", "Pack instructions", pack) if pack else ""
 
+    if instructions:
+        step_items = "".join(f"<li>{_e(step)}</li>" for step in instructions)
+        steps_html = f'<div class="pr-label">Sunday cook</div><ol class="pr-steps">{step_items}</ol>'
+        ing_html = (
+            '<div class="pr-columns">'
+            f'<div class="pr-col-left">{ing_html}</div>'
+            f'<div class="pr-col-right">{steps_html}</div>'
+            '</div>'
+        )
+
     return (
-        '<div class="pr-meal avoid-break">'
+        f'<div class="pr-meal {"pr-meal--batch" if instructions else "avoid-break"}">'
         f'<div class="pr-meal__title">{_e(name)}</div>'
         f'{meta_html}{tags_html}'
         '<hr class="pr-divider">'
@@ -903,10 +945,9 @@ def build_html(
         + _cover_extras(dinners, lunches, prep, summary)
         # DINNERS: section banner + first dinner share a page; subsequent dinners
         # each get a new page via break-before:page on .pr-meal--dinner.
-        + '<div class="pr-section page-break">DINNERS</div>'
-        + dinners_html
-        + '<div class="pr-section page-break">LUNCHES</div>'
-        + lunches_html
+        # A lunch-only week has no dinners, and a week can have no lunches.
+        + ('<div class="pr-section page-break">DINNERS</div>' + dinners_html if dinners else "")
+        + ('<div class="pr-section page-break">LUNCHES</div>' + lunches_html if lunches else "")
         + '<div class="pr-section page-break">SUNDAY PREP</div>'
         + _prep_section(prep)
         + _snacks_section(snacks)

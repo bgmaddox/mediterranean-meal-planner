@@ -48,7 +48,7 @@ LIBRARY_FILE = PERSONAL_DIR / "recipe_library.json"
 ANCHOR_RECIPES_FILE = DATA_DIR / "anchor_recipes.json"          # shipped seed (git-tracked)
 ANCHOR_RECIPES_USER_FILE = PERSONAL_DIR / "anchor_recipes_user.json"  # user additions (gitignored)
 
-MAX_HISTORY_WEEKS = 12     # stored
+MAX_HISTORY_WEEKS = 26     # stored. Was 12; lunch-only weeks now take slots too.
 HISTORY_WEEKS_FOR_PROMPT = 6  # passed to Claude
 
 
@@ -77,7 +77,9 @@ def load_history() -> list[MealHistoryEntry]:
 
 def history_for_prompt() -> list[MealHistoryEntry]:
     """Return only the last HISTORY_WEEKS_FOR_PROMPT entries for Claude's context."""
-    return load_history()[:HISTORY_WEEKS_FOR_PROMPT]
+    # Lunch-only weeks have no dinners to avoid repeating; skipping them keeps
+    # the window at six weeks of dinners.
+    return [e for e in load_history() if e.get("meal_names")][:HISTORY_WEEKS_FOR_PROMPT]
 
 
 def update_history_plan(week_plan: WeekPlan, week_start: str) -> None:

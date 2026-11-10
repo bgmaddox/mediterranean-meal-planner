@@ -9,6 +9,27 @@ Use this file as the entry point when planning the next session.
 
 ---
 
+## 0a. Lunch weeks (2026-11-10) — built on `feature/lunch-week`, not merged
+
+`/plan-lunches` plans two Sunday batch lunches and saves them into their week. Steps 1
+and 2 of the plan are done: `lunch_week.py`, checker rules, `cli.py lunch-*`, save by
+part, the lunch reviewer rubric, lunch methods in the PDF and Kitchen Mode. How it works:
+`CLAUDE.md` → "Lunch weeks". Why: `DECISIONS.md`.
+
+**Next action: merge and deploy, then run the first real `/plan-lunches`.** Deploy
+**before** the first lunch-only save: the Pi's current code still caps history at 12
+weeks, so a new week added there would drop the oldest. After deploy, check the app
+with a lunch-only week loaded (Generate tab, Kitchen Mode); only the PDF and the CLI
+were exercised here.
+
+| Item | Trigger |
+|---|---|
+| **Lunch-only button in the app's Generate tab** (API path). | Only if planning lunches without a session is wanted. |
+| **Weight tracker logs a batch lunch once.** `Weight/core/diet.py` hides a lunch after one log, keyed by week and id, so a 3-portion batch can be logged from the plan on one day only. | When lunch logging in Crumb matters. Fix belongs in `Weight/`. |
+| **Lunch targets are prompt-only** (450–550 kcal, ≥30 g protein, ≥10 g fiber). | If saved lunches drift under them. |
+| **`special_ingredient_unused` reads as new on a merged week** whenever the lunch plan changes which ingredients it lists. Noise, not wrong. | If it buries real findings in `lunch-check`. |
+| **Dinner prep tasks that served a replaced lunch** stay on the prep list. The skill tells the session to point them out; nothing removes them. | If it causes wasted Sunday work. |
+
 ## 0. Resume point (2026-10-08)
 
 **Deployed `ab3e89f`:** weeks are now planned in Claude Code with `/plan-week`, and the
@@ -30,7 +51,7 @@ measurement of what a session's review costs.
 | **Is double dinner review worth it?** Read `sessions/review-log.md`: if reviewer B rarely finds what A missed, drop to one (skill step 6). | After 3–4 logged sessions. |
 | **First app generation on Opus 5.5.** Only a small live call has exercised `_ask()`; a full week plus review/repair has not. Watch for time, truncation (`max_tokens` 64k), and cost against the old ~$0.70. | The next time the app's "Generate Week" is used. |
 | **API key is plain text in `/etc/systemd/system/diet.service`** (readable by any Pi user). Move it to an `EnvironmentFile=` with mode 600, as cloudflared's token is. | Any other Pi service change, or before any second user gets a Pi account. |
-| **History keeps only 12 weeks** (`MAX_HISTORY_WEEKS`). Each new week drops the oldest; the recipe library keeps every meal. Raise or remove the cap if a full week-by-week record is wanted. | If the user asks to see a week older than 12. |
+| **History keeps 26 weeks** (`MAX_HISTORY_WEEKS`, raised from 12 on 2026-11-10 for lunch-only weeks; takes effect on the Pi at the next deploy). | If the user asks to see an older week. |
 | **Leftover lunches are left out of the shopping list entirely** (`shopping.py`), including their fresh add-ons such as yogurt or greens. Pre-existing behavior, noticed in passing. | The first time an add-on is missing at the store, or a shopping review flags it. |
 
 ---

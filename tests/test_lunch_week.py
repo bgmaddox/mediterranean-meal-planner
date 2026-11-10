@@ -262,3 +262,180 @@ def test_lunch_schema_keeps_the_dinner_weeks_lunch_fields():
     lunch = lw.lunch_output_schema(["l1", "l2"])["week_plan"]["lunches"][0]
     assert base <= set(lunch)
     assert {"days", "keeps_days", "instructions", "cook_time_minutes"} <= set(lunch)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# The session path: a lunch week is saved INTO its week (cli.py, pi_ops.py)
+# ─────────────────────────────────────────────────────────────────────────────
+
+import json  # noqa: E402
+
+import cli  # noqa: E402
+import data_store  # noqa: E402
+import pi_ops  # noqa: E402
+from test_cli import CLEAN, sandbox, stored_week, write  # noqa: E402,F401
+
+WEEK = "2026-11-16"
+
+
+def lunch_file(tmp_path, plan=None, name="lunches.json") -> str:
+    plan = plan or {**good_week(), "sunday_prep_list": [
+        {"task": "Cook the lentil soup", "yields_for": ["Lentil Soup"], "storage": "Fridge, 5 days"}]}
+    return write(tmp_path, name, {"week_plan": plan})
+
+
+def save_dinner_week(tmp_path) -> dict:
+    cli.main(["save", write(tmp_path, "p.json", stored_week(CLEAN)), "--offline", "--week-start", WEEK])
+    return data_store.load_history()[0]["plan"]
+
+
+def test_merge_into_no_week_makes_a_lunch_only_week():
+    merged = pi_ops.merge_lunches(None, good_week()["lunches"], [{"task": "Cook"}])
+    assert merged["dinners"] == [] and len(merged["lunches"]) == 2
+    assert merged["sunday_prep_list"] == [{"task": "Cook", "part": "lunch"}]
+    assert "week_summary" in merged
+
+
+def test_merge_replaces_lunches_and_leaves_dinners_alone():
+    plan = stored_week(CLEAN)
+    keep = plan["lunches"][0]["id"]
+    new = [batch("l8"), batch("l9", "Farro Salad", days=("Thu", "Fri"))]
+    merged = pi_ops.merge_lunches(plan, new, [{"task": "Cook"}], [keep])
+    assert merged["dinners"] == plan["dinners"]
+    assert [l["id"] for l in merged["lunches"]] == [keep, "l8", "l9"]
+    assert plan["lunches"] != merged["lunches"]          # the saved plan is not mutated
+    assert merged["sunday_prep_list"][:-1] == plan["sunday_prep_list"]
+
+
+def test_merging_twice_does_not_stack_lunch_prep_tasks():
+    plan = stored_week(CLEAN)
+    once = pi_ops.merge_lunches(plan, good_week()["lunches"], [{"task": "Cook"}])
+    twice = pi_ops.merge_lunches(once, good_week()["lunches"], [{"task": "Cook again"}])
+    assert [t["task"] for t in twice["sunday_prep_list"] if t.get("part") == "lunch"] == ["Cook again"]
+
+
+def test_merge_drops_notes_about_replaced_lunches_only():
+    plan = stored_week(CLEAN)
+    gone, kept_dinner = plan["lunches"][0]["id"], plan["dinners"][0]["id"]
+    plan["_soft_violations"] = [{"code": "x", "meal_id": gone, "message": "old lunch"},
+                                {"code": "y", "meal_id": kept_dinner, "message": "dinner"}]
+    merged = pi_ops.merge_lunches(plan, good_week()["lunches"], [])
+    assert [n["message"] for n in merged["_soft_violations"]] == ["dinner"]
+
+
+def test_merge_refuses_a_bad_keep_or_an_id_clash():
+    plan = stored_week(CLEAN)
+    with pytest.raises(ValueError):
+        pi_ops.merge_lunches(plan, good_week()["lunches"], [], ["l99"])
+    with pytest.raises(ValueError):
+        pi_ops.merge_lunches(plan, good_week()["lunches"], [], ["l1"])
+
+
+def test_lunch_save_creates_a_lunch_only_week_and_queues_it(sandbox):
+    assert cli.main(["lunch-save", lunch_file(sandbox), "--offline", "--week-start", WEEK,
+                     "--days", "Mon,Tue,Wed,Thu,Fri"]) == 0
+    entry = data_store.load_history()[0]
+    assert entry["week_start"] == WEEK and entry["meal_names"] == []
+    assert [l["name"] for l in entry["plan"]["lunches"]] == ["Lentil Soup", "Farro and Roasted Vegetable Salad"]
+    queued = json.loads((sandbox / "outbox" / f"{WEEK}-lunches.json").read_text())
+    assert queued["op"] == "import_lunches"
+    assert "Lentil Soup" in {r["name"] for r in data_store.load_recipe_library()}
+
+
+def test_lunch_save_into_a_dinner_week_keeps_its_dinners(sandbox):
+    before = save_dinner_week(sandbox)
+    assert cli.main(["lunch-save", lunch_file(sandbox), "--offline", "--week-start", WEEK]) == 0
+    history = data_store.load_history()
+    assert [e["week_start"] for e in history].count(WEEK) == 1
+    after = history[0]["plan"]
+    assert after["dinners"] == before["dinners"]
+    assert {l["id"] for l in after["lunches"]} == {"l1", "l2"}
+    assert all(l.get("days") for l in after["lunches"])
+
+
+def test_lunch_save_refuses_a_plan_that_breaks_a_rule(sandbox):
+    bad = week(batch(ingredients=("salmon",)), batch("l2", "Farro Salad", days=("Thu", "Fri")))
+    before = data_store.load_history()
+    assert cli.main(["lunch-save", lunch_file(sandbox, bad), "--offline", "--week-start", WEEK]) == 1
+    assert data_store.load_history() == before
+    assert not (sandbox / "outbox").exists()
+
+
+def test_lunch_save_refuses_a_malformed_plan(sandbox):
+    bad = week(batch(instructions=[]))
+    assert cli.main(["lunch-save", lunch_file(sandbox, bad), "--offline", "--week-start", WEEK]) == 1
+
+
+def test_lunch_check_ignores_what_the_dinner_week_already_carried(sandbox, capsys):
+    """Measured against the saved week: its dinners' findings are not the lunch plan's."""
+    plan = stored_week(1)                      # the week with a hard violation of its own
+    data_store.append_to_history(plan, WEEK)
+    assert cli.main(["lunch-check", lunch_file(sandbox), "--offline", "--week-start", WEEK]) == 0
+    assert "HARD" not in capsys.readouterr().out
+
+
+def test_lunch_check_does_not_compare_a_week_with_itself(sandbox, capsys):
+    cli.main(["lunch-save", lunch_file(sandbox), "--offline", "--week-start", WEEK])
+    capsys.readouterr()
+    cli.main(["lunch-check", lunch_file(sandbox), "--offline", "--week-start", WEEK])
+    assert "lunch_repeat_from_history" not in capsys.readouterr().out
+
+
+def test_whole_week_save_will_not_silently_drop_lunch_week_recipes(sandbox):
+    save_dinner_week(sandbox)
+    cli.main(["lunch-save", lunch_file(sandbox), "--offline", "--week-start", WEEK])
+    dinners = write(sandbox, "p.json", stored_week(CLEAN))
+    assert cli.main(["save", dinners, "--offline", "--week-start", WEEK]) == 1
+    assert all(l.get("days") for l in data_store.load_history()[0]["plan"]["lunches"])
+    assert cli.main(["save", dinners, "--offline", "--week-start", WEEK, "--replace-lunches"]) == 0
+
+
+def test_a_saved_lunch_only_week_can_be_exported_and_resaved(sandbox):
+    cli.main(["lunch-save", lunch_file(sandbox), "--offline", "--week-start", WEEK])
+    out = sandbox / "edit" / "plan.json"
+    assert cli.main(["week", WEEK, "--export", str(out), "--offline"]) == 0
+    assert cli.main(["save", str(out), "--offline", "--week-start", WEEK]) == 0
+
+
+def test_lunch_context_reports_the_week_and_free_ids(sandbox, capsys):
+    plan = save_dinner_week(sandbox)
+    keep = plan["lunches"][0]["id"]
+    assert cli.main(["lunch-context", "--offline", "--week-start", WEEK, "--keep", keep,
+                     "--days", "Mon,Tue,Wed,Thu"]) == 0
+    out = capsys.readouterr().out
+    assert plan["dinners"][0]["name"] in out
+    assert plan["lunches"][0]["name"] in out.split("Lunches Already Covering Other Days")[1]
+    assert f"`{keep}`:" not in out
+    assert "saving will REPLACE these lunches" in out
+
+
+def test_lunch_packets_cover_each_recipe_the_week_and_the_shopping(sandbox):
+    import week_review
+    out = sandbox / "packets"
+    assert cli.main(["lunch-packets", lunch_file(sandbox), "--offline", "--week-start", WEEK,
+                     "--out", str(out)]) == 0
+    assert sorted(p.stem for p in out.glob("*.md")) == ["l1", "l2", "lunch_week", "shopping"]
+    assert week_review.LUNCH_WEEK_SYSTEM in (out / "lunch_week.md").read_text()
+    assert "Simmer the lentils." in (out / "l1.md").read_text()
+
+
+def test_lunch_week_findings_are_accepted_as_notes(sandbox):
+    notes = write(sandbox, "n.json", {"findings": [
+        {"meal_id": "l2", "meal_name": "x", "category": "holds_poorly", "message": "wilts by Friday"}]})
+    cli.main(["lunch-save", lunch_file(sandbox), "--offline", "--week-start", WEEK, "--notes", notes])
+    saved = data_store.load_history()[0]["plan"]["_soft_violations"]
+    assert any(v["code"] == "critique_holds_poorly" for v in saved)
+
+
+def test_dinner_prompt_history_skips_lunch_only_weeks(sandbox):
+    cli.main(["lunch-save", lunch_file(sandbox), "--offline", "--week-start", WEEK])
+    assert WEEK not in [e["week_start"] for e in data_store.history_for_prompt()]
+
+
+def test_pdf_html_handles_a_lunch_only_week_and_shows_the_method():
+    import pdf_render
+    import shopping
+    plan = pi_ops.merge_lunches(None, good_week()["lunches"], [])
+    html = pdf_render.build_html(plan, shopping.build_shopping_list(plan), week_start=WEEK)
+    assert "Simmer the lentils." in html and "Sunday batch for Mon, Tue, Wed" in html
+    assert ">DINNERS<" not in html
