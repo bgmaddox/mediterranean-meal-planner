@@ -9,18 +9,16 @@ Use this file as the entry point when planning the next session.
 
 ---
 
-## 0a. Lunch weeks (2026-11-10) — built on `feature/lunch-week`, not merged
+## 0a. Lunch weeks (2026-11-10) — merged and deployed
 
 `/plan-lunches` plans two Sunday batch lunches and saves them into their week. Steps 1
 and 2 of the plan are done: `lunch_week.py`, checker rules, `cli.py lunch-*`, save by
 part, the lunch reviewer rubric, lunch methods in the PDF and Kitchen Mode. How it works:
 `CLAUDE.md` → "Lunch weeks". Why: `DECISIONS.md`.
 
-**Next action: merge and deploy, then run the first real `/plan-lunches`.** Deploy
-**before** the first lunch-only save: the Pi's current code still caps history at 12
-weeks, so a new week added there would drop the oldest. After deploy, check the app
-with a lunch-only week loaded (Generate tab, Kitchen Mode); only the PDF and the CLI
-were exercised here.
+**Next action: run the first real `/plan-lunches`.** The history cap is gone (every
+week is kept). After the first lunch-only save, look at that week in the app's Generate
+tab: only the PDF, the CLI and Kitchen Mode were exercised with a lunch-only week.
 
 | Item | Trigger |
 |---|---|
@@ -51,7 +49,6 @@ measurement of what a session's review costs.
 | **Is double dinner review worth it?** Read `sessions/review-log.md`: if reviewer B rarely finds what A missed, drop to one (skill step 6). | After 3–4 logged sessions. |
 | **First app generation on Opus 5.5.** Only a small live call has exercised `_ask()`; a full week plus review/repair has not. Watch for time, truncation (`max_tokens` 64k), and cost against the old ~$0.70. | The next time the app's "Generate Week" is used. |
 | **API key is plain text in `/etc/systemd/system/diet.service`** (readable by any Pi user). Move it to an `EnvironmentFile=` with mode 600, as cloudflared's token is. | Any other Pi service change, or before any second user gets a Pi account. |
-| **History keeps 26 weeks** (`MAX_HISTORY_WEEKS`, raised from 12 on 2026-11-10 for lunch-only weeks; takes effect on the Pi at the next deploy). | If the user asks to see an older week. |
 | **Leftover lunches are left out of the shopping list entirely** (`shopping.py`), including their fresh add-ons such as yogurt or greens. Pre-existing behavior, noticed in passing. | The first time an add-on is missing at the store, or a shopping review flags it. |
 
 ---

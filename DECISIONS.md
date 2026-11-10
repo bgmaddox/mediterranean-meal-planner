@@ -97,7 +97,8 @@ treated as heated, so the old hard rejection still covers every unclear case.
 (2026-11-10). One grocery trip and one Sunday prep per week means one record: one
 shopping list, one PDF, and the app shows it with no new tab. The costs were accepted and
 handled: a whole-week save refuses to drop lunch recipes, the dinner prompt's history
-skips lunch-only weeks, and the history cap went from 12 to 26. A separate lunch file
+skips lunch-only weeks, and the 12-week history cap was removed (the user's call:
+limiting it helped nothing). A separate lunch file
 would have avoided those at the price of merging two shopping lists.
 
 **The unit of a lunch week is a batch recipe, not a lunch per day** (2026-11-10). Two
