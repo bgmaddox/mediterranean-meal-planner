@@ -188,20 +188,36 @@ def load_plan(path: str) -> dict:
     return data.get("week_plan", data) if isinstance(data, dict) else data
 
 
-def run_checks(plan: dict, days: int | None = None) -> tuple[list[str], list[dict], list[dict]]:
+def run_checks(plan: dict, days: int | None = None,
+               around: dict | None = None,
+               week: str | None = None) -> tuple[list[str], list[dict], list[dict]]:
     """Structural problems, hard violations, soft violations — the same gates
-    meal_planner applies to an API-generated plan."""
+    meal_planner applies to an API-generated plan.
+
+    `around` is the week's saved lunch week (saved_lunch_week): the plan is then
+    dinners only, checked for that, and its constraint findings are taken on
+    the week as it will be saved, lunches included. `week` keeps a saved week
+    from being compared with itself as history."""
     import constraint_check
     import data_store
     from meal_planner import MealPlanError, _validate_plan
 
     prefs = data_store.load_preferences()
+    if around:
+        structural = []
+        try:
+            _validate_plan(plan, days or len(plan.get("dinners") or []),
+                           require_kid_adaptation=bool(prefs.get("children")), dinners_only=True)
+        except MealPlanError as e:
+            structural.append(str(e))
+        hard, soft = _constraint_findings(with_saved_lunches(plan, around), prefs, week)
+        return structural, hard, soft
     if not plan.get("dinners") and plan.get("lunches"):
         # A lunch-only week (cli.py lunch-save made it). It has no dinners to
         # count or label, so it gets the lunch week's structural checks.
         import lunch_week
         structural = lunch_week.lunch_plan_problems(plan, adults=prefs.get("lunch_adult_count", 1))
-        hard, soft = _constraint_findings(plan, prefs)
+        hard, soft = _constraint_findings(plan, prefs, week)
         return structural, hard, soft
     view = plan
     if days is None:
@@ -219,7 +235,7 @@ def run_checks(plan: dict, days: int | None = None) -> tuple[list[str], list[dic
     except MealPlanError as e:
         structural.append(str(e))
 
-    hard, soft = _constraint_findings(plan, prefs)
+    hard, soft = _constraint_findings(plan, prefs, week)
     return structural, hard, soft
 
 
@@ -235,8 +251,9 @@ def _all_findings(plan: dict, prefs: dict, skip_week: str | None = None) -> list
     )
 
 
-def _constraint_findings(plan: dict, prefs: dict) -> tuple[list[dict], list[dict]]:
-    violations = _all_findings(plan, prefs)
+def _constraint_findings(plan: dict, prefs: dict,
+                         week: str | None = None) -> tuple[list[dict], list[dict]]:
+    violations = _all_findings(plan, prefs, skip_week=week)
     return ([v for v in violations if v["severity"] == "hard"],
             [v for v in violations if v["severity"] == "soft"])
 
@@ -270,6 +287,51 @@ def merged_lunch_week(lunch_plan: dict, week: str, keep: list[str]) -> tuple[dic
     except ValueError as e:
         raise CLIError(str(e))
     return existing, merged
+
+
+def saved_lunch_week(week: str | None) -> dict | None:
+    """The lunch week already saved into `week`, or None.
+
+    {"lunches": its batch recipes, "prep": their Sunday tasks, "notes": findings
+    on them, "dropped": other lunches in that week (dinner leftovers), which a
+    dinners-only plan replaces}. Only batch recipes (lunches with `days`) count:
+    a week whose lunches are all dinner leftovers has no lunch week."""
+    plan = _saved_plan(week) if week else None
+    batch = [l for l in (plan or {}).get("lunches") or [] if l.get("days")]
+    if not batch:
+        return None
+    ids = {str(l.get("id")) for l in batch}
+    return {
+        "lunches": batch,
+        "prep": [t for t in plan.get("sunday_prep_list") or [] if t.get("part") == "lunch"],
+        "notes": [n for n in plan.get("_soft_violations") or [] if str(n.get("meal_id", "")) in ids],
+        "dropped": [l for l in plan.get("lunches") or [] if not l.get("days")],
+    }
+
+
+def with_saved_lunches(plan: dict, around: dict) -> dict:
+    """A dinners-only plan with the week's saved lunch week merged back in,
+    through the same pi_ops.merge_lunches a lunch save uses. The week-level
+    cost then includes the lunches."""
+    import pi_ops
+    merged = pi_ops.merge_lunches({**plan, "lunches": []}, around["lunches"], around["prep"])
+    summary = dict(merged.get("week_summary") or {})
+    if summary.get("estimated_weekly_grocery_cost_usd") is not None:
+        lunch_cost = sum(float((l.get("cost_estimate") or {}).get("total_ingredient_cost_usd") or 0)
+                         for l in around["lunches"])
+        summary["estimated_weekly_grocery_cost_usd"] = round(
+            float(summary["estimated_weekly_grocery_cost_usd"]) + lunch_cost, 2)
+        merged["week_summary"] = summary
+    return merged
+
+
+def _dinners_only(plan: dict, week: str | None) -> dict | None:
+    """The saved lunch week to plan around, when `plan` is a dinners-only plan
+    for a week that has one. A plan that brings its own lunches is a whole-week
+    plan, and `save` guards that case separately."""
+    if plan.get("lunches"):
+        return None
+    return saved_lunch_week(week)
 
 
 def run_lunch_checks(lunch_plan: dict, week: str, keep: list[str],
@@ -469,23 +531,38 @@ def cmd_pull(args) -> int:
 def cmd_context(args) -> int:
     _ensure_mirror(args.offline)
     import meal_planner
+    around = saved_lunch_week(args.week_start)
     system_prompt, user_message, require_kid = meal_planner.build_generation_prompts(
         week_notes=args.notes, cuisine_notes=args.cuisine,
         use_up_ingredients=args.use_up, days=args.days,
         anchor_ids=[i.strip() for i in args.anchors.split(",") if i.strip()] if args.anchors else None,
+        saved_lunches=around["lunches"] if around else None,
     )
     print(system_prompt)
     print("\n" + "=" * 79)
     print("USER MESSAGE (what the app would send):")
     print(user_message)
-    print(f"\n[{args.days} dinners + {args.days} lunches; kid_adaptation required: {require_kid}]")
+    if around:
+        names = "; ".join(f"{l.get('id')} {l.get('name')} ({', '.join(l['days'])})"
+                          for l in around["lunches"])
+        print(f"\n[{args.days} dinners, NO lunches: week {args.week_start} already has a lunch week "
+              f"({names}). Pass --week-start {args.week_start} to check, review-packets and save; "
+              f"save keeps those lunches. kid_adaptation required: {require_kid}]")
+        if around["dropped"]:
+            print("[warning: the saved week also has dinner-leftover lunches, which this plan drops: "
+                  + "; ".join(f"{l.get('id')} {l.get('name')}" for l in around["dropped"]) + "]")
+    else:
+        print(f"\n[{args.days} dinners + {args.days} lunches; kid_adaptation required: {require_kid}]")
     return 0
 
 
 def cmd_check(args) -> int:
     _ensure_mirror(args.offline)
     plan = load_plan(args.plan)
-    structural, hard, soft = run_checks(plan, args.days)
+    around = _dinners_only(plan, args.week_start)
+    if around:
+        print(f"(dinners only: checked with week {args.week_start}'s saved lunch week merged in)")
+    structural, hard, soft = run_checks(plan, args.days, around, args.week_start)
     return _report(structural, hard, soft)
 
 
@@ -699,6 +776,13 @@ def cmd_review_packets(args) -> int:
     the week, so reviewers in a session apply exactly the app's rubric."""
     import plan_critique as pc
     plan = load_plan(args.plan)
+    around = _dinners_only(plan, args.week_start)
+    if around:
+        # Dinners-only plan: the dinners get a packet each; the week, walkthrough
+        # and shopping packets see the week as saved, lunches included, so the
+        # shared shopping and the Sunday load are reviewed together. The saved
+        # lunches were proofread when they were planned.
+        dinners_plan, plan = plan, with_saved_lunches(plan, around)
     only = set(args.only.split(",")) if args.only else None
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
@@ -708,7 +792,7 @@ def cmd_review_packets(args) -> int:
     dinners = plan.get("dinners") or []
     by_id = {str(d.get("id")): d for d in dinners}
     jobs = [(d, "dinner", None) for d in dinners]
-    for l in plan.get("lunches") or []:
+    for l in (dinners_plan if around else plan).get("lunches") or []:
         jobs.append((l, "lunch", by_id.get(str(l.get("leftover_from_dinner_id") or ""))))
 
     defect_fmt = _PACKET_FORMAT % ", ".join(sorted(pc.DEFECT_CATEGORIES))
@@ -847,7 +931,9 @@ def _session_notes(plan: dict, notes_path: str | None) -> list[dict]:
 def cmd_save(args) -> int:
     _ensure_mirror(args.offline)
     plan = load_plan(args.plan)
-    structural, hard, soft = run_checks(plan)
+    week = args.week_start or date.today().isoformat()
+    around = _dinners_only(plan, week)
+    structural, hard, soft = run_checks(plan, None, around, week)
     if structural or hard:
         print("Refusing to save — fix these first (cli.py check shows them):")
         for s in structural:
@@ -856,8 +942,15 @@ def cmd_save(args) -> int:
             print(_fmt(v))
         return 1
 
+    if around:
+        # Dinners only: the saved lunch week goes back in, with the reviewer
+        # notes it was saved with (rule findings were just recomputed in `soft`).
+        plan = with_saved_lunches(plan, around)
+        seen = {(v["code"], v["meal_id"], v["message"]) for v in soft}
+        soft += [n for n in around["notes"] if (n.get("code"), n.get("meal_id"), n.get("message")) not in seen]
+        print(f"Keeping week {week}'s lunch week: "
+              + ", ".join(f"{l.get('id')} {l.get('name')}" for l in around["lunches"]))
     plan["_soft_violations"] = soft + _session_notes(plan, args.notes)
-    week = args.week_start or date.today().isoformat()
     names = {l.get("name") for l in plan.get("lunches") or []}
     lost = [l for l in (_saved_plan(week) or {}).get("lunches") or []
             if l.get("days") and l.get("name") not in names]
@@ -907,6 +1000,10 @@ def cmd_push(args) -> int:
     return 0
 
 
+AROUND_HELP = ("ISO date of the week being planned. If it already has a lunch week, "
+               "the plan is dinners only and is built and checked around those lunches")
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(description=__doc__.split("\n\n")[1],
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -924,6 +1021,7 @@ def main(argv: list[str] | None = None) -> int:
     sp.add_argument("--use-up", help="ingredients on hand to use up")
     sp.add_argument("--days", type=int, default=5)
     sp.add_argument("--anchors", help="comma-separated anchor ids to use instead of the random sample")
+    sp.add_argument("--week-start", help=AROUND_HELP)
     offline(sp)
     sp.set_defaults(fn=cmd_context)
 
@@ -944,6 +1042,7 @@ def main(argv: list[str] | None = None) -> int:
     sp = sub.add_parser("check", help="run the app's structural and constraint checks")
     sp.add_argument("plan")
     sp.add_argument("--days", type=int)
+    sp.add_argument("--week-start", help=AROUND_HELP)
     offline(sp)
     sp.set_defaults(fn=cmd_check)
 
@@ -955,6 +1054,7 @@ def main(argv: list[str] | None = None) -> int:
     sp.add_argument("plan")
     sp.add_argument("--out", required=True)
     sp.add_argument("--only", help="comma-separated meal ids (re-proofing after a fix)")
+    sp.add_argument("--week-start", help=AROUND_HELP)
     sp.set_defaults(fn=cmd_review_packets)
 
     sp = sub.add_parser("save", help="check, then write the week to the Pi (and optionally PDF/Drive)")

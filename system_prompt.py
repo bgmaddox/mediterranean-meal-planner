@@ -566,6 +566,40 @@ for it or leave `special: false`. Confirm every special ingredient in \
 
 
 
+def _saved_lunches_block(saved_lunches: list[dict], lunch_adult_count: int) -> tuple[str, str]:
+    """(the Lunches section, output rule 3) for a week whose lunches are already
+    planned as a lunch week. The dinners then make no leftover portions, may
+    share ingredients with the lunches, and must not repeat them."""
+    lines = []
+    for l in saved_lunches:
+        bought = [i["name"] for i in l.get("ingredients") or []
+                  if not i.get("pantry_staple") and not i.get("made_in")]
+        lines.append(
+            f"  - {l.get('name')} ({', '.join(l.get('days') or [])}; "
+            f"{'cold' if 'cold' in str(l.get('reheat', '')) else 'microwaved'}). "
+            f"Buys: {', '.join(bought) or 'pantry only'}.")
+    block = f"""\
+## Lunches — already planned this week
+This week's office lunches ({lunch_adult_count} adult(s)) are already planned and saved: \
+batch recipes cooked on Sunday. **Plan dinners only.**
+
+{chr(10).join(lines)}
+
+- Return `"lunches": []`. Every dinner has `generates_lunch: false` and \
+`lunch_scaling_instructions: null`: no dinner is scaled up for leftovers.
+- **Share ingredients with these lunches where it is natural.** The rest of a bunch of herbs, \
+a tub of yogurt, a bag of greens bought for a lunch is worth using at dinner. A `special` \
+ingredient used in one dinner and one of these lunches meets the "2+ meals" rule; say so in \
+`ingredient_overlap_notes`.
+- **Do not repeat them.** No dinner is the same dish as a lunch, and avoid the same main \
+protein in the same cuisine as a lunch.
+- **Sunday is already busy** with the lunch batch cook. Keep `sunday_prep_list` to 1–3 short \
+dinner tasks, or none."""
+    rule = ("3. `lunches` is an empty list and every dinner has `generates_lunch: false`: "
+            "this week's lunches are already planned.")
+    return block, rule
+
+
 def build_system_prompt(
     history: list[dict] | None = None,
     favorites: list[dict] | None = None,
@@ -581,6 +615,7 @@ def build_system_prompt(
     days: int = 5,
     anchor_recipes: list[dict] | None = None,
     include_snacks: bool = True,
+    saved_lunches: list[dict] | None = None,
 ) -> str:
     """
     Build the full system prompt for weekly meal plan generation.
@@ -608,6 +643,10 @@ def build_system_prompt(
     cuisine_notes : str or None
         User's cuisine preference for this week
         (e.g. 'all Mediterranean', 'one Thai meal', '2 Mexican dinners').
+    saved_lunches : list[dict] or None
+        A lunch week's batch recipes already saved for this week (lunch_week.py).
+        When given, the plan is dinners only: no lunches, no leftover portions,
+        and the dinners are built around those lunches instead.
     """
     if current_date is None:
         current_date = date.today().isoformat()
@@ -789,11 +828,28 @@ a small handful of **walnuts or almonds** with fruit, olives + feta + cucumber.
     schema_with_kids["week_plan"]["dinners"][0]["servings"]["kids"] = kids_count
     schema_with_kids["week_plan"]["dinners"][0]["id"] = f"string — 'd1' through 'd{days}'"
     schema_with_kids["week_plan"]["lunches"][0]["id"] = f"string — 'l1' through 'l{days}'"
+    if saved_lunches:
+        schema_with_kids["week_plan"]["lunches"] = []
+        schema_with_kids["week_plan"]["dinners"][0]["generates_lunch"] = (
+            "boolean — always false this week: lunches are already planned")
+        schema_with_kids["week_plan"]["dinners"][0]["lunch_scaling_instructions"] = "null"
     if not has_kids:
         schema_with_kids["week_plan"]["dinners"][0].pop("kid_adaptation", None)
         for ss in schema_with_kids["week_plan"]["dinners"][0].get("serving_sizes", []):
             ss["kid_portion"] = ""
     schema_str = json.dumps(schema_with_kids, indent=2)
+
+    if saved_lunches:
+        lunch_rules_block, lunch_output_rule = _saved_lunches_block(saved_lunches, lunch_adult_count)
+    else:
+        lunch_rules_block = f"""\
+## Lunches — {days} per week, {lunch_adult_count} adult(s)
+- Office, weekdays. Microwave available; cold lunches are equally welcome.
+- **Fish only in a lunch eaten cold** (`reheat: 'none (cold)'`). Never in a microwaved lunch.
+- ≤5 min to assemble/reheat at the office.
+- Mix of standalone recipes and dinner leftovers.
+- Cold lunches (grain salads, wraps, hummus plates) don't need reheating notes."""
+        lunch_output_rule = "3. `generates_lunch: true` dinners must include `lunch_scaling_instructions`."
 
     cost_block = """\
 ## Cost Estimation Guidelines
@@ -895,14 +951,9 @@ Every dinner should deliver **at least 10–12 g of fiber per adult serving**. T
 - Protein targets: {protein_targets}.
 - **Legume target:** legumes (beans, lentils, chickpeas, edamame) feature in at least {legume_target} of the {days} dinners — as the main protein or a substantial component (≥1/2 cup per adult), not a garnish. This is a positive target, not just what's left after the meat is planned.{chr(10) + "- " + portion_scale_instruction if portion_scale_instruction else ""}
 
-## Lunches — {days} per week, {lunch_adult_count} adult(s)
-- Office, weekdays. Microwave available; cold lunches are equally welcome.
-- **Fish only in a lunch eaten cold** (`reheat: 'none (cold)'`). Never in a microwaved lunch.
-- ≤5 min to assemble/reheat at the office.
-- Mix of standalone recipes and dinner leftovers.
-- Cold lunches (grain salads, wraps, hummus plates) don't need reheating notes.
+{lunch_rules_block}
 
-## Sunday Prep — 3–5 tasks
+## Sunday Prep — {"1–3 dinner tasks (the lunch batch cook is already planned)" if saved_lunches else "3–5 tasks"}
 - Only items that hold well for 5 days without degrading.
 - Good: cooked grains, marinated raw protein (2–3 days), sauces (tzatziki, hummus), roasted garlic.
 - Avoid: cooked fish, couscous, dressed salads.
@@ -968,7 +1019,7 @@ The response must begin with `{{` and end with `}}`.
 ## Output rules:
 1. Every ingredient — pantry or not — must appear in the `ingredients` array with a quantity and unit. Set `pantry_staple: true` for items in the staples list; the app uses this flag to separate them from the shopping list. Never omit a pantry staple from the ingredient list.
 2. `special: true` means non-staple purchased this week — must appear in 2+ meals.
-3. `generates_lunch: true` dinners must include `lunch_scaling_instructions`.
+{lunch_output_rule}
 4. `sunday_prep` is the task string (or null).
 {_kid_output_rule_5}
 6. `uric_acid_tip` when a technique meaningfully reduces purines.

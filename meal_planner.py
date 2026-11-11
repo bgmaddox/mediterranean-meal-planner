@@ -116,6 +116,7 @@ def build_generation_prompts(
     use_up_ingredients: str | None = None,
     days: int = 5,
     anchor_ids: list[str] | None = None,
+    saved_lunches: list[dict] | None = None,
 ) -> tuple[str, str]:
     """
     Build the system prompt and user message for generate_week_plan without
@@ -124,6 +125,9 @@ def build_generation_prompts(
     `anchor_ids` replaces the random anchor sample with chosen recipes. A
     Claude Code session picks them from the whole library (cli.py anchors);
     the app keeps rotating a random sample.
+
+    `saved_lunches` are a lunch week's batch recipes already saved for this
+    week: the prompt then asks for dinners only (see build_system_prompt).
 
     Returns
     -------
@@ -155,6 +159,7 @@ def build_generation_prompts(
         days=days,
         anchor_recipes=anchor_recipes,
         include_snacks=prefs.get("include_snacks", True),
+        saved_lunches=saved_lunches,
     )
     require_kid = bool(prefs.get("children"))
     return system_prompt, _DEFAULT_USER_MESSAGE, require_kid
@@ -298,15 +303,26 @@ def generate_week_plan(week_notes: str | None = None, cuisine_notes: str | None 
     )
 
 
-def _validate_plan(plan: WeekPlan, days: int = 5, require_kid_adaptation: bool = True) -> None:
+def _validate_plan(plan: WeekPlan, days: int = 5, require_kid_adaptation: bool = True,
+                   dinners_only: bool = False) -> None:
+    """`dinners_only`: the week's lunches are already planned as a lunch week, so
+    this plan must bring no lunches and no dinner may be scaled for leftovers."""
     if not plan.get("dinners"):
         raise MealPlanError("Plan has no dinners.")
-    if not plan.get("lunches"):
-        raise MealPlanError("Plan has no lunches.")
     if len(plan["dinners"]) != days:
         raise MealPlanError(f"Expected {days} dinners, got {len(plan['dinners'])}.")
-    if len(plan["lunches"]) != days:
-        raise MealPlanError(f"Expected {days} lunches, got {len(plan['lunches'])}.")
+    if dinners_only:
+        if plan.get("lunches"):
+            raise MealPlanError("This week's lunches are already planned; the plan must have no lunches.")
+        scaled = [d.get("id") for d in plan["dinners"] if d.get("generates_lunch")]
+        if scaled:
+            raise MealPlanError(f"Dinner(s) {', '.join(map(str, scaled))} make leftover lunches, "
+                                "but this week's lunches are already planned.")
+    else:
+        if not plan.get("lunches"):
+            raise MealPlanError("Plan has no lunches.")
+        if len(plan["lunches"]) != days:
+            raise MealPlanError(f"Expected {days} lunches, got {len(plan['lunches'])}.")
     if require_kid_adaptation:
         for dinner in plan["dinners"]:
             if not dinner.get("kid_adaptation"):
