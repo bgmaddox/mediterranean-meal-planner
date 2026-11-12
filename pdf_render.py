@@ -880,9 +880,19 @@ def _snacks_section(snacks: list) -> str:
         return ""
     cards = '<div class="pr-section" style="margin-top:14pt;">SNACKS</div>'
     for snack in snacks:
+        when = snack.get("when")
+        title = _e(snack.get("name", "")) + (f' <span style="font-weight:400;">· {_e(when)}</span>' if when else "")
+        portion = snack.get("portion")
+        per_week = snack.get("portions_per_week")
+        portion_html = (
+            f'<div class="pr-prep__storage"><b>Portion:</b> {_e(portion)}'
+            + (f' · {_e(str(per_week))} this week' if per_week else "")
+            + '</div>'
+        ) if portion else ""
         cards += (
             '<div class="pr-prep">'
-            f'<div class="pr-prep__task">{_e(snack.get("name", ""))}</div>'
+            f'<div class="pr-prep__task">{title}</div>'
+            f'{portion_html}'
             f'<div class="pr-prep__storage">{_e(snack.get("description", ""))}</div>'
             '</div>'
         )

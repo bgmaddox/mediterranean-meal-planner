@@ -160,6 +160,7 @@ def build_generation_prompts(
         anchor_recipes=anchor_recipes,
         include_snacks=prefs.get("include_snacks", True),
         saved_lunches=saved_lunches,
+        snack_notes=prefs.get("snack_notes"),
     )
     require_kid = bool(prefs.get("children"))
     return system_prompt, _DEFAULT_USER_MESSAGE, require_kid

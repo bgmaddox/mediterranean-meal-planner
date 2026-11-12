@@ -211,3 +211,20 @@ def set_target_calories(ds, p):
         raise ValueError(f"{value} is outside the sensible range for lunch and dinner")
     prefs = ds.update_preferences(target_calories_lunch_dinner=value)
     return {"target_calories_lunch_dinner": prefs["target_calories_lunch_dinner"]}
+
+
+def set_snack_notes(ds, p):
+    """The user's snacking in their own words (when, where, cravings, likes).
+
+    Writes the preference directly rather than through update_preferences, whose
+    allowed keys on an older deployed version would silently drop it.
+
+    payload: {"snack_notes": str}  (empty clears it)
+    """
+    text = str(p.get("snack_notes") or "").strip()
+    if len(text) > 1000:
+        raise ValueError("snack notes are over 1000 characters; keep them to a few sentences")
+    prefs = ds.load_preferences()
+    prefs["snack_notes"] = text or None
+    ds.save_preferences(prefs)
+    return {"snack_notes": prefs["snack_notes"]}

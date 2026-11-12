@@ -606,7 +606,10 @@ def _print_summary(plan: dict, ratings: dict | None = None) -> None:
     if s.get("special_ingredients"):
         print(f"      specials: {', '.join(s['special_ingredients'])}")
     for snack in plan.get("snacks") or []:
-        print(f"SNACK {snack.get('name')}")
+        when = f"  [{snack['when']}]" if snack.get("when") else ""
+        print(f"SNACK {snack.get('name')}{when}")
+        if snack.get("portion"):
+            print(f"      portion: {snack['portion']} x{snack.get('portions_per_week', '?')}")
 
 
 def _find_week(week: str | None) -> dict:
@@ -750,6 +753,17 @@ def cmd_set_target(args) -> int:
         print(_local_op("set_target_calories", payload))
         return 0
     print(_pi_op("set_target_calories", payload))
+    pull(quiet=True)
+    return 0
+
+
+def cmd_set_snacks(args) -> int:
+    """Set the snacking notes the prompt plans snacks from, on the Pi."""
+    payload = {"snack_notes": args.notes}
+    if args.offline:
+        print(_local_op("set_snack_notes", payload))
+        return 0
+    print(_pi_op("set_snack_notes", payload))
     pull(quiet=True)
     return 0
 
@@ -1123,6 +1137,11 @@ def main(argv: list[str] | None = None) -> int:
     sp.add_argument("calories", type=int)
     offline(sp)
     sp.set_defaults(fn=cmd_set_target)
+
+    sp = sub.add_parser("set-snacks", help="set when/what you snack (plans one snack per snack time)")
+    sp.add_argument("notes", help='e.g. "Salty before lunch at work; sweet at 10pm. Like pistachios." ("" clears)')
+    offline(sp)
+    sp.set_defaults(fn=cmd_set_snacks)
 
     sub.add_parser("push", help="send weeks queued while the Pi was offline").set_defaults(fn=cmd_push)
 

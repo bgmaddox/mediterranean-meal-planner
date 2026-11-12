@@ -276,6 +276,7 @@ def update_preferences(**kwargs) -> UserPreferences:
         "portion_scale",
         "use_anchor_recipes",
         "include_snacks",
+        "snack_notes",
         "recipient_email",
         "auto_send_email",
         "target_calories_lunch_dinner",
