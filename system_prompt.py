@@ -257,7 +257,7 @@ OUTPUT_SCHEMA = {
                 "name": "string — e.g. 'Greek yogurt with cherries and walnuts'",
                 "description": "string — 1-2 sentences: how to assemble it and why it fits the health goals",
                 "when": "string — the snack time it is for, e.g. 'Before lunch, at work'",
-                "portion": "string — one serving, measurable without a scale, with ~kcal, e.g. '1 oz in-shell pistachios (about 49 nuts), ~160 kcal'",
+                "portion": "string — one serving, measurable without a scale, with ~kcal, e.g. '1 oz pistachios, shelled weight (about 49 nuts), ~160 kcal'",
                 "portions_per_week": "integer — servings the ingredient quantities cover",
                 "ingredients": [
                     {
@@ -833,8 +833,8 @@ list; mark pantry staples).
 walnuts, **cherries** (clinical evidence for uric acid), **hummus or another legume dip with cut vegetables**, \
 **nuts** (pistachios, almonds, walnuts) with fruit, olives + feta + cucumber, cottage cheese, hard-boiled eggs.
 - **Portions are the point.** `portion` is one serving, written the way it will actually be measured without a \
-scale (a count, a cup, a pre-portioned bag), with approximate kcal, e.g. "1 oz in-shell pistachios (about 49 \
-nuts, a heaped 1/2 cup in the shell), ~160 kcal". Each snack is roughly 150–250 kcal; all snacks together stay \
+scale (a count, a cup, a pre-portioned bag), with approximate kcal, e.g. "1 oz pistachios, shelled weight (about 49 \
+nuts, roughly 1/2 cup still in the shell), ~160 kcal". Each snack is roughly 150–250 kcal; all snacks together stay \
 under ~400 kcal a day. Nuts, nut mixes, dried fruit and chocolate are where a healthy snack quietly becomes \
 600 kcal: for those, the description says to pre-portion the week on Sunday rather than eat from the bag.
 - `portions_per_week` is how many servings the week needs (5 for a workday-only snack, 7 for an every-day one). \
