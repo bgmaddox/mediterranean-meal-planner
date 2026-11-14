@@ -1,6 +1,6 @@
 # Future Work — Mediterranean Meal Planner
 
-Remaining and deferred work, last updated **2026-10-08** (§0); the rest dates from **2026-06-08**, after completing
+Remaining and deferred work, last updated **2026-11-11** (§0b), **2026-11-10** (§0a) and **2026-10-08** (§0); the rest dates from **2026-06-08**, after completing
 `IMPROVEMENTS.md`, `IMPROVEMENTS_V2.md` (all 4 phases), and addressing
 `gemini_review.md`. Completed plans are archived in `archive/` with
 `archive/IMPLEMENTATION_NOTES.md`. The master design doc is `PLAN.md`.
@@ -9,19 +9,55 @@ Use this file as the entry point when planning the next session.
 
 ---
 
-## 0a. Lunch weeks (2026-11-10) — merged and deployed
+## 0b. Snack profile (2026-11-11) — built on `feature/snack-profile`, not merged or deployed
+
+A `snack_notes` preference says when the user snacks and what they crave; dinner plans
+then carry one snack per snack time, each with `when`, `portion` and `portions_per_week`,
+and week-sized quantities on the shopping list (`83f589e`, `3fbe3db`; 246 tests pass).
+How it works: `CLAUDE.md` → "How are snacks planned?". Why: `DECISIONS.md`. A reference
+page for the user is shelved at `shelf.bgmaddox.com/snack-drawer.html`.
+
+**Next action (before §0a step 2, so the first dinner week has snacks):**
+1. Run the app locally and check the Settings "Your snacking" box saves.
+2. Merge to `main`, push, deploy (`ssh rachett 'bash ~/deploy.sh diet'`).
+3. Set the notes on the Pi, wording agreed in session:
+   `.venv/bin/python cli.py set-snacks "Skip breakfast. Hungry late morning before lunch at work (fridge and microwave there), 5 days a week, and want something salty. Hungry again around 10pm at home, every day, and want something sweet. I like pistachios and nut mixes."`
+
+**Waiting on the user:** a yes to merge and deploy (asked 2026-11-11, not yet answered).
+
+| Item | Trigger |
+|---|---|
+| **Snack portions are prompt-only**; nothing checks a snack has `portion`. A soft check would flag old saved snacks too, so the corpus test's known-findings set would need it. | The first planned week whose snacks lack a portion. |
+| **Lunch-only weeks (`/plan-lunches`) carry no snacks**; only dinner plans do. | If a week is planned as lunches only and snacks are wanted on its list. |
+
+## 0a. Lunch weeks (2026-11-10) — merged, deployed, first week saved
 
 `/plan-lunches` plans two Sunday batch lunches and saves them into their week. Steps 1
 and 2 of the plan are done: `lunch_week.py`, checker rules, `cli.py lunch-*`, save by
 part, the lunch reviewer rubric, lunch methods in the PDF and Kitchen Mode. How it works:
 `CLAUDE.md` → "Lunch weeks". Why: `DECISIONS.md`.
 
-**Next action: run the first real `/plan-lunches`.** The history cap is gone (every
-week is kept). After the first lunch-only save, look at that week in the app's Generate
-tab: only the PDF, the CLI and Kitchen Mode were exercised with a lunch-only week.
+**First real lunch week saved (2026-11-10):** week **2026-11-16**, lunch-only. l1 kale and
+chicken quinoa bowls (Mon–Wed, cold) and l2 turkey and black bean chili (Thu–Fri, with
+Friday's portion frozen). One reviewer was used; see `sessions/review-log.md`.
+
+**Dinners around a saved lunch week: built, merged and deployed in `32b0ff4`.** Planning
+dinners for a week that already has batch lunches is now dinners only (`--week-start`);
+see `CLAUDE.md` → "Lunch weeks" and `DECISIONS.md`. It has been tested with a sandbox copy
+of the real data but not yet used in a real `/plan-week`.
+
+**Next action:**
+1. Open week 2026-11-16 in the app (Generate tab, Kitchen Mode) to check a lunch-only week
+   renders. This is still unexercised.
+2. If dinners are wanted for that week, run `/plan-week` with week start 2026-11-16. It
+   will plan dinners only.
+3. The following week, `/plan-lunches` step 0 asks how many days each lunch was actually
+   brought.
 
 | Item | Trigger |
 |---|---|
+| **The app's Generate tab still plans whole weeks**, so it would replace a saved lunch week's lunches. Dinners-only mode is session-only. | If dinners are ever generated in the app for a week that has a lunch week. |
+| **Mixed lunch weeks lose their kept leftovers.** When a lunch week kept dinner leftovers (`--keep`), a later dinners-only plan drops them; `context` only warns. | The first time that warning appears. |
 | **Lunch-only button in the app's Generate tab** (API path). | Only if planning lunches without a session is wanted. |
 | **Weight tracker logs a batch lunch once.** `Weight/core/diet.py` hides a lunch after one log, keyed by week and id, so a 3-portion batch can be logged from the plan on one day only. | When lunch logging in Crumb matters. Fix belongs in `Weight/`. |
 | **Lunch targets are prompt-only** (450–550 kcal, ≥30 g protein, ≥10 g fiber). | If saved lunches drift under them. |
@@ -37,8 +73,8 @@ Week — two paths". Why: `DECISIONS.md`.
 
 **Next action: run the first real `/plan-week`** from the `Diet/` directory, on the home
 network if Tailscale is still down. It opens with the look-back at the 2026-08-29 week,
-then plans the new one. At the end it creates `sessions/review-log.md`, the first
-measurement of what a session's review costs.
+then plans the new one. At the end it adds to `sessions/review-log.md` (created by the
+first lunch week, 2026-11-10), the first measurement of what a dinner review costs.
 
 **Waiting on the user:** nothing. They will run that week.
 

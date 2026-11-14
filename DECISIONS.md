@@ -106,6 +106,25 @@ recipes cooked in one Sunday session, split 3 + 2. The plan's main risk is the l
 recipe, so fridge life is data (`keeps_days`) and arithmetic the checker does, and
 "still good on Friday" is the lunch reviewer's main question.
 
+**Dinners planned after a lunch week are dinners only** (2026-11-10, `32b0ff4`). With
+`--week-start` on a week that has batch lunches, `/plan-week` asks for no lunches and no
+leftover portions, and `save` merges the saved lunches back in through
+`pi_ops.merge_lunches`. Rejected: the `--replace-lunches` + re-run `lunch-save` dance
+(it left dinners cooking extra portions nobody had planned for), and having the dinner
+plan re-emit the saved lunches (the model could quietly alter them). Lunches are never
+re-planned in this mode; that stays `/plan-lunches`' job. Revisit if the app's Generate
+tab needs the same, or if mixed weeks (kept leftovers plus batch lunches) become common:
+their leftover lunches are dropped, with a warning only.
+
+**Snacks are planned from the user's own snacking notes, with portions** (2026-11-11,
+`83f589e`). One free-text preference (`snack_notes`: when, where, craving, what they
+like) goes into the dinner prompt, and each snack comes back with `when`, `portion`
+(measurable without a scale, with kcal) and `portions_per_week`, so the shopping list
+holds a week's worth. Portions are the point: the user's usual snack is nuts, where a
+handful is 2–3 portions. Rejected: a fixed staple snack list (no variety, a second
+source of snack truth) and structured slot settings (more UI for what two sentences
+say). Revisit if the model ignores the notes or drops portions.
+
 **The office has a microwave with no time limit and nothing else.** An earlier draft
 capped reheating at two minutes and made it a setting; the user corrected that. Do not
 reintroduce a reheat-time rule.
