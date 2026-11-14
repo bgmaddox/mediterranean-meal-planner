@@ -1095,13 +1095,14 @@ def cmd_set_days(args) -> int:
 
 
 def cmd_skylight_login(args) -> int:
-    """Interactive: run it yourself (`! .venv/bin/python cli.py skylight-login`).
+    """Interactive: run it yourself (`.venv/bin/python cli.py skylight-login` in a separate Terminal window (the `!` prompt has no typed input)).
     The password is used once and not stored; only the token pair is kept."""
     import getpass
     import skylight
     if not sys.stdin.isatty():
-        raise CLIError("skylight-login asks for a password, so it must run in a terminal: "
-                       "type `! .venv/bin/python cli.py skylight-login` in Claude Code.")
+        raise CLIError("skylight-login asks for a password, so it needs a real terminal "
+                       "(Claude Code's `!` prompt can't take typed input). Open Terminal and run:\n"
+                       f"  cd {str(ROOT)!r} && .venv/bin/python cli.py skylight-login")
     email = args.email or input("Skylight email: ").strip()
     password = getpass.getpass("Skylight password (not saved): ")
     try:

@@ -18,7 +18,7 @@ so merge that one first. The API version is pinned to `2026-05-01`, and the logi
 follows skylight-mcp as of its 2026-11-14 commit.
 
 **Next action, needs the user:**
-1. `! .venv/bin/python cli.py skylight-login`. It prints the frames and meal
+1. `.venv/bin/python cli.py skylight-login` in a separate Terminal window (the `!` prompt has no typed input). It prints the frames and meal
    categories. Confirm the categories include "Dinner" and "Lunch" (the match is by name).
 2. `.venv/bin/python cli.py skylight-sync 2026-11-16 --dry-run`, then without
    `--dry-run`. That week is lunch-only (l1 Mon–Wed, l2 Thu–Fri), so it's a safe first
