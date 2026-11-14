@@ -125,6 +125,21 @@ handful is 2–3 portions. Rejected: a fixed staple snack list (no variety, a se
 source of snack truth) and structured slot settings (more UI for what two sentences
 say). Revisit if the model ignores the notes or drops portions.
 
+**Saved weeks go onto the Skylight calendar through its private API, from the Mac**
+(2026-11-14). The user has Calendar Plus and wanted meals in the Meals tab. Skylight
+has no public API, so `skylight.py` talks to the private one its apps use, following
+chrischall/skylight-mcp's live-verified login and routes. Written stdlib-only instead
+of using `pyskylight`: that library has no meal routes and can't handle the emailed
+login code Skylight added on 2026-11-11. Meals are one-time sittings with the recipe in
+the description, with nothing added to the recipe box. Dinners got a `day` field so
+they can go on the calendar (nothing in a plan said which day before). The saved week
+is the source of truth, and sync reconciles against it. Runs on the Mac only, so the
+Skylight session never sits on the Pi, and the password is never stored. Rejected: an
+iCal feed from the Pi (supported and sturdier, but meals would show as calendar events,
+not in the Meals tab; keep it as the fallback if the private API becomes unworkable),
+and syncing Skylight's grocery list (ours is better: pantry staples, `made_in`). Revisit
+if the sync breaks more than occasionally.
+
 **The office has a microwave with no time limit and nothing else.** An earlier draft
 capped reheating at two minutes and made it a setting; the user corrected that. Do not
 reintroduce a reheat-time rule.

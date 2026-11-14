@@ -100,6 +100,67 @@ def import_lunches(ds, p):
             "dinners": len(merged.get("dinners") or []), "lunches": len(merged["lunches"])}
 
 
+DAYS = ("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")   # = lunch_week.DAY_ORDER
+
+
+def day_problems(plan):
+    """Why a plan's dinner days can't stand: a day that isn't Mon..Sun, or two
+    dinners on one day. A dinner without a day is fine (it isn't on the calendar
+    yet). Pure, so cli.py checks a plan with it before saving."""
+    problems, seen = [], {}
+    for d in (plan or {}).get("dinners") or []:
+        day = d.get("day")
+        if day is None:
+            continue
+        if day not in DAYS:
+            problems.append(f"{d.get('id')} has day {day!r}; use one of {', '.join(DAYS)}.")
+        elif day in seen:
+            problems.append(f"{seen[day]} and {d.get('id')} are both on {day}.")
+        else:
+            seen[day] = d.get("id")
+    return problems
+
+
+def assign_days(plan, days):
+    """The plan with dinner days set. `days` maps a dinner id to a day, or to
+    None to take it off the calendar. Applied together, then checked, so two
+    dinners can swap days in one call. Pure."""
+    dinners = {str(d.get("id")): d for d in plan.get("dinners") or []}
+    unknown = [k for k in days if str(k) not in dinners]
+    if unknown:
+        raise ValueError(f"No dinner {', '.join(map(str, unknown))} in this week "
+                         f"(dinners: {', '.join(dinners) or 'none'}).")
+    out = dict(plan)
+    out["dinners"] = []
+    for d in plan.get("dinners") or []:
+        d = dict(d)
+        key = str(d.get("id"))
+        if key in days:
+            if days[key]:
+                d["day"] = days[key]
+            else:
+                d.pop("day", None)
+        out["dinners"].append(d)
+    problems = day_problems(out)
+    if problems:
+        raise ValueError(" ".join(problems))
+    return out
+
+
+def set_dinner_days(ds, p):
+    """Put a saved week's dinners on days (or move them).
+
+    payload: {"week_start", "days": {"d1": "Mon", "d2": None, ...}}
+    """
+    week = p["week_start"]
+    entry = next((e for e in ds.load_history() if e["week_start"] == week), None)
+    if entry is None:
+        raise ValueError(f"No week {week} in history.")
+    plan = assign_days(entry["plan"], p.get("days") or {})
+    ds.update_history_plan(plan, week)
+    return {"days": {str(d.get("id")): d.get("day") for d in plan.get("dinners") or []}}
+
+
 def apply_feedback(ds, p):
     """Record how a week went.
 

@@ -43,8 +43,10 @@ def sandbox(tmp_path, monkeypatch):
         monkeypatch.setattr(data_store, attr, tmp_path / name)
     monkeypatch.setattr(cli, "MIRROR", tmp_path)
     monkeypatch.setattr(cli, "OUTBOX", tmp_path / "outbox")
-    # A save must never reach the real Pi from a test.
+    # A save must never reach the real Pi from a test, nor the real Skylight
+    # (a save syncs automatically once signed in).
     monkeypatch.setattr(cli, "_run_on_pi", lambda script: pytest.fail("contacted the Pi"))
+    monkeypatch.setattr(cli, "SKYLIGHT_DIR", tmp_path / "skylight")
     return tmp_path
 
 

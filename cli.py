@@ -34,6 +34,14 @@ same week as the dinners, replacing only that week's lunches:
   .venv/bin/python cli.py lunch-packets lunches.json --week-start 2026-11-16 --out DIR
   .venv/bin/python cli.py lunch-save lunches.json --week-start 2026-11-16 --pdf
 
+Dinners go on days, and saved weeks onto the Skylight calendar's meal planner
+(skylight_sync.py). `save`, `lunch-save` and `set-days` sync automatically once
+signed in:
+
+  .venv/bin/python cli.py skylight-login              # once, interactive
+  .venv/bin/python cli.py set-days 2026-11-16 d1=Mon d2=Wed d3=Thu
+  .venv/bin/python cli.py skylight-sync [2026-11-16] [--dry-run]
+
 No command here calls the Anthropic API.
 """
 
@@ -210,6 +218,8 @@ def run_checks(plan: dict, days: int | None = None,
                            require_kid_adaptation=bool(prefs.get("children")), dinners_only=True)
         except MealPlanError as e:
             structural.append(str(e))
+        import pi_ops
+        structural += pi_ops.day_problems(plan)
         hard, soft = _constraint_findings(with_saved_lunches(plan, around), prefs, week)
         return structural, hard, soft
     if not plan.get("dinners") and plan.get("lunches"):
@@ -234,6 +244,8 @@ def run_checks(plan: dict, days: int | None = None,
         _validate_plan(view, days, require_kid_adaptation=bool(prefs.get("children")))
     except MealPlanError as e:
         structural.append(str(e))
+    import pi_ops
+    structural += pi_ops.day_problems(plan)
 
     hard, soft = _constraint_findings(plan, prefs, week)
     return structural, hard, soft
@@ -496,6 +508,7 @@ def cmd_lunch_save(args) -> int:
 
     if args.pdf or args.drive:
         _write_pdf(_saved_plan(week) or merged, week, args.drive)
+    _sync_after_save(week, args)
     return 0
 
 
@@ -997,7 +1010,127 @@ def cmd_save(args) -> int:
 
     if args.pdf or args.drive:
         _write_pdf(plan, week, args.drive)
+    _sync_after_save(week, args)
     return 0
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Days and the Skylight calendar
+#
+# Runs on the Mac only: the Skylight session (.skylight/, gitignored) lives here.
+# A failed sync never fails the save that triggered it; `skylight-sync` retries.
+# ─────────────────────────────────────────────────────────────────────────────
+
+SKYLIGHT_DIR = Path(os.environ.get("DIET_SKYLIGHT_DIR") or ROOT / ".skylight")
+
+
+def _skylight():
+    import skylight
+    return skylight.Skylight(skylight.TokenStore(SKYLIGHT_DIR / "token.json"))
+
+
+def _sync_week(week: str, dry_run: bool = False, frame: str | None = None) -> int:
+    import skylight
+    import skylight_sync
+    entry = _find_week(week)
+    state = skylight_sync.State(SKYLIGHT_DIR / "state.json")
+    try:
+        skylight_sync.sync(_skylight(), state, entry["plan"], entry["week_start"],
+                           dry_run=dry_run, frame_id=frame)
+    except (skylight.SkylightError, RuntimeError) as e:
+        raise CLIError(str(e))
+    return 0
+
+
+def _sync_after_save(week: str, args) -> None:
+    if getattr(args, "no_skylight", False) or not (SKYLIGHT_DIR / "token.json").exists():
+        return
+    print("Skylight:")
+    try:
+        _sync_week(week)
+    except CLIError as e:
+        print(f"  Skylight not updated ({e}). Retry with: cli.py skylight-sync {week}")
+
+
+def _parse_days(pairs: list[str]) -> dict:
+    import pi_ops
+    days = {}
+    for pair in pairs:
+        meal, sep, day = pair.partition("=")
+        if not sep:
+            raise CLIError(f"{pair!r}: write it as d1=Mon (or d1= to take it off the calendar)")
+        day = day.strip()[:3].title()
+        if day and day not in pi_ops.DAYS:
+            raise CLIError(f"{pair!r}: day must be one of {', '.join(pi_ops.DAYS)}")
+        days[meal.strip()] = day or None
+    return days
+
+
+def cmd_set_days(args) -> int:
+    """Put a saved week's dinners on days, or move them, then update Skylight."""
+    import pi_ops
+    import skylight_sync
+    _ensure_mirror(args.offline)
+    entry = _find_week(args.week_start)
+    week = entry["week_start"]
+    payload = {"week_start": week, "days": _parse_days(args.days)}
+    try:
+        pi_ops.assign_days(entry["plan"], payload["days"])   # fail here, not on the Pi
+    except ValueError as e:
+        raise CLIError(str(e))
+    if args.offline:
+        result = _local_op("set_dinner_days", payload)
+        print("(local mirror only; re-run without --offline to save it on the Pi)")
+    else:
+        result = _pi_op("set_dinner_days", payload)
+        pull(quiet=True)
+    names = {str(d.get("id")): d.get("name") for d in entry["plan"].get("dinners") or []}
+    order = {d: n for n, d in enumerate(pi_ops.DAYS)}
+    for mid, day in sorted(result["days"].items(), key=lambda kv: order.get(kv[1], 99)):
+        when = f"{day} {skylight_sync.day_date(week, day)}" if day else "no day"
+        print(f"  {when:<15} {mid} {names.get(mid, '')}")
+    if not args.offline:
+        _sync_after_save(week, args)
+    return 0
+
+
+def cmd_skylight_login(args) -> int:
+    """Interactive: run it yourself (`! .venv/bin/python cli.py skylight-login`).
+    The password is used once and not stored; only the token pair is kept."""
+    import getpass
+    import skylight
+    if not sys.stdin.isatty():
+        raise CLIError("skylight-login asks for a password, so it must run in a terminal: "
+                       "type `! .venv/bin/python cli.py skylight-login` in Claude Code.")
+    email = args.email or input("Skylight email: ").strip()
+    password = getpass.getpass("Skylight password (not saved): ")
+    try:
+        tokens = skylight.login(email, password, lambda: input(
+            "Skylight emailed you a 6-digit code. Code: ").strip())
+    except skylight.SkylightError as e:
+        raise CLIError(str(e))
+    skylight.TokenStore(SKYLIGHT_DIR / "token.json").save(tokens)
+    client = _skylight()
+    frames = client.frames()
+    print(f"Signed in. Session saved in {SKYLIGHT_DIR.relative_to(ROOT) if SKYLIGHT_DIR.is_relative_to(ROOT) else SKYLIGHT_DIR}/token.json.")
+    for f in frames:
+        print(f"  frame {f['id']}: {f.get('name') or '(unnamed)'}")
+    if frames:
+        import skylight_sync
+        state = skylight_sync.State(SKYLIGHT_DIR / "state.json")
+        try:
+            frame = skylight_sync.choose_frame(client, state)
+            cats = client.meal_categories(frame)
+            print("  meal categories: " + ", ".join(skylight.category_name(c) or c["id"] for c in cats))
+            state.save()
+        except RuntimeError as e:
+            print(f"  {e}")
+    return 0
+
+
+def cmd_skylight_sync(args) -> int:
+    _ensure_mirror(args.offline)
+    return _sync_week(_find_week(args.week_start)["week_start"], args.dry_run, args.frame)
 
 
 def cmd_push(args) -> int:
@@ -1144,6 +1277,31 @@ def main(argv: list[str] | None = None) -> int:
     sp.set_defaults(fn=cmd_set_snacks)
 
     sub.add_parser("push", help="send weeks queued while the Pi was offline").set_defaults(fn=cmd_push)
+
+    def no_skylight(sp):
+        sp.add_argument("--no-skylight", action="store_true",
+                        help="don't update the Skylight calendar afterwards")
+
+    for name in ("save", "lunch-save"):
+        no_skylight(sub.choices[name])
+
+    sp = sub.add_parser("set-days", help="put a saved week's dinners on days (or move them); updates Skylight")
+    sp.add_argument("week_start", help="the saved week, e.g. 2026-11-16")
+    sp.add_argument("days", nargs="+", help="d1=Mon d2=Wed ... (d3= takes d3 off the calendar)")
+    no_skylight(sp)
+    offline(sp)
+    sp.set_defaults(fn=cmd_set_days)
+
+    sp = sub.add_parser("skylight-login", help="sign in to Skylight once (interactive; run it yourself)")
+    sp.add_argument("--email")
+    sp.set_defaults(fn=cmd_skylight_login)
+
+    sp = sub.add_parser("skylight-sync", help="make the Skylight meal planner match a saved week")
+    sp.add_argument("week_start", nargs="?", help="defaults to the newest week")
+    sp.add_argument("--dry-run", action="store_true", help="show the changes without making them")
+    sp.add_argument("--frame", help="Skylight frame id, if the account has several")
+    offline(sp)
+    sp.set_defaults(fn=cmd_skylight_sync)
 
     args = p.parse_args(argv)
     os.environ.setdefault("DIET_DATA_DIR", str(MIRROR))

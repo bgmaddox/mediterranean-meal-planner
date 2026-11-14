@@ -78,6 +78,10 @@ class DinnerMeal(TypedDict):
     nutrition_estimate: NutritionEstimate
     cost_estimate: CostEstimate
     serving_sizes: list[ServingSize]
+    # The day it is cooked, 'Mon'..'Sun' (pi_ops.DAYS), counted from the week's
+    # week_start (skylight_sync.day_date). Set in session or with `cli.py
+    # set-days`; absent on app-generated plans and older weeks.
+    day: NotRequired[str]
 
 
 class LunchMeal(TypedDict):

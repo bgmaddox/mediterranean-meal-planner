@@ -1,6 +1,6 @@
 # Future Work — Mediterranean Meal Planner
 
-Remaining and deferred work, last updated **2026-11-11** (§0b), **2026-11-10** (§0a) and **2026-10-08** (§0); the rest dates from **2026-06-08**, after completing
+Remaining and deferred work, last updated **2026-11-14** (§0c), **2026-11-11** (§0b), **2026-11-10** (§0a) and **2026-10-08** (§0); the rest dates from **2026-06-08**, after completing
 `IMPROVEMENTS.md`, `IMPROVEMENTS_V2.md` (all 4 phases), and addressing
 `gemini_review.md`. Completed plans are archived in `archive/` with
 `archive/IMPLEMENTATION_NOTES.md`. The master design doc is `PLAN.md`.
@@ -8,6 +8,28 @@ Remaining and deferred work, last updated **2026-11-11** (§0b), **2026-11-10** 
 Use this file as the entry point when planning the next session.
 
 ---
+
+## 0c. Skylight calendar sync (2026-11-14) — built on `feature/skylight-sync`, not live-tested
+
+Dinners carry a `day`. `save`, `lunch-save` and `set-days` put the week on the Skylight
+meal planner once signed in. How it works: `CLAUDE.md` → "Dinner days and the Skylight
+calendar". Why: `DECISIONS.md`. Branched from `feature/snack-profile` (not yet merged),
+so merge that one first. The API version is pinned to `2026-05-01`, and the login
+follows skylight-mcp as of its 2026-11-14 commit.
+
+**Next action, needs the user:**
+1. `! .venv/bin/python cli.py skylight-login`. It prints the frames and meal
+   categories. Confirm the categories include "Dinner" and "Lunch" (the match is by name).
+2. `.venv/bin/python cli.py skylight-sync 2026-11-16 --dry-run`, then without
+   `--dry-run`. That week is lunch-only (l1 Mon–Wed, l2 Thu–Fri), so it's a safe first
+   test: 5 Lunch entries. Check them on the device, including how the description looks.
+3. Once dinners are planned for that week, check that a `set-days` swap moves them.
+
+| Item | Trigger |
+|---|---|
+| **Description length/format unverified.** Ingredients and method go in the sitting's `description`. Skylight may truncate or not render line breaks. | Step 2 above. If it renders badly, shorten to the method only, or the first line. |
+| **The app's Generate tab and PDF ignore `day`.** Kitchen Mode and the PDF could order dinners by day. | When the user wants days visible outside Skylight. |
+| **Private API.** It can break without notice (version header, login steps). | A sync error. Compare with chrischall/skylight-mcp's latest `src/auth-session-login.ts` and `src/tools/meals.ts`. Fallback: an iCal feed (see DECISIONS.md). |
 
 ## 0b. Snack profile (2026-11-11) — built on `feature/snack-profile`, not merged or deployed
 
