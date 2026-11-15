@@ -78,6 +78,10 @@ class DinnerMeal(TypedDict):
     nutrition_estimate: NutritionEstimate
     cost_estimate: CostEstimate
     serving_sizes: list[ServingSize]
+    # The day it is cooked, 'Mon'..'Sun' (pi_ops.DAYS), counted from the week's
+    # week_start (skylight_sync.day_date). Set in session or with `cli.py
+    # set-days`; absent on app-generated plans and older weeks.
+    day: NotRequired[str]
 
 
 class LunchMeal(TypedDict):
@@ -124,7 +128,11 @@ class SnackSuggestion(TypedDict):
     """A no-recipe snack suggestion for the week. Ingredients feed the shopping list."""
     name: str                           # e.g. 'Greek yogurt with cherries and walnuts'
     description: str                    # 1-2 sentences: assembly + why it fits the health goals
-    ingredients: list[Ingredient]       # Same shape as meal ingredients (pantry_staple flag honored)
+    ingredients: list[Ingredient]       # Whole week's quantity (portion x portions_per_week)
+    # Added with the snack profile (preferences.snack_notes); absent on older plans.
+    when: NotRequired[str]              # The snack time it is for, e.g. 'Before lunch, at work'
+    portion: NotRequired[str]           # One serving, measurable without a scale, with ~kcal
+    portions_per_week: NotRequired[int] # How many servings the shopping quantities cover
 
 
 class WeekPlan(TypedDict):
@@ -235,6 +243,7 @@ class UserPreferences(TypedDict):
     portion_scale: float               # Default 1.0; 0.9 = ~10% smaller, 1.1 = ~10% larger
     use_anchor_recipes: bool           # Default True; inject curated real recipes as inspiration
     include_snacks: bool               # Default True; add 2-3 weekly snack suggestions to the plan
+    snack_notes: NotRequired[Optional[str]]  # When the user snacks, what they crave, what they like
 
     # Email
     recipient_email: Optional[str]     # Where to send the weekly email report

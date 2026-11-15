@@ -43,3 +43,6 @@ recipes/
 # Claude Code session planning: mirror of the Pi data, and session drafts
 .pi-data/
 sessions/
+
+# Skylight calendar session token and sync state (skylight.py) — never commit
+.skylight/

@@ -843,7 +843,15 @@ with tab_generate:
             _section_header("This Week's Snacks", "box")
             st.caption("Simple between-meal options aligned with the health goals. Ingredients are already on the shopping list.")
             for snack in snacks:
-                st.markdown(f"**{snack.get('name', 'Snack')}**  \n{snack.get('description', '')}")
+                lines = [f"**{snack.get('name', 'Snack')}**"]
+                if snack.get("when"):
+                    lines.append(f"*{snack['when']}*")
+                if snack.get("portion"):
+                    per_week = snack.get("portions_per_week")
+                    lines.append(f"Portion: {snack['portion']}"
+                                 + (f" · {per_week} this week" if per_week else ""))
+                lines.append(snack.get("description", ""))
+                st.markdown("  \n".join(lines))
 
     else:
         st.info("Click **Generate Week** above to create this week's meal plan.")
@@ -1147,6 +1155,20 @@ def _settings_fragment():
             "ingredients are added to the shopping list."
         ),
     )
+    snack_notes = st.text_area(
+        "Your snacking",
+        value=prefs.get("snack_notes") or "",
+        placeholder=(
+            "e.g. Skip breakfast. Hungry before lunch at work (fridge + microwave), want "
+            "something salty. Hungry again around 10pm at home, want something sweet. "
+            "I like pistachios and nut mixes."
+        ),
+        help=(
+            "When you get hungry, where you are, what you crave, and what you already like. "
+            "With this filled in, each plan has one snack per snack time, with a portion size "
+            "and enough on the shopping list for the week."
+        ),
+    )
 
     if st.button("Save Meal Planning Preferences"):
         data_store.update_preferences(
@@ -1155,6 +1177,7 @@ def _settings_fragment():
             portion_scale=_portion_options[portion_label],
             use_anchor_recipes=bool(use_anchors),
             include_snacks=bool(include_snacks),
+            snack_notes=snack_notes.strip() or None,
         )
         st.success("Saved.")
 

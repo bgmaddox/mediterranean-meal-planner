@@ -256,6 +256,9 @@ OUTPUT_SCHEMA = {
             {
                 "name": "string — e.g. 'Greek yogurt with cherries and walnuts'",
                 "description": "string — 1-2 sentences: how to assemble it and why it fits the health goals",
+                "when": "string — the snack time it is for, e.g. 'Before lunch, at work'",
+                "portion": "string — one serving, measurable without a scale, with ~kcal, e.g. '1 oz pistachios, shelled weight (about 49 nuts), ~160 kcal'",
+                "portions_per_week": "integer — servings the ingredient quantities cover",
                 "ingredients": [
                     {
                         "name": "string",
@@ -616,6 +619,7 @@ def build_system_prompt(
     anchor_recipes: list[dict] | None = None,
     include_snacks: bool = True,
     saved_lunches: list[dict] | None = None,
+    snack_notes: Optional[str] = None,
 ) -> str:
     """
     Build the full system prompt for weekly meal plan generation.
@@ -647,6 +651,10 @@ def build_system_prompt(
         A lunch week's batch recipes already saved for this week (lunch_week.py).
         When given, the plan is dinners only: no lunches, no leftover portions,
         and the dinners are built around those lunches instead.
+    snack_notes : str or None
+        The user's own words on when they snack, what they crave then, and what
+        they like (the `snack_notes` preference). With it, snacks are planned one
+        per snack time; without it, 2-3 general suggestions.
     """
     if current_date is None:
         current_date = date.today().isoformat()
@@ -799,25 +807,51 @@ def build_system_prompt(
         "Kid portions should be roughly half of adult portions. For lunches, kid_portion can be an empty string."
     ) if has_kids else "kid_portion should always be an empty string."
 
+    _snack_profile = (snack_notes or "").strip()
+    if _snack_profile:
+        _snacks_intro = f"""## Snacks — one for each snack time
+Weight loss fails between meals, not at them. The user describes their snacking in their own words:
+
+> {_snack_profile}
+
+Plan one snack for each snack time described there (a second option for the same time is fine; 2–4 \
+snacks in all). Match each time's craving and setting, and set `when` to it in a few words. Use the foods \
+the user says they like whenever they fit the rules below: a better version of what they already reach for \
+beats something new they won't eat."""
+    else:
+        _snacks_intro = """## Snacks — 2–3 suggestions for the week
+Weight loss fails between meals, not at them. Suggest 2–3 simple snacks that bridge the gap between the \
+planned lunch+dinner calories and the full daily target. Set `when` to when each is best eaten."""
+
     _snacks_rules_block = (
-        """
-## Snacks — 2–3 suggestions for the week
-Weight loss fails between meals, not at them. Suggest 2–3 simple snacks (a `snacks` array in the JSON) \
-that bridge the gap between the planned lunch+dinner calories and the full daily target. These are \
-assemblies, not recipes — no instructions, no nutrition estimate, just a name, a 1–2 sentence description, \
-and an ingredients list (which feeds the shopping list; mark pantry staples).
+        f"""
+{_snacks_intro}
+Snacks are a `snacks` array in the JSON. They are assemblies, not recipes: a name, a 1–2 sentence \
+description, `when`, `portion`, `portions_per_week`, and an ingredients list (which feeds the shopping \
+list; mark pantry staples).
 - Lean on the snacks that actively serve the health goals: **Greek yogurt** (lowers uric acid) with fruit or \
 walnuts, **cherries** (clinical evidence for uric acid), **hummus or another legume dip with cut vegetables**, \
-a small handful of **walnuts or almonds** with fruit, olives + feta + cucumber.
-- Portion-aware: each snack should be roughly 100–200 kcal as described.
-- No added-sugar snacks, no juice, no processed snack foods. Fresh fruit is fine; fruit juice is not.
-- At least one should be zero-prep (grab-and-eat); Sunday-preppable snacks (cut vegetables, portioned yogurt) are welcome."""
+**nuts** (pistachios, almonds, walnuts) with fruit, olives + feta + cucumber, cottage cheese, hard-boiled eggs.
+- **Portions are the point.** `portion` is one serving, written the way it will actually be measured without a \
+scale (a count, a cup, a pre-portioned bag), with approximate kcal, e.g. "1 oz pistachios, shelled weight (about 49 \
+nuts, roughly 1/2 cup still in the shell), ~160 kcal". Each snack is roughly 150–250 kcal; all snacks together stay \
+under ~400 kcal a day. Nuts, nut mixes, dried fruit and chocolate are where a healthy snack quietly becomes \
+600 kcal: for those, the description says to pre-portion the week on Sunday rather than eat from the bag.
+- `portions_per_week` is how many servings the week needs (5 for a workday-only snack, 7 for an every-day one). \
+Ingredient quantities are portion × portions_per_week, rounded to what a store sells (a 16 oz bag, a 32 oz tub).
+- Salty snacks: unsalted or lightly salted nuts and nut mixes, under ~200 mg sodium a portion.
+- Sweet snacks: fruit (fresh, frozen, or unsweetened tart cherries), plain Greek yogurt or cottage cheese with \
+fruit and cinnamon, or at most one small square (~10 g) of 70%+ dark chocolate alongside fruit. No other \
+added-sugar snacks, no juice, no honey-roasted or candy-studded nut mixes, no processed snack foods.
+- At least one should be zero-prep (grab-and-eat); Sunday-preppable snacks (cut vegetables, portioned yogurt, \
+bagged nuts, boiled eggs) are welcome."""
         if include_snacks else ""
     )
 
     _snacks_output_rule = (
-        "14. `snacks` is required: 2–3 snack suggestions following the Snacks rules. "
-        "Ingredients listed with quantities for the week so they can be shopped.\n"
+        "14. `snacks` is required, following the Snacks rules. Every snack has `when`, `portion` and "
+        "`portions_per_week`, and its ingredients are listed with quantities for the whole week so they "
+        "can be shopped.\n"
         if include_snacks else ""
     )
 

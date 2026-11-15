@@ -106,6 +106,40 @@ recipes cooked in one Sunday session, split 3 + 2. The plan's main risk is the l
 recipe, so fridge life is data (`keeps_days`) and arithmetic the checker does, and
 "still good on Friday" is the lunch reviewer's main question.
 
+**Dinners planned after a lunch week are dinners only** (2026-11-10, `32b0ff4`). With
+`--week-start` on a week that has batch lunches, `/plan-week` asks for no lunches and no
+leftover portions, and `save` merges the saved lunches back in through
+`pi_ops.merge_lunches`. Rejected: the `--replace-lunches` + re-run `lunch-save` dance
+(it left dinners cooking extra portions nobody had planned for), and having the dinner
+plan re-emit the saved lunches (the model could quietly alter them). Lunches are never
+re-planned in this mode; that stays `/plan-lunches`' job. Revisit if the app's Generate
+tab needs the same, or if mixed weeks (kept leftovers plus batch lunches) become common:
+their leftover lunches are dropped, with a warning only.
+
+**Snacks are planned from the user's own snacking notes, with portions** (2026-11-11,
+`83f589e`). One free-text preference (`snack_notes`: when, where, craving, what they
+like) goes into the dinner prompt, and each snack comes back with `when`, `portion`
+(measurable without a scale, with kcal) and `portions_per_week`, so the shopping list
+holds a week's worth. Portions are the point: the user's usual snack is nuts, where a
+handful is 2–3 portions. Rejected: a fixed staple snack list (no variety, a second
+source of snack truth) and structured slot settings (more UI for what two sentences
+say). Revisit if the model ignores the notes or drops portions.
+
+**Saved weeks go onto the Skylight calendar through its private API, from the Mac**
+(2026-11-14). The user has Calendar Plus and wanted meals in the Meals tab. Skylight
+has no public API, so `skylight.py` talks to the private one its apps use, following
+chrischall/skylight-mcp's live-verified login and routes. Written stdlib-only instead
+of using `pyskylight`: that library has no meal routes and can't handle the emailed
+login code Skylight added on 2026-11-11. Meals are one-time sittings with the recipe in
+the description, with nothing added to the recipe box. Dinners got a `day` field so
+they can go on the calendar (nothing in a plan said which day before). The saved week
+is the source of truth, and sync reconciles against it. Runs on the Mac only, so the
+Skylight session never sits on the Pi, and the password is never stored. Rejected: an
+iCal feed from the Pi (supported and sturdier, but meals would show as calendar events,
+not in the Meals tab; keep it as the fallback if the private API becomes unworkable),
+and syncing Skylight's grocery list (ours is better: pantry staples, `made_in`). Revisit
+if the sync breaks more than occasionally.
+
 **The office has a microwave with no time limit and nothing else.** An earlier draft
 capped reheating at two minutes and made it a setting; the user corrected that. Do not
 reintroduce a reheat-time rule.
