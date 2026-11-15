@@ -38,7 +38,7 @@ PRINT_STYLES = """
 
 @page {
   size: Letter;
-  margin: 14mm 15mm 16mm;
+  margin: 10mm 7mm 11mm;   /* tight for the home HP inkjet; header/footer still fit in top/bottom */
   @top-center {
     content: "Mediterranean Meal Plan";
     font-family: Georgia, serif;
@@ -227,7 +227,9 @@ body {
   gap: 14pt;
   margin-bottom: 2pt;
 }
-.pr-col-left  { flex: 0 0 42%; }
+/* Ingredients are short lines with room to spare; the steps are what run a
+   recipe onto a second page, so they get the wider column. */
+.pr-col-left  { flex: 0 0 34%; }
 .pr-col-right { flex: 1; }
 
 /* ── Labels (Ingredients / Instructions / etc.) ──────────────────────────── */
@@ -303,6 +305,14 @@ body {
   color: #233044;
 }
 .pr-servings tr:last-child td { border-bottom: none; }
+
+/* Dinner serving sizes, stacked so they fit under the ingredients in the
+   narrow left column (a 3-column table wraps badly there). */
+.pr-portions { list-style: none; font-size: 8pt; color: #233044; }
+.pr-portions li { padding: 1.5pt 0; border-bottom: .5pt solid #F1EBDC; }
+.pr-portions li:last-child { border-bottom: none; }
+.pr-portions__name { font-weight: 600; }
+.pr-portions__amt { color: #5A6472; }
 
 /* ── Callout boxes ───────────────────────────────────────────────────────── */
 .pr-callout {
@@ -714,32 +724,29 @@ def _dinner(d: dict, n: int = 0, total: int = 0) -> str:
     step_items = "".join(f"<li>{_e(step)}</li>" for step in instructions)
     steps_html = f'<div class="pr-label">Instructions</div><ol class="pr-steps">{step_items}</ol>'
 
-    # two-column layout
-    columns_html = (
-        '<div class="pr-columns">'
-        f'<div class="pr-col-left">{ing_html}</div>'
-        f'<div class="pr-col-right">{steps_html}</div>'
-        '</div>'
-    )
-
-    # serving sizes
+    # serving sizes: stacked under the ingredients, where the left column has room
     servings_html = ""
     if serving_sizes:
         rows = ""
         for s in serving_sizes:
-            kid = s.get("kid_portion", "")
-            kid_td = f"<td>{_e(kid)}</td>" if kid else "<td>—</td>"
+            kid = s.get("kid_portion", "") or "—"
             rows += (
-                f"<tr><td>{_e(s.get('component',''))}</td>"
-                f"<td>{_e(s.get('adult_portion',''))}</td>"
-                f"{kid_td}</tr>"
+                f'<li><span class="pr-portions__name">{_e(s.get("component", ""))}</span><br>'
+                f'<span class="pr-portions__amt">Adult: {_e(s.get("adult_portion", ""))}'
+                f' · Kids: {_e(kid)}</span></li>'
             )
         servings_html = (
-            '<div class="pr-label" style="margin-top:10pt;">Serving Sizes</div>'
-            '<table class="pr-servings">'
-            '<thead><tr><th>Component</th><th>Adult</th><th>Kids</th></tr></thead>'
-            f'<tbody>{rows}</tbody></table>'
+            '<div class="pr-label" style="margin-top:8pt;">Serving Sizes</div>'
+            f'<ul class="pr-portions">{rows}</ul>'
         )
+
+    # two-column layout
+    columns_html = (
+        '<div class="pr-columns">'
+        f'<div class="pr-col-left">{ing_html}{servings_html}</div>'
+        f'<div class="pr-col-right">{steps_html}</div>'
+        '</div>'
+    )
 
     # callouts
     callouts = (
@@ -761,7 +768,6 @@ def _dinner(d: dict, n: int = 0, total: int = 0) -> str:
         '<hr class="pr-divider">'
         '</div>'
         f'{columns_html}'
-        f'{servings_html}'
         f'{callouts}'
         f'{_footer_note(nut, cost)}'
         '</div>'
