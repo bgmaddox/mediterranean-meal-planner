@@ -374,6 +374,8 @@ class Skylight:
         return _flatten((self.request("GET", f"/frames/{frame}/meals/categories") or {}).get("data"))
 
     def sittings(self, frame: str, date_min: str, date_max: str) -> list[dict]:
+        """Planned meals from date_min up to but NOT including date_max
+        (observed live 2026-11-14: a one-day range min == max returns nothing)."""
         doc = self.request("GET", f"/frames/{frame}/meals/sittings",
                            {"date_min": date_min, "date_max": date_max, "include": "meal_category"})
         return [_with_category(s) for s in _rows((doc or {}).get("data"))]
