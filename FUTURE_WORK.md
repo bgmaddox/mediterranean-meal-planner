@@ -9,12 +9,14 @@ Use this file as the entry point when planning the next session.
 
 ---
 
-## 0c. Skylight calendar sync (2026-11-14) — built on `feature/skylight-sync`, first live sync done
+## 0c. Skylight calendar sync (2026-11-14) — merged and deployed (`ba108d7`), first live sync done
+
+**Next for the project overall:** the first dinners-only `/plan-week --week-start
+2026-11-16` (§0a). It will be the first week with snacks and with dinner days on Skylight.
 
 Dinners carry a `day`. `save`, `lunch-save` and `set-days` put the week on the Skylight
 meal planner once signed in. How it works: `CLAUDE.md` → "Dinner days and the Skylight
-calendar". Why: `DECISIONS.md`. Branched from `feature/snack-profile` (not yet merged),
-so merge that one first. The API version is pinned to `2026-05-01`, and the login
+calendar". Why: `DECISIONS.md`. The API version is pinned to `2026-05-01`, and the login
 follows skylight-mcp as of its 2026-11-14 commit.
 
 **Done 2026-11-14:** signed in (frame 2573761 "maddoxcalendar"; categories Breakfast,
@@ -26,7 +28,6 @@ exclusive.
 **Next action:**
 1. The user checks the 11/16 lunches on the device, especially how the description reads.
 2. Once dinners are planned for that week, check that a `set-days` swap moves them.
-3. Merge `feature/snack-profile`, then this branch.
 
 | Item | Trigger |
 |---|---|
@@ -34,7 +35,7 @@ exclusive.
 | **The app's Generate tab and PDF ignore `day`.** Kitchen Mode and the PDF could order dinners by day. | When the user wants days visible outside Skylight. |
 | **Private API.** It can break without notice (version header, login steps). | A sync error. Compare with chrischall/skylight-mcp's latest `src/auth-session-login.ts` and `src/tools/meals.ts`. Fallback: an iCal feed (see DECISIONS.md). |
 
-## 0b. Snack profile (2026-11-11) — built on `feature/snack-profile`, not merged or deployed
+## 0b. Snack profile (2026-11-11) — merged and deployed 2026-11-14 (`ba108d7`), notes set on the Pi
 
 A `snack_notes` preference says when the user snacks and what they crave; dinner plans
 then carry one snack per snack time, each with `when`, `portion` and `portions_per_week`,
@@ -42,13 +43,11 @@ and week-sized quantities on the shopping list (`83f589e`, `3fbe3db`; 246 tests 
 How it works: `CLAUDE.md` → "How are snacks planned?". Why: `DECISIONS.md`. A reference
 page for the user is shelved at `shelf.bgmaddox.com/snack-drawer.html`.
 
-**Next action (before §0a step 2, so the first dinner week has snacks):**
-1. Run the app locally and check the Settings "Your snacking" box saves.
-2. Merge to `main`, push, deploy (`ssh rachett 'bash ~/deploy.sh diet'`).
-3. Set the notes on the Pi, wording agreed in session:
-   `.venv/bin/python cli.py set-snacks "Skip breakfast. Hungry late morning before lunch at work (fridge and microwave there), 5 days a week, and want something salty. Hungry again around 10pm at home, every day, and want something sweet. I like pistachios and nut mixes."`
+**Done 2026-11-14:** merged, deployed (service active, `/diet/` answers 200), and the
+agreed notes set on the Pi with `cli.py set-snacks`.
 
-**Waiting on the user:** a yes to merge and deploy (asked 2026-11-11, not yet answered).
+**Not yet checked:** the app's Settings "Your snacking" box. It was skipped before the
+merge. Open it at diet.bgmaddox.com/diet/ and confirm it shows the notes and saves an edit.
 
 | Item | Trigger |
 |---|---|
